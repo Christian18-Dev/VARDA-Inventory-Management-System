@@ -11,7 +11,12 @@ const PORT = process.env.PORT || 5001;
 
 // Middleware - Must come first
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+  origin: ["https://christian18-dev.github.io/VARDA-Inventory-Management-System/"], // Replace with your actual GitHub Pages URL
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  credentials: true
+}));
+
 
 // MongoDB Atlas URI
 const mongoURI = process.env.MONGO_URI;

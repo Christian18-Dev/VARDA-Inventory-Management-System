@@ -1,4 +1,4 @@
-export const API_URL = "http://localhost:5001/api/inventory";
+export const API_URL = "https://varda-inventory-management-system.onrender.com/api/inventory";
 
 // Fetch products for a specific branch
 export const fetchProducts = async (branch, page = 1, limit = 25) => {
