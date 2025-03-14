@@ -13,13 +13,13 @@ const LoginForm = () => {
     setError(null);
   
     try {
-      const response = await fetch("http://localhost:5001/api/auth/login", {
+      const response = await fetch("https://varda-inventory-management-system.onrender.com/api/auth/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ username, password }),
-      });
+      });      
   
       const data = await response.json();
   

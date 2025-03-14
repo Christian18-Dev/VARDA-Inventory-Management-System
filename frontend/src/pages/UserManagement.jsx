@@ -28,7 +28,7 @@ const UserManagement = () => {
   const fetchUsers = async () => {
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch("http://localhost:5001/api/auth/users", {
+      const response = await fetch("https://varda-inventory-management-system.onrender.com/api/auth/users", {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await response.json();
@@ -108,8 +108,8 @@ const UserManagement = () => {
     try {
       const token = localStorage.getItem("token");
       const url = isEditing
-        ? `http://localhost:5001/api/auth/users/${selectedUserId}`
-        : "http://localhost:5001/api/auth/register";
+        ? `https://varda-inventory-management-system.onrender.com/api/auth/users/${selectedUserId}`
+        : "https://varda-inventory-management-system.onrender.com/api/auth/register";
       const method = isEditing ? "PUT" : "POST";
 
       const body = {
@@ -201,7 +201,7 @@ const UserManagement = () => {
                 onClick={async () => {
                   try {
                     const token = localStorage.getItem("token");
-                    const response = await fetch(`http://localhost:5001/api/auth/users/${userToDelete._id}`, {
+                    const response = await fetch(`https://varda-inventory-management-system.onrender.com/api/auth/users/${userToDelete._id}`, {
                       method: "DELETE",
                       headers: { Authorization: `Bearer ${token}` },
                     });
