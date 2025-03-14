@@ -19,7 +19,7 @@ console.log(`🔧 Using MongoDB URI: ${mongoURI ? "✅ Loaded" : "❌ Not Found"
 
 // ✅ Improved CORS Configuration
 const allowedOrigins = [
-  "https://christian18-dev.github.io/VARDA-Inventory-Management-System/",
+  "https://christian18-dev.github.io",
   "http://localhost:3001", // Allow local testing
 ];
 
