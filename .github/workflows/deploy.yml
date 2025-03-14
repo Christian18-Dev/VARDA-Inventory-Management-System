@@ -1,0 +1,39 @@
+name: Deploy VARDA Inventory Management System
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout the repository
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # Setup NodeJS
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      # Install Dependencies inside 'frontend/'
+      - name: Install Dependencies
+        run: npm install
+        working-directory: frontend  # ✅ Fix: Run inside 'frontend' folder
+
+      # Build the Project inside 'frontend/'
+      - name: Build Project
+        run: npm run build
+        working-directory: frontend  # ✅ Fix: Run inside 'frontend' folder
+
+      # Deploy to Github Pages from 'frontend/dist/'
+      - name: Deploy to Github Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: frontend/dist  # ✅ Fix: Use 'frontend/dist' instead of 'dist'
