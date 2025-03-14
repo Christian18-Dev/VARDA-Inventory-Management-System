@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const getInventoryModel = require("../models/BranchInventory");
-const inventoryController = require("../models/inventoryController");
+const inventoryController = require("../models/InventoryController");
 
 router.post("/:branch/reset", inventoryController.resetInventory);
 
