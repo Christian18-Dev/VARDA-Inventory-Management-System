@@ -4,4 +4,4 @@ const CHKNChopInventory = () => {
   return <BranchInventory branchName="CHKN CHOP" />;
 };
 
-export default CHKNChopInventory;
+export default CHKNChopInventory; 
