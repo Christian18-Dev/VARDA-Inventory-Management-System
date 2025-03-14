@@ -58,7 +58,7 @@ const BranchInventory = ({ branchName }) => {
   
     try {
       // 🔸 1. Save current inventory data to history collection
-      const saveHistoryResponse = await fetch("http://localhost:5001/api/history/save", {
+      const saveHistoryResponse = await fetch("https://varda-inventory-management-system.onrender.com/api/history/save", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

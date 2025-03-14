@@ -32,7 +32,7 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchTotalProducts = async () => {
       try {
-        const response = await fetch("http://localhost:5001/api/dashboard/total-products");
+        const response = await fetch("https://varda-inventory-management-system.onrender.com/api/dashboard/total-products");
         const data = await response.json();
         setInventoryStats((prevStats) => ({
           ...prevStats,

@@ -33,7 +33,7 @@ const History = () => {
     const branchKey = branch.toUpperCase();
     console.log("🔍 Fetching history for:", branchKey);
     try {
-      const response = await fetch(`http://localhost:5001/api/history/${branchKey}`);
+      const response = await fetch(`https://varda-inventory-management-system.onrender.com/api/history/${branchKey}`);
       if (!response.ok) throw new Error("Failed to fetch history");
       const data = await response.json();
       setHistoryData(data);
