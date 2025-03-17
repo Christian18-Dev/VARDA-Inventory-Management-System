@@ -2,6 +2,7 @@ const express = require("express");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
+const ActivityLog = require("../models/ActivityLog");
 
 const router = express.Router();
 
@@ -68,34 +69,44 @@ router.post("/register", async (req, res) => {
 
 // Login Route
 router.post("/login", async (req, res) => {
-  console.log("🔹 Login endpoint hit");
-
   const { username, password } = req.body;
 
   if (!username || !password) {
-      return res.status(400).json({ error: "Username and password are required" });
+    return res.status(400).json({ error: "Username and password are required" });
   }
 
   try {
-      const user = await User.findOne({ username });
-      if (!user) {
-          console.log("❌ User not found:", username);
-          return res.status(400).json({ error: "User not found" });
-      }
+    const user = await User.findOne({ username });
+    if (!user) {
+      return res.status(400).json({ error: "User not found" });
+    }
 
-      const isMatch = await bcrypt.compare(password, user.password);
-      if (!isMatch) {
-          console.log("❌ Invalid password for:", username);
-          return res.status(400).json({ error: "Invalid credentials" });
-      }
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(400).json({ error: "Invalid credentials" });
+    }
 
-      const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: "1h" });
+    const token = jwt.sign(
+      { id: user._id, role: user.role },
+      process.env.JWT_SECRET,
+      { expiresIn: "1h" }
+    );
 
-      console.log("✅ User logged in:", username);
-      res.json({ token, role: user.role }); // ✅ Send role in response
+    try {
+      await ActivityLog.create({
+        username: user.username,
+        role: user.role,
+        action: "Login",
+      });
+      console.log("✅ Activity log saved for", user.username);
+    } catch (err) {
+      console.error("❌ Failed to save activity log:", err.message);
+    }    
+
+    res.json({ token, role: user.role });
   } catch (error) {
-      console.error("❌ Login error:", error);
-      res.status(500).json({ error: "Login failed" });
+    console.error("Login error:", error);
+    res.status(500).json({ error: "Login failed" });
   }
 });
 
@@ -162,6 +173,5 @@ router.delete("/users/:id", verifyToken, async (req, res) => {
       res.status(500).json({ error: "Server error" });
   }
 });
-
 
 module.exports = router;

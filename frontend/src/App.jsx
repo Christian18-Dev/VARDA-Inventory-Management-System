@@ -11,6 +11,7 @@ import StJudeVardaInventory from "./pages/inventory/StJudeVarda";
 import IntramurosVardaInventory from "./pages/inventory/IntramurosVarda";
 import UserManagement from "./pages/UserManagement";
 import History from "./pages/History";
+import ActivityLog from "./pages/ActivityLog";
 
 // ✅ PrivateRoute to Protect Routes
 const PrivateRoute = ({ element }) => {
@@ -34,6 +35,7 @@ function App() {
         <Route path="/inventory/st-jude-varda" element={<PrivateRoute element={<StJudeVardaInventory />} />} />
         <Route path="/inventory/intramuros-varda" element={<PrivateRoute element={<IntramurosVardaInventory />} />} />
         <Route path="/history" element={<History />} />
+        <Route path="/activitylogs" element={<ActivityLog />} />
 
       </Routes>
     </Router>

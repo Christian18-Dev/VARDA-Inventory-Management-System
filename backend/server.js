@@ -9,6 +9,7 @@ const AuthRoutes = require("./routes/AuthRoutes");
 const InventoryRoutes = require("./routes/InventoryRoutes");
 const DashboardRoutes = require("./routes/DashboardRoutes");
 const HistoryRoutes = require("./routes/HistoryRoutes");
+const activityRoutes = require("./routes/ActivityRoutes");
 
 const app = express();
 const PORT = process.env.PORT || 10000;
@@ -62,6 +63,7 @@ app.use("/api/inventory", InventoryRoutes);
 app.use("/api/dashboard", DashboardRoutes);
 app.use("/api/auth", AuthRoutes);
 app.use("/api/history", HistoryRoutes);
+app.use("/api/activitylogs", activityRoutes);
 
 // ✅ Debug: Ensure Login Route Works
 app.post("/api/auth/login", (req, res, next) => {
