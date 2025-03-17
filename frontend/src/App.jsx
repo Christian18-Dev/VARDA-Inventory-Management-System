@@ -34,6 +34,7 @@ function App() {
         <Route path="/inventory/st-jude-varda" element={<PrivateRoute element={<StJudeVardaInventory />} />} />
         <Route path="/inventory/intramuros-varda" element={<PrivateRoute element={<IntramurosVardaInventory />} />} />
         <Route path="/history" element={<History />} />
+
       </Routes>
     </Router>
   );

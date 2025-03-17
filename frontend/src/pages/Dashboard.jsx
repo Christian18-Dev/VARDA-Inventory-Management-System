@@ -1,109 +1,249 @@
 import Sidebar from "../components/Sidebar";
 import { useEffect, useState } from "react";
-import { Bar } from "react-chartjs-2";
-import "chart.js/auto";
+import { Pie, Bar } from "react-chartjs-2";
+import {
+  Chart as ChartJS,
+  ArcElement,
+  Tooltip,
+  Legend,
+  BarElement,
+  CategoryScale,
+  LinearScale,
+} from "chart.js";
+
+ChartJS.register(ArcElement, Tooltip, Legend, BarElement, CategoryScale, LinearScale);
 
 const Dashboard = () => {
-  const [inventoryStats, setInventoryStats] = useState({
-    totalProducts: 0,
-    lowStock: 10,
-    totalSuppliers: 5,
-    pendingOrders: 8,
-  });
+  const [highInventoryItems, setHighInventoryItems] = useState([]);
+  const [lowInventoryItems, setLowInventoryItems] = useState([]);
+  const [categoryData, setCategoryData] = useState({ labels: [], values: [] });
+  const [recentActivity, setRecentActivity] = useState([]);
+  const [inventoryGraphData, setInventoryGraphData] = useState({ labels: [], values: [] });
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
-  const [recentPurchases] = useState([
-    { id: 1, item: "Laptop", quantity: 5, date: "2025-03-06" },
-    { id: 2, item: "Keyboard", quantity: 10, date: "2025-03-05" },
-    { id: 3, item: "Mouse", quantity: 15, date: "2025-03-04" },
-  ]);
-
-  const stockChartData = {
-    labels: ["Laptops", "Keyboards", "Mice", "Monitors", "Printers"],
-    datasets: [
-      {
-        label: "Stock Levels",
-        data: [50, 100, 75, 20, 10],
-        backgroundColor: ["#6366F1", "#22C55E", "#EAB308", "#EF4444", "#3B82F6"],
-      },
-    ],
-  };
-
-  // Fetch Total Products from API
   useEffect(() => {
-    const fetchTotalProducts = async () => {
+    const fetchHighInventoryItems = async () => {
       try {
-        const response = await fetch("https://varda-inventory-management-system.onrender.com/api/dashboard/total-products");
+        const response = await fetch(`${API_BASE_URL}/api/dashboard/inventory-data`);
         const data = await response.json();
-        setInventoryStats((prevStats) => ({
-          ...prevStats,
-          totalProducts: data.totalProducts || 0,
-        }));
+        setHighInventoryItems(data);
       } catch (error) {
-        console.error("Error fetching total products:", error);
+        console.error("Error fetching highest inventory items:", error);
       }
     };
 
-    fetchTotalProducts();
+    const fetchLowInventoryItems = async () => {
+      try {
+        const response = await fetch(`${API_BASE_URL}/api/dashboard/lowest-inventory-items`);
+        const data = await response.json();
+        setLowInventoryItems(data);
+      } catch (error) {
+        console.error("Error fetching lowest inventory items:", error);
+      }
+    };
+
+    const fetchCategoryData = async () => {
+      try {
+        const response = await fetch(`${API_BASE_URL}/api/dashboard/category-distribution`);
+        const data = await response.json();
+        const labels = data.map((category) => category.name);
+        const values = data.map((category) => category.count);
+        setCategoryData({ labels, values });
+      } catch (error) {
+        console.error("Error fetching category data:", error);
+      }
+    };
+
+    const fetchInventoryGraphData = async () => {
+      try {
+        const response = await fetch(`${API_BASE_URL}/api/dashboard/inventory-data`);
+        const data = await response.json();
+    
+        console.log("Fetched Inventory Data:", data); // Debug API response
+    
+        // Ensure the API response includes "branch" field
+        if (!data.every(item => item.branch)) {
+          console.error("Missing branch field in API response");
+          return;
+        }
+    
+        // Extract unique product names and branches
+        const productNames = [...new Set(data.map(item => item.name))];
+        const branches = [...new Set(data.map(item => item.branch))];
+    
+        // Group data by branch
+        const datasets = branches.map(branch => ({
+          label: branch, // Branch name as the dataset label
+          data: productNames.map(
+            product => data.find(item => item.name === product && item.branch === branch)?.stock || 0
+          ),
+          backgroundColor: `#${Math.floor(Math.random() * 16777215).toString(16)}`, // Random color
+        }));
+    
+        console.log("Processed Chart Data:", { labels: productNames, datasets });
+    
+        setInventoryGraphData({ labels: productNames, datasets });
+      } catch (error) {
+        console.error("Error fetching inventory graph data:", error);
+      }
+    };    
+    
+    fetchHighInventoryItems();
+    fetchLowInventoryItems();
+    fetchCategoryData();
+    fetchInventoryGraphData();
   }, []);
 
   return (
     <div className="flex">
       <Sidebar />
       <div className="flex-1 p-6 bg-gray-100 min-h-screen md:ml-64 w-full">
-        {/* Responsive Grid for Quick Stats */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-6">
-          <DashboardCard title="Total Products" value={inventoryStats.totalProducts} color="bg-blue-500" />
-          <DashboardCard title="Low Stock Items" value={inventoryStats.lowStock} color="bg-red-500" />
-          <DashboardCard title="Total Suppliers" value={inventoryStats.totalSuppliers} color="bg-green-500" />
-          <DashboardCard title="Purchase Orders" value={inventoryStats.pendingOrders} color="bg-yellow-500" />
-        </div>
 
-        {/* Recent Purchases Table */}
-        <div className="bg-white p-4 rounded-lg shadow-md mb-6">
-          <h2 className="text-xl font-semibold mb-3">Recent Products</h2>
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[500px] border-collapse">
-              <thead>
-                <tr className="bg-gray-200 text-gray-700">
-                  <th className="p-2 text-left">Item</th>
-                  <th className="p-2 text-left">Quantity</th>
-                  <th className="p-2 text-left">Date</th>
-                </tr>
-              </thead>
-              <tbody>
-                {recentPurchases.map((purchase) => (
-                  <tr key={purchase.id} className="border-t">
-                    <td className="p-2">{purchase.item}</td>
-                    <td className="p-2">{purchase.quantity}</td>
-                    <td className="p-2">{purchase.date}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+        {/* Top Section (Recent Activity + Pie Chart) */}
+        <div className="grid grid-cols-3 gap-8">
+          
+          {/* Recent Activity */}
+          <div className="bg-white p-6 rounded-lg shadow-md col-span-2">
+            <h2 className="text-xl font-semibold mb-3">Recent Activity</h2>
+            <ul className="space-y-2 text-gray-700">
+              {recentActivity.length > 0 ? (
+                recentActivity.map((activity, index) => (
+                  <li key={index} className="border-b pb-2">
+                    <span className="font-semibold">{activity.user}</span> {activity.action} on{" "}
+                    <span className="text-gray-500">{activity.timestamp}</span>
+                  </li>
+                ))
+              ) : (
+                <li className="text-gray-500">No recent activity</li>
+              )}
+            </ul>
+          </div>
+
+          {/* Pie Chart */}
+          <div className="flex justify-end col-span-1">
+            <div className="bg-white p-6 rounded-lg shadow-md flex flex-col items-center justify-center w-[400px] h-[400px]">
+              <h2 className="text-lg font-semibold mb-4">Category Distribution</h2>
+              <div className="w-full h-[350px]">
+                {categoryData.labels.length > 0 ? (
+                  <Pie
+                    data={{
+                      labels: categoryData.labels,
+                      datasets: [
+                        {
+                          data: categoryData.values,
+                          backgroundColor: ["#FF6384", "#36A2EB", "#FFCE56", "#4CAF50", "#9966FF"],
+                        },
+                      ],
+                    }}
+                    options={{ responsive: true, maintainAspectRatio: false }}
+                  />
+                ) : (
+                  <p className="text-gray-500 text-sm">Loading...</p>
+                )}
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* Stock Chart - Responsive */}
-        <div className="bg-white p-4 rounded-lg shadow-md">
-          <h2 className="text-xl font-semibold mb-3">Stock Levels</h2>
-          <div className="w-full h-[300px] md:h-[400px] lg:h-[500px] md:w-3/4 lg:w-2/3 xl:w-1/2 mx-auto">
-            <Bar
-              data={stockChartData}
-              options={{ maintainAspectRatio: false }}
-            />
+        {/* Middle Section (Graph Chart) */}
+        <div className="bg-white p-6 mt-6 rounded-lg shadow-md">
+          <h2 className="text-xl font-semibold mb-4">Product Inventory Levels</h2>
+          <div className="w-full h-[300px]">
+            {inventoryGraphData.labels.length > 0 ? (
+             <Bar
+             data={{
+               labels: inventoryGraphData.labels, // Product Names
+               datasets: inventoryGraphData.datasets, // Per-branch datasets
+             }}
+             options={{
+               responsive: true,
+               maintainAspectRatio: false,
+               plugins: {
+                 legend: {
+                   display: true, // Enable clickable branch labels
+                   position: "top",
+                 },
+               },
+               scales: {
+                 y: { beginAtZero: true },
+               },
+             }}
+           />
+             
+            ) : (
+              <p className="text-gray-500 text-sm">Loading...</p>
+            )}
+          </div>
+        </div>
+
+        {/* Bottom Section (Tables) */}
+        <div className="grid grid-cols-2 gap-8 mt-6">
+          
+          {/* Highest Inventory Items */}
+          <div className="bg-white p-4 rounded-lg shadow-md">
+            <h2 className="text-xl font-semibold mb-3">Top 10 Highest Inventory Items</h2>
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-[500px] border-collapse">
+                <thead>
+                  <tr className="bg-gray-200 text-gray-700">
+                    <th className="p-2 text-left">Item Name</th>
+                    <th className="p-2 text-left">Inventory</th>
+                    <th className="p-2 text-left">Branch</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {highInventoryItems.length > 0 ? (
+                    highInventoryItems.map((item, index) => (
+                      <tr key={index} className="border-t">
+                        <td className="p-2">{item.name}</td>
+                        <td className="p-2">{item.stock}</td>
+                        <td className="p-2">{item.branch}</td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan="3" className="p-2 text-center">No data available</td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* Lowest Inventory Items */}
+          <div className="bg-white p-4 rounded-lg shadow-md">
+            <h2 className="text-xl font-semibold mb-3">Top 10 Lowest Inventory Items</h2>
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-[500px] border-collapse">
+                <thead>
+                  <tr className="bg-gray-200 text-gray-700">
+                    <th className="p-2 text-left">Item Name</th>
+                    <th className="p-2 text-left">Inventory</th>
+                    <th className="p-2 text-left">Branch</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {lowInventoryItems.length > 0 ? (
+                    lowInventoryItems.map((item, index) => (
+                      <tr key={index} className="border-t">
+                        <td className="p-2">{item.name}</td>
+                        <td className="p-2">{item.stock}</td>
+                        <td className="p-2">{item.branch}</td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan="3" className="p-2 text-center">No data available</td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </div>
     </div>
   );
 };
-
-// Dashboard Card Component
-const DashboardCard = ({ title, value, color }) => (
-  <div className={`p-5 rounded-lg shadow-md text-white ${color} text-center`}>
-    <h2 className="text-lg font-semibold">{title}</h2>
-    <p className="text-3xl font-bold mt-2">{value}</p>
-  </div>
-);
 
 export default Dashboard;
