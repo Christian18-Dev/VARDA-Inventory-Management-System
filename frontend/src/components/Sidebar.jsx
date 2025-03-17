@@ -93,6 +93,7 @@ const Sidebar = () => {
           <SidebarLink to="/reports" label="Reports" currentPath={location.pathname} />
           <SidebarLink to="/purchase-orders" label="Purchase Order" currentPath={location.pathname} /> */}
           <SidebarLink to="/history" label="History" currentPath={location.pathname} />
+          <SidebarLink to="/activitylogs" label="Activity Logs" currentPath={location.pathname} />
 
           {userRole === "Admin" && (
             <SidebarLink to="/users" label="Users" currentPath={location.pathname} />
