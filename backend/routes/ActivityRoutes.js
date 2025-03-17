@@ -1,7 +1,7 @@
 // backend/routes/ActivityRoutes.js
 const express = require("express");
 const router = express.Router();
-const ActivityLog = require("../models/ActivityLog"); // adjust path as needed
+const ActivityLog = require("../models/ActivityLog");
 
 // GET all activity logs
 router.get("/", async (req, res) => {
@@ -13,5 +13,29 @@ router.get("/", async (req, res) => {
     res.status(500).json({ error: "Failed to fetch activity logs" });
   }
 });
+
+// ✅ ADD THIS POST ROUTE:
+router.post("/log", async (req, res) => {
+  try {
+    console.log("Received request to log activity:", req.body); // Log the incoming request
+
+    const { username, role, action, branch, details } = req.body;
+
+    const newLog = new ActivityLog({
+      username,
+      role,
+      action,
+      branch,
+      details, // Add details if you want them saved
+    });
+
+    await newLog.save();
+    res.status(201).json({ message: "Activity log saved successfully" });
+  } catch (error) {
+    console.error("Error logging activity:", error);
+    res.status(500).json({ error: "Failed to log activity" });
+  }
+});
+
 
 module.exports = router;

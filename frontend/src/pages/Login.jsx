@@ -13,7 +13,7 @@ const LoginForm = () => {
     event.preventDefault();
     setError(null);
     setLoading(true);
-
+  
     try {
       const response = await fetch(
         `${import.meta.env.VITE_BACKEND_URL}/api/auth/login`,      
@@ -23,23 +23,25 @@ const LoginForm = () => {
           body: JSON.stringify({ username, password }),
         }
       );
-
+  
       const data = await response.json();
-
+  
       if (!response.ok) {
         throw new Error(data.error || "Login failed");
       }
-
+  
+      // Store the username, token, and role in localStorage
       localStorage.setItem("token", data.token);
       localStorage.setItem("role", data.role);
-
+      localStorage.setItem("username", username); // Store the username in localStorage
+  
       navigate("/dashboard");
     } catch (error) {
       setError(error.message);
     } finally {
       setLoading(false);
     }
-  };
+  };  
 
   return (
     <div className="h-screen w-screen bg-gray-300 flex justify-center items-center px-4">
