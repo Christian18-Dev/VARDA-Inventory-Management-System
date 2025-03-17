@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import Sidebar from "./Sidebar";
 import Navbar from "./Navbar";
 import { fetchProducts, addProduct, deleteProduct, updateProduct, resetInventory, API_URL } from "../api";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
 
 const calculateInventory = ({ begInventory = 0, delivered = 0, waste = 0, use = 0, withdrawal = 0 }) => {
   const current = begInventory + delivered - waste - use;
@@ -102,7 +104,7 @@ const BranchInventory = ({ branchName }) => {
     };
     const { current } = calculateInventory(parsedProduct);
     const productToAdd = { ...parsedProduct, current };
-
+  
     try {
       const added = await addProduct(branchName, productToAdd);
       if (added) {
@@ -118,11 +120,33 @@ const BranchInventory = ({ branchName }) => {
           current: 0,
         });
         setShowAddModal(false);
+  
+        // ✅ Log to Activity Log
+        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/activitylogs/log`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            username: localStorage.getItem("username") || "Unknown User",
+            role: role,
+            action: `Added ${productToAdd.name} from the Inventory at ${branchName}`, // Include both product name and branch name in the action
+          }),
+        });
+  
+        if (!response.ok) {
+          console.error("Failed to log activity:", response.statusText);
+          throw new Error("Failed to log activity");
+        }
+  
+        const result = await response.json();
+        console.log("Activity log response:", result); // Log the response for debugging
       }
     } catch (err) {
       console.error("Add error:", err);
     }
-  };
+  };  
+  
 
   const handleUpdateProduct = async () => {
     const parsedProduct = {
@@ -135,29 +159,65 @@ const BranchInventory = ({ branchName }) => {
     };
     const { current } = calculateInventory(parsedProduct);
     const updatedProduct = { ...parsedProduct, current };
-
+  
     try {
       const updated = await updateProduct(branchName, updatedProduct._id, updatedProduct);
       if (updated) {
         setProducts((prev) => prev.map((p) => (p._id === updated._id ? updated : p)));
         setShowEditModal(false);
         setEditProduct(null);
+  
+        // Log the update action
+        await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/activitylogs/log`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            username: localStorage.getItem("username") || "Unknown User",
+            role: role,
+            action: `Updated the product ${updatedProduct.name} from the inventory at ${branchName}`,
+            branch: branchName,
+          }),
+        });
       }
     } catch (err) {
       console.error("Update error:", err);
     }
   };
-
+  
   const handleDeleteProduct = async () => {
+    if (!productToDelete) {
+      console.error("Product to delete is not defined");
+      return;
+    }
+  
+    // Log the product before deletion
+    console.log("productToDelete", productToDelete);  // Check the full content of productToDelete
+  
     try {
       await deleteProduct(branchName, productToDelete);
-      setProducts((prev) => prev.filter((product) => product._id !== productToDelete));
+      setProducts((prev) => prev.filter((product) => product._id !== productToDelete._id));
       setShowDeleteConfirm(false);
       setProductToDelete(null);
+  
+      // Log the delete action with product name
+      await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/activitylogs/log`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          username: localStorage.getItem("username") || "Unknown User",
+          role: role,
+          action: `Deleted the product ${productToDelete?.name || "Unknown Product"} from the Inventory at ${branchName}`,
+          branch: branchName,
+        }),
+      });
     } catch (err) {
       console.error("Delete error:", err);
     }
-  };
+  };  
 
   if (!role) return null;
 
