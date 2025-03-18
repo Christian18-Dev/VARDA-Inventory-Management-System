@@ -17,7 +17,7 @@ const LoginForm = () => {
     try {
       // 🎯 Fetch login and get role dynamically
       const response = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL}/api/auth/login`,
+        "https://varda-inventory-management-system.onrender.com/api/auth/login",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
