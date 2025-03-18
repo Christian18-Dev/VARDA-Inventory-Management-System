@@ -37,5 +37,17 @@ router.post("/log", async (req, res) => {
   }
 });
 
+// DELETE all logs
+router.delete("/clear", async (req, res) => {
+  try {
+    await ActivityLog.deleteMany({});
+    res.json({ message: "All logs cleared successfully" });
+  } catch (error) {
+    console.error("Error clearing logs:", error);
+    res.status(500).json({ error: "Failed to clear activity logs" });
+  }
+});
+
+
 
 module.exports = router;
