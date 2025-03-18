@@ -187,17 +187,25 @@ const BranchInventory = ({ branchName }) => {
   };
   
   const handleDeleteProduct = async () => {
-    if (!productToDelete) {
-      console.error("Product to delete is not defined");
+    if (!productToDelete || typeof productToDelete !== "object") {
+      console.error("Product to delete is not defined or invalid");
       return;
     }
   
-    // Log the product before deletion
-    console.log("productToDelete", productToDelete);  // Check the full content of productToDelete
+    // Log to check the final product details
+    console.log("Final productToDelete object:", productToDelete);
+  
+    // Get the product name correctly
+    const productName = productToDelete?.name || "Unknown Product";
   
     try {
+      // Delete the product
       await deleteProduct(branchName, productToDelete);
-      setProducts((prev) => prev.filter((product) => product._id !== productToDelete._id));
+  
+      // Update state to remove the deleted product
+      setProducts((prev) =>
+        prev.filter((product) => product._id !== productToDelete._id)
+      );
       setShowDeleteConfirm(false);
       setProductToDelete(null);
   
@@ -210,7 +218,7 @@ const BranchInventory = ({ branchName }) => {
         body: JSON.stringify({
           username: localStorage.getItem("username") || "Unknown User",
           role: role,
-          action: `Deleted the product ${productToDelete?.name || "Unknown Product"} from the Inventory at ${branchName}`,
+          action: `Deleted the product ${productName} from the Inventory at ${branchName}`,
           branch: branchName,
         }),
       });
@@ -218,6 +226,7 @@ const BranchInventory = ({ branchName }) => {
       console.error("Delete error:", err);
     }
   };  
+  
 
   if (!role) return null;
 
@@ -286,7 +295,7 @@ const BranchInventory = ({ branchName }) => {
                           <button
                             className="bg-red-500 text-white px-3 py-1 rounded-md"
                             onClick={() => {
-                              setProductToDelete(product._id);
+                              setProductToDelete(product);
                               setShowDeleteConfirm(true);
                             }}
                           >
