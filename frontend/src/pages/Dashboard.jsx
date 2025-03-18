@@ -22,6 +22,30 @@ const Dashboard = () => {
   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
   useEffect(() => {
+    const fetchRecentActivity = async () => {
+      try {
+        const response = await fetch(`${API_BASE_URL}/api/activitylogs`);
+        if (!response.ok) throw new Error("Failed to fetch activity logs");
+        const data = await response.json();
+  
+        // ✅ Only keep the most recent 5 activities
+        setRecentActivity(data.slice(0, 7));
+      } catch (error) {
+        console.error("Error fetching recent activity:", error);
+      }
+    };
+  
+    // 🕒 Fetch logs on load and every 5 seconds
+    fetchRecentActivity();
+    const interval = setInterval(fetchRecentActivity, 5000); // Poll every 5 seconds
+  
+    // 🧹 Cleanup interval on unmount
+    return () => clearInterval(interval);
+  }, []);
+  
+  
+
+  useEffect(() => {
     const fetchHighInventoryItems = async () => {
       try {
         const response = await fetch(`${API_BASE_URL}/api/dashboard/inventory-data`);
@@ -109,8 +133,11 @@ const Dashboard = () => {
               {recentActivity.length > 0 ? (
                 recentActivity.map((activity, index) => (
                   <li key={index} className="border-b pb-2">
-                    <span className="font-semibold">{activity.user}</span> {activity.action} on{" "}
-                    <span className="text-gray-500">{activity.timestamp}</span>
+                    <span className="font-semibold">{activity.username}</span>{" "}
+                    {activity.action} on{" "}
+                    <span className="text-gray-500">
+                      {new Date(activity.timestamp).toLocaleString()}
+                    </span>
                   </li>
                 ))
               ) : (
