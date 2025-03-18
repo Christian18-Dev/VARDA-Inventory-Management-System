@@ -67,8 +67,8 @@ app.use("/api/auth", AuthRoutes);
 app.use("/api/history", HistoryRoutes);
 app.use("/api/auth", require("./routes/AuthRoutes"));
 app.use("/api/activitylogs", activityRoutes);
-app.use('/api/dashboard', require('./routes/dashboard'));
-app.use('/api/activitylogs', require('./routes/activitylogs'));
+app.use('/api/dashboard', require('./routes/DasboardRoutes'));
+app.use('/api/activitylogs', require('./routes/ActivityRoutes'));
 
 // ✅ Debug: Ensure Login Route Works
 app.post("/api/auth/login", (req, res, next) => {
