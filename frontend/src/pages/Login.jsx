@@ -17,7 +17,7 @@ const LoginForm = () => {
     try {
       // 🎯 Fetch login and get role dynamically
       const response = await fetch(
-        "https://varda-inventory-management-system.onrender.com/api/auth/login",
+        `${import.meta.env.VITE_BACKEND_URL}/api/auth/login`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -38,7 +38,7 @@ const LoginForm = () => {
   
       // 🎯 Log the login event with the correct role
       const logResponse = await fetch(
-        "https://varda-inventory-management-system.onrender.com/api/activitylogs/log",
+        "http://localhost:10000/api/activitylogs/log",
         {
           method: "POST",
           headers: {
