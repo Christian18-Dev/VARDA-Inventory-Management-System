@@ -15,8 +15,9 @@ const LoginForm = () => {
     setLoading(true);
   
     try {
+      // 🎯 Fetch login and get role dynamically
       const response = await fetch(
-        `${import.meta.env.VITE_BACKEND_URL}/api/auth/login`,      
+        `${import.meta.env.VITE_API_BASE_URL}/api/auth/login`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -30,18 +31,44 @@ const LoginForm = () => {
         throw new Error(data.error || "Login failed");
       }
   
-      // Store the username, token, and role in localStorage
+      // 📝 Store user data after login
       localStorage.setItem("token", data.token);
       localStorage.setItem("role", data.role);
-      localStorage.setItem("username", username); // Store the username in localStorage
+      localStorage.setItem("username", username);
   
+      // 🎯 Log the login event with the correct role
+      const logResponse = await fetch(
+        "http://localhost:10000/api/activitylogs/log",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            username: username,
+            role: data.role, // ✅ Use role from login response
+            action: "has logged in",
+          }),
+        }
+      );
+  
+      const logData = await logResponse.json();
+      if (!logResponse.ok) {
+        console.error("❌ Failed to log activity:", logData.error);
+      } else {
+        console.log("✅ Activity log created:", logData.message);
+      }
+  
+      // 🎉 Navigate to dashboard after successful login
       navigate("/dashboard");
     } catch (error) {
+      console.error("❌ Error:", error.message);
       setError(error.message);
     } finally {
       setLoading(false);
     }
-  };  
+  };
+  
 
   return (
     <div className="h-screen w-screen bg-gray-300 flex justify-center items-center px-4">

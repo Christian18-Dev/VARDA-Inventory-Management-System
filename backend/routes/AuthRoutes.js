@@ -69,8 +69,9 @@ router.post("/register", async (req, res) => {
 
 // Login Route
 router.post("/login", async (req, res) => {
-  const { username, password } = req.body;
+  console.log("🔹 Login endpoint hit"); // Check if this is logged
 
+  const { username, password } = req.body;
   if (!username || !password) {
     return res.status(400).json({ error: "Username and password are required" });
   }
@@ -92,24 +93,14 @@ router.post("/login", async (req, res) => {
       { expiresIn: "1h" }
     );
 
-    try {
-      await ActivityLog.create({
-        username: username || "Unknown User",
-        role: role || "Unknown Role",
-        action: "has Logged in",
-      });
-      console.log("✅ Activity log saved for", user.username);
-    } catch (err) {
-      console.error("❌ Failed to save activity log:", err.message);
-    }    
+    console.log("✅ Login successful for:", username);
 
     res.json({ token, role: user.role });
   } catch (error) {
-    console.error("Login error:", error);
+    console.error("❌ Login error:", error);
     res.status(500).json({ error: "Login failed" });
   }
 });
-
 
 // ✅ Protected Route: Profile
 router.get("/profile", verifyToken, async (req, res) => {
