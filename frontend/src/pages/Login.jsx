@@ -38,7 +38,7 @@ const LoginForm = () => {
   
       // 🎯 Log the login event with the correct role
       const logResponse = await fetch(
-        `${import.meta.env.VITE_BACKEND_URL}/api/activitylogs/log"`,
+        "http://localhost:10000/api/activitylogs/log",
         {
           method: "POST",
           headers: {
