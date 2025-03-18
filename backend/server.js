@@ -24,6 +24,8 @@ const allowedOrigins = [
   "http://localhost:3001", // Allow local testing
 ];
 
+app.use(cors({ origin: '*' })); // Allow from all origins
+
 app.use(express.json());
 app.use(
   cors({
