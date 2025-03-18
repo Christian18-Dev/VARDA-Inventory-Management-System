@@ -63,6 +63,7 @@ app.use("/api/inventory", InventoryRoutes);
 app.use("/api/dashboard", DashboardRoutes);
 app.use("/api/auth", AuthRoutes);
 app.use("/api/history", HistoryRoutes);
+app.use("/api/auth", require("./routes/AuthRoutes"));
 app.use("/api/activitylogs", activityRoutes);
 
 // ✅ Debug: Ensure Login Route Works
