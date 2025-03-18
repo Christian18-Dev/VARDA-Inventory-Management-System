@@ -195,21 +195,28 @@ const BranchInventory = ({ branchName }) => {
     // Log to check the final product details
     console.log("Final productToDelete object:", productToDelete);
   
-    // Get the product name correctly
+    // Get the product name and ID
     const productName = productToDelete?.name || "Unknown Product";
+    const productId = productToDelete?._id;
+  
+    if (!productId) {
+      console.error("Product ID is missing. Cannot delete.");
+      return;
+    }
   
     try {
-      // Delete the product
-      await deleteProduct(branchName, productToDelete);
+      // ✅ Delete the product using the corrected deleteProduct function
+      await deleteProduct(branchName, productId);
   
-      // Update state to remove the deleted product
+      // ✅ Update state to remove the deleted product
       setProducts((prev) =>
-        prev.filter((product) => product._id !== productToDelete._id)
+        prev.filter((product) => product._id !== productId)
       );
+  
       setShowDeleteConfirm(false);
       setProductToDelete(null);
   
-      // Log the delete action with product name
+      // ✅ Log the delete action
       await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/activitylogs/log`, {
         method: "POST",
         headers: {
@@ -222,10 +229,12 @@ const BranchInventory = ({ branchName }) => {
           branch: branchName,
         }),
       });
+  
+      console.log(`Successfully logged deletion of ${productName}`);
     } catch (err) {
       console.error("Delete error:", err);
     }
-  };  
+  };
   
 
   if (!role) return null;
