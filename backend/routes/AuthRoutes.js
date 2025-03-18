@@ -94,8 +94,8 @@ router.post("/login", async (req, res) => {
 
     try {
       await ActivityLog.create({
-        username: user.username,
-        role: user.role,
+        username: username || "Unknown User",
+        role: role || "Unknown Role",
         action: "has Logged in",
       });
       console.log("✅ Activity log saved for", user.username);

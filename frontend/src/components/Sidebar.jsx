@@ -34,11 +34,32 @@ const Sidebar = () => {
     }
   }, [location.pathname]);
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    const username = localStorage.getItem("username"); // Get username from local storage
+    const role = localStorage.getItem("role"); // Get role if needed
+  
+    try {
+      // Send a log to the backend before clearing
+      await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/activitylogs/log`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          username: username || "Unknown User",
+          role: role || "Unknown Role",
+          action: "has Logged out",
+        }),
+      });
+    } catch (error) {
+      console.error("Failed to log logout action:", error);
+    }
+  
+    // Clear local storage and reload
     localStorage.clear();
     navigate("/");
     window.location.reload();
-  };
+  };  
 
   const inventoryBranches = [
     { label: "CHKN CHOP", path: "/inventory/chkn-chop" },
