@@ -17,11 +17,17 @@ export const addProduct = async (branch, product) => {
   try {
     console.log("📡 Sending to API:", product);
 
+    const cleanProduct = {
+      ...product,
+      price: parseFloat(product.price) || 0 // ✅ Force price to be a number
+    };
+    
     const response = await fetch(`${API_URL}?branch=${encodeURIComponent(branch)}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(product),
+      body: JSON.stringify(cleanProduct),
     });
+    
 
     const data = await response.json();
     console.log("🔍 Response from API:", data);

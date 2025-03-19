@@ -78,6 +78,7 @@ const History = () => {
       const row = worksheet.addRow([
         item.name || "N/A",
         item.category || "N/A",
+        item.price || 0,
         item.begInventory || 0,
         item.delivered || 0,
         item.waste || 0,
@@ -176,6 +177,7 @@ const History = () => {
                           <tr>
                             <th className="px-4 py-3 border">Name</th>
                             <th className="px-4 py-3 border">Category</th>
+                            <th className="px-4 py-3 border">Price</th>
                             <th className="px-4 py-3 border">Beg Inventory</th>
                             <th className="px-4 py-3 border">Delivered</th>
                             <th className="px-4 py-3 border">Waste</th>
@@ -189,6 +191,7 @@ const History = () => {
                             <tr key={i} className="hover:bg-gray-100">
                               <td className="px-4 py-3 border">{item.name}</td>
                               <td className="px-4 py-3 border">{item.category}</td>
+                              <td className="px-4 py-3 border">{item.price}</td>
                               <td className="px-4 py-3 border">{item.begInventory}</td>
                               <td className="px-4 py-3 border">{item.delivered}</td>
                               <td className="px-4 py-3 border">{item.waste}</td>

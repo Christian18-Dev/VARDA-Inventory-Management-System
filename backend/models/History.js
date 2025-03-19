@@ -7,13 +7,14 @@ const HistorySchema = new mongoose.Schema({
     {
       name: String,
       category: String,
+      price: Number, 
       begInventory: Number,
       delivered: Number,
       waste: Number,
       use: Number,
       withdrawal: Number,
       current: Number,
-    }
+    },
   ],
 });
 
