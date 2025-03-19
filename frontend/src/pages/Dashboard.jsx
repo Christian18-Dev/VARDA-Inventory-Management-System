@@ -122,21 +122,24 @@ const Dashboard = () => {
   return (
     <div className="flex">
       <Sidebar />
-      <div className="flex-1 p-6 bg-gray-100 min-h-screen md:ml-64 w-full">
-
+      <div className="flex-1 p-6 bg-gray-50 min-h-screen md:ml-64 w-full">
+  
         {/* Top Section (Recent Activity + Pie Chart) */}
-        <div className="grid grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           
           {/* Recent Activity */}
-          <div className="bg-white p-6 rounded-lg shadow-md col-span-2">
-            <h2 className="text-xl font-semibold mb-3">Recent Activity</h2>
-            <ul className="space-y-2 text-gray-700">
+          <div className="bg-white p-6 rounded-xl shadow-lg col-span-2">
+            <h2 className="text-xl font-semibold mb-4 text-gray-800">Recent Activity</h2>
+            <ul className="space-y-3">
               {recentActivity.length > 0 ? (
                 recentActivity.map((activity, index) => (
-                  <li key={index} className="border-b pb-2">
-                    <span className="font-semibold">{activity.username}</span>{" "}
-                    {activity.action} on{" "}
-                    <span className="text-gray-500">
+                  <li
+                    key={index}
+                    className="border-b border-gray-200 pb-2 flex justify-start items-center text-sm text-gray-700 hover:bg-gray-50 transition-colors p-2 rounded-md gap-4"
+                  >
+                    <span className="font-medium text-gray-800 w-1/4">{activity.username}</span>
+                    <span className="w-1/2 truncate">{activity.action}</span>
+                    <span className="text-gray-500 w-1/4 text-right">
                       {new Date(activity.timestamp).toLocaleString()}
                     </span>
                   </li>
@@ -148,120 +151,137 @@ const Dashboard = () => {
           </div>
 
           {/* Pie Chart */}
-          <div className="flex justify-end col-span-1">
-            <div className="bg-white p-6 rounded-lg shadow-md flex flex-col items-center justify-center w-[400px] h-[400px]">
-              <h2 className="text-lg font-semibold mb-4">Categories</h2>
-              <div className="w-full h-[350px]">
-                {categoryData.labels.length > 0 ? (
-                  <Pie
-                    data={{
-                      labels: categoryData.labels,
-                      datasets: [
-                        {
-                          data: categoryData.values,
-                          backgroundColor: ["#FF6384", "#36A2EB", "#FFCE56", "#4CAF50", "#9966FF"],
+          <div className="bg-white p-6 rounded-xl shadow-lg flex items-center justify-center">
+          <div className="w-full max-w-[350px] h-[350px]">
+            <h2 className="text-lg font-semibold mb-3 text-gray-800 text-center">Categories</h2>
+            {categoryData.labels.length > 0 ? (
+              <Pie
+                data={{
+                  labels: categoryData.labels,
+                  datasets: [
+                    {
+                      data: categoryData.values,
+                      backgroundColor: ["#FF6384", "#36A2EB", "#FFCE56", "#4CAF50", "#9966FF"],
+                    },
+                  ],
+                }}
+                options={{
+                  responsive: true,
+                  maintainAspectRatio: false,
+                  plugins: {
+                    legend: {
+                      display: true,
+                      position: "bottom",
+                      labels: {
+                        boxWidth: 20,
+                        padding: 20, // Added padding for better spacing
+                        font: {
+                          size: 14,
+                          weight: '500',
                         },
-                      ],
-                    }}
-                    options={{ responsive: true, maintainAspectRatio: false }}
-                  />
-                ) : (
-                  <p className="text-gray-500 text-sm">Loading...</p>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Middle Section (Graph Chart) */}
-        <div className="bg-white p-6 mt-6 rounded-lg shadow-md">
-          <h2 className="text-xl font-semibold mb-4">Product Inventory Levels</h2>
-          <div className="w-full h-[300px]">
-            {inventoryGraphData.labels.length > 0 ? (
-             <Bar
-             data={{
-               labels: inventoryGraphData.labels, // Product Names
-               datasets: inventoryGraphData.datasets, // Per-branch datasets
-             }}
-             options={{
-               responsive: true,
-               maintainAspectRatio: false,
-               plugins: {
-                 legend: {
-                   display: true, // Enable clickable branch labels
-                   position: "top",
-                 },
-               },
-               scales: {
-                 y: { beginAtZero: true },
-               },
-             }}
-           />
-             
+                        color: "#555", // Softer gray color for better contrast
+                      },
+                      align: "center",
+                    },
+                  },
+                }}
+              />
             ) : (
-              <p className="text-gray-500 text-sm">Loading...</p>
+              <p className="text-gray-500 text-center">Loading...</p>
             )}
           </div>
         </div>
-
+        </div>
+  
+        {/* Middle Section (Graph Chart) */}
+        <div className="bg-white p-6 mt-6 rounded-xl shadow-lg">
+          <h2 className="text-xl font-semibold mb-4 text-gray-800">Product Inventory Levels</h2>
+          <div className="w-full h-[300px]">
+            {inventoryGraphData.labels.length > 0 ? (
+              <Bar
+                data={{
+                  labels: inventoryGraphData.labels,
+                  datasets: inventoryGraphData.datasets,
+                }}
+                options={{
+                  responsive: true,
+                  maintainAspectRatio: false,
+                  plugins: {
+                    legend: { display: true, position: "top" },
+                  },
+                  scales: {
+                    y: { beginAtZero: true },
+                  },
+                }}
+              />
+            ) : (
+              <p className="text-gray-500 text-center">Loading...</p>
+            )}
+          </div>
+        </div>
+  
         {/* Bottom Section (Tables) */}
-        <div className="grid grid-cols-2 gap-8 mt-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
           
           {/* Highest Inventory Items */}
-          <div className="bg-white p-4 rounded-lg shadow-md">
-            <h2 className="text-xl font-semibold mb-3">Top Highest Inventory Items</h2>
+          <div className="bg-white p-5 rounded-xl shadow-lg">
+            <h2 className="text-xl font-semibold mb-4 text-gray-800">Top Highest Inventory Items</h2>
             <div className="overflow-x-auto">
-              <table className="w-full min-w-[500px] border-collapse">
+              <table className="w-full border-collapse">
                 <thead>
                   <tr className="bg-gray-200 text-gray-700">
-                    <th className="p-2 text-left">Item Name</th>
-                    <th className="p-2 text-left">Inventory</th>
-                    <th className="p-2 text-left">Branch</th>
+                    <th className="p-3 text-left font-medium">Item Name</th>
+                    <th className="p-3 text-left font-medium">Inventory</th>
+                    <th className="p-3 text-left font-medium">Branch</th>
                   </tr>
                 </thead>
                 <tbody>
                   {highInventoryItems.length > 0 ? (
                     highInventoryItems.map((item, index) => (
-                      <tr key={index} className="border-t">
-                        <td className="p-2">{item.name}</td>
-                        <td className="p-2">{item.stock}</td>
-                        <td className="p-2">{item.branch}</td>
+                      <tr key={index} className="border-b border-gray-200">
+                        <td className="p-3 text-gray-800">{item.name}</td>
+                        <td className="p-3 text-gray-800">{item.stock}</td>
+                        <td className="p-3 text-gray-800">{item.branch}</td>
                       </tr>
                     ))
                   ) : (
                     <tr>
-                      <td colSpan="3" className="p-2 text-center">No data available</td>
+                      <td colSpan="3" className="p-3 text-center text-gray-500">
+                        No data available
+                      </td>
                     </tr>
                   )}
                 </tbody>
               </table>
             </div>
           </div>
-
+  
           {/* Lowest Inventory Items */}
-          <div className="bg-white p-4 rounded-lg shadow-md">
-            <h2 className="text-xl font-semibold mb-3">Top Lowest Inventory Items</h2>
+          <div className="bg-white p-5 rounded-xl shadow-lg">
+            <h2 className="text-xl font-semibold mb-4 text-gray-800">Top Lowest Inventory Items</h2>
             <div className="overflow-x-auto">
-              <table className="w-full min-w-[500px] border-collapse">
+              <table className="w-full border-collapse">
                 <thead>
                   <tr className="bg-gray-200 text-gray-700">
-                    <th className="p-2 text-left">Item Name</th>
-                    <th className="p-2 text-left">Inventory</th>
-                    <th className="p-2 text-left">Branch</th>
+                    <th className="p-3 text-left font-medium">Item Name</th>
+                    <th className="p-3 text-left font-medium">Inventory</th>
+                    <th className="p-3 text-left font-medium">Branch</th>
                   </tr>
                 </thead>
                 <tbody>
                   {lowInventoryItems.length > 0 ? (
                     lowInventoryItems.map((item, index) => (
-                      <tr key={index} className="border-t">
-                        <td className="p-2">{item.name}</td>
-                        <td className="p-2">{item.stock}</td>
-                        <td className="p-2">{item.branch}</td>
+                      <tr key={index} className="border-b border-gray-200">
+                        <td className="p-3 text-gray-800">{item.name}</td>
+                        <td className="p-3 text-gray-800">{item.stock}</td>
+                        <td className="p-3 text-gray-800">{item.branch}</td>
                       </tr>
                     ))
                   ) : (
                     <tr>
-                      <td colSpan="3" className="p-2 text-center">No data available</td>
+                      <td colSpan="3" className="p-3 text-center text-gray-500">
+                        No data available
+                      </td>
                     </tr>
                   )}
                 </tbody>
@@ -272,6 +292,7 @@ const Dashboard = () => {
       </div>
     </div>
   );
-};
+};  
+    
 
 export default Dashboard;

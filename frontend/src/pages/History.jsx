@@ -2,10 +2,11 @@ import React, { useEffect, useState } from "react";
 import Sidebar from "../components/Sidebar";
 import { FaFilePdf, FaFileExcel } from "react-icons/fa";
 import ExcelJS from "exceljs";
-import { saveAs } from "file-saver"
+import { saveAs } from "file-saver";
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import PDFDocument from "../components/PDFDocument";
 
+// Branch list
 const branches = [
   "CHKN CHOP",
   "VARDA BURGER",
@@ -27,13 +28,14 @@ const History = () => {
       fetchHistory(selectedBranch);
       setOpenTables({}); // Reset expanded tables when switching branches
     }
-  }, [selectedBranch]);  
+  }, [selectedBranch]);
 
   const fetchHistory = async (branch) => {
     const branchKey = branch.toUpperCase();
     console.log("🔍 Fetching history for:", branchKey);
+
     try {
-      const response = await fetch(`https://varda-inventory-management-system.onrender.com/api/history/${branchKey}`);
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/history/${branchKey}`);
       if (!response.ok) throw new Error("Failed to fetch history");
       const data = await response.json();
       setHistoryData(data);
@@ -41,6 +43,7 @@ const History = () => {
       console.error("❌ Failed to fetch history:", err);
     }
   };
+  
 
   const toggleTable = (idx) => {
     setOpenTables((prev) => ({
@@ -54,25 +57,22 @@ const History = () => {
       console.error("❌ Error: Invalid data structure. 'products' is missing or not an array.", record);
       return;
     }
-  
+
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet("Inventory History");
-  
+
     // Define headers
-    const headers = [
-      "Name", "Category", "Beg Inventory", "Delivered", 
-      "Waste", "Use", "Withdrawal", "Current"
-    ];
-  
+    const headers = ["Name", "Category", "Price", "Beg Inventory", "Delivered", "Waste", "Use", "Withdrawal", "Current"];
+
     // Add header row
     const headerRow = worksheet.addRow(headers);
     headerRow.eachCell((cell) => {
       cell.font = { bold: true, color: { argb: "FFFFFFFF" } };
       cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FF4F81BD" } };
-      cell.alignment = { horizontal: "center" }; // Center header text
+      cell.alignment = { horizontal: "center" };
       cell.border = { top: { style: "thin" }, bottom: { style: "thin" }, left: { style: "thin" }, right: { style: "thin" } };
     });
-  
+
     // Add product rows
     record.products.forEach((item) => {
       const row = worksheet.addRow([
@@ -84,28 +84,27 @@ const History = () => {
         item.waste || 0,
         item.use || 0,
         item.withdrawal || 0,
-        item.current || 0
+        item.current || 0,
       ]);
-  
-      // Center align all cells in the row
+
       row.eachCell((cell) => {
-        cell.alignment = { horizontal: "center" }; // Ensures all cells are centered
+        cell.alignment = { horizontal: "center" };
         cell.border = { top: { style: "thin" }, bottom: { style: "thin" }, left: { style: "thin" }, right: { style: "thin" } };
       });
     });
-  
+
     // Auto-adjust column widths
     worksheet.columns.forEach((col, i) => {
       col.width = headers[i].length + 5;
     });
-  
+
     // Freeze header row
     worksheet.views = [{ state: "frozen", ySplit: 1 }];
-  
+
     // Format date for filename
     const formattedDate = record.date ? new Date(record.date).toISOString().split("T")[0] : "UnknownDate";
     const fileName = `Inventory-${selectedBranch.replace(/\s+/g, "_")}-${formattedDate}.xlsx`;
-  
+
     try {
       const buffer = await workbook.xlsx.writeBuffer();
       saveAs(new Blob([buffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" }), fileName);
@@ -163,11 +162,9 @@ const History = () => {
                       >
                         <FaFilePdf /> PDF
                       </PDFDownloadLink>
-                      <button 
-                      onClick={() => exportToExcel(record)} 
-                      className="flex items-center gap-2 px-3 py-2 bg-green-500 text-white font-bold rounded">
-                      <FaFileExcel /> Excel
-                    </button>
+                      <button onClick={() => exportToExcel(record)} className="flex items-center gap-2 px-3 py-2 bg-green-500 text-white font-bold rounded">
+                        <FaFileExcel /> Excel
+                      </button>
                     </div>
 
                     {/* Table - Responsive */}
