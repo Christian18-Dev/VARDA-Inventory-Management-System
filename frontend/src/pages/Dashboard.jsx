@@ -20,11 +20,12 @@ const Dashboard = () => {
   const [recentActivity, setRecentActivity] = useState([]);
   const [inventoryGraphData, setInventoryGraphData] = useState({ labels: [], values: [] });
   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+  const API_BACK_URL = import.meta.env.VITE_BACKEND_URL;
 
   useEffect(() => {
     const fetchRecentActivity = async () => {
       try {
-        const response = await fetch(`${VITE_BACKEND_URL}/api/activitylogs`);
+        const response = await fetch(`${API_BACK_URL}/api/activitylogs`);
         if (!response.ok) throw new Error("Failed to fetch activity logs");
         const data = await response.json();
   
@@ -48,7 +49,7 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchHighInventoryItems = async () => {
       try {
-        const response = await fetch(`${VITE_BACKEND_URL}/api/dashboard/inventory-data`);
+        const response = await fetch(`${API_BACK_URL}/api/dashboard/inventory-data`);
         const data = await response.json();
         setHighInventoryItems(data);
       } catch (error) {
@@ -58,7 +59,7 @@ const Dashboard = () => {
 
     const fetchLowInventoryItems = async () => {
       try {
-        const response = await fetch(`${VITE_BACKEND_URL}/api/dashboard/lowest-inventory-items`);
+        const response = await fetch(`${API_BACK_URL}/api/dashboard/lowest-inventory-items`);
         const data = await response.json();
         setLowInventoryItems(data);
       } catch (error) {
@@ -68,7 +69,7 @@ const Dashboard = () => {
 
     const fetchCategoryData = async () => {
       try {
-        const response = await fetch(`${VITE_BACKEND_URL}/api/dashboard/category-distribution`);
+        const response = await fetch(`${API_BACK_URL}/api/dashboard/category-distribution`);
         const data = await response.json();
         const labels = data.map((category) => category.name);
         const values = data.map((category) => category.count);
@@ -80,7 +81,7 @@ const Dashboard = () => {
 
     const fetchInventoryGraphData = async () => {
       try {
-        const response = await fetch(`${VITE_BACKEND_URL}/api/dashboard/inventory-data`);
+        const response = await fetch(`${API_BACK_URL}/api/dashboard/inventory-data`);
         const data = await response.json();
     
         console.log("Fetched Inventory Data:", data); // Debug API response
@@ -149,7 +150,7 @@ const Dashboard = () => {
           {/* Pie Chart */}
           <div className="flex justify-end col-span-1">
             <div className="bg-white p-6 rounded-lg shadow-md flex flex-col items-center justify-center w-[400px] h-[400px]">
-              <h2 className="text-lg font-semibold mb-4">Category Distribution</h2>
+              <h2 className="text-lg font-semibold mb-4">Categories</h2>
               <div className="w-full h-[350px]">
                 {categoryData.labels.length > 0 ? (
                   <Pie
@@ -208,7 +209,7 @@ const Dashboard = () => {
           
           {/* Highest Inventory Items */}
           <div className="bg-white p-4 rounded-lg shadow-md">
-            <h2 className="text-xl font-semibold mb-3">Top 10 Highest Inventory Items</h2>
+            <h2 className="text-xl font-semibold mb-3">Top Highest Inventory Items</h2>
             <div className="overflow-x-auto">
               <table className="w-full min-w-[500px] border-collapse">
                 <thead>
@@ -239,7 +240,7 @@ const Dashboard = () => {
 
           {/* Lowest Inventory Items */}
           <div className="bg-white p-4 rounded-lg shadow-md">
-            <h2 className="text-xl font-semibold mb-3">Top 10 Lowest Inventory Items</h2>
+            <h2 className="text-xl font-semibold mb-3">Top Lowest Inventory Items</h2>
             <div className="overflow-x-auto">
               <table className="w-full min-w-[500px] border-collapse">
                 <thead>

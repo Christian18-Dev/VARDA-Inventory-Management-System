@@ -254,7 +254,7 @@ const BranchInventory = ({ branchName }) => {
             )}
             {role === "admin" && (
               <button onClick={handleResetInventory} className="bg-red-600 text-white px-4 py-2 rounded-md">
-                Reset
+                Submit
               </button>
             )}
           </div>
