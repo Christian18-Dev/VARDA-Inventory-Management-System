@@ -6,7 +6,7 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 
 const calculateInventory = ({ begInventory = 0, delivered = 0, waste = 0, use = 0, withdrawal = 0 }) => {
-  const current = begInventory + delivered - waste - use;
+  const current = begInventory + delivered - waste - use - withdrawal; 
   return { current: Math.max(current, 0) };
 };
 
@@ -17,6 +17,7 @@ const BranchInventory = ({ branchName }) => {
   const [newProduct, setNewProduct] = useState({
     name: "",
     category: "",
+    price: "",
     begInventory: "",
     delivered: "",
     waste: "",
@@ -96,6 +97,7 @@ const BranchInventory = ({ branchName }) => {
     const parsedProduct = {
       name: newProduct.name,
       category: newProduct.category,
+      price: parseFloat(newProduct.price) || 0, // Include price field
       begInventory: role === "admin" ? parseFloat(newProduct.begInventory) || 0 : 0,
       delivered: parseFloat(newProduct.delivered) || 0,
       waste: role === "admin" ? parseFloat(newProduct.waste) || 0 : 0,
@@ -112,6 +114,7 @@ const BranchInventory = ({ branchName }) => {
         setNewProduct({
           name: "",
           category: "",
+          price: "",
           begInventory: "",
           delivered: "",
           waste: "",
@@ -130,7 +133,7 @@ const BranchInventory = ({ branchName }) => {
           body: JSON.stringify({
             username: localStorage.getItem("username") || "Unknown User",
             role: role,
-            action: `Added ${productToAdd.name} from the Inventory at ${branchName}`, // Include both product name and branch name in the action
+            action: `Added ${productToAdd.name} from the Inventory at ${branchName}`,
           }),
         });
   
@@ -140,17 +143,18 @@ const BranchInventory = ({ branchName }) => {
         }
   
         const result = await response.json();
-        console.log("Activity log response:", result); // Log the response for debugging
+        console.log("Activity log response:", result);
       }
     } catch (err) {
       console.error("Add error:", err);
     }
-  };  
+  };
   
 
   const handleUpdateProduct = async () => {
     const parsedProduct = {
       ...editProduct,
+      price: parseFloat(editProduct.price) || 0, // Include price field
       begInventory: role === "admin" ? parseFloat(editProduct.begInventory) || 0 : editProduct.begInventory,
       delivered: parseFloat(editProduct.delivered) || 0,
       waste: role === "admin" ? parseFloat(editProduct.waste) || 0 : editProduct.waste,
@@ -264,7 +268,7 @@ const BranchInventory = ({ branchName }) => {
           <table className="min-w-full text-sm text-left">
             <thead className="bg-gray-100">
               <tr>
-                {["Name", "Category", "Beg Inv", "Delivered", "Waste", "Use", "Withdrawal", "Current", "Actions"].map((head, idx) => (
+                {["Name", "Category", "Price", "Beg Inv", "Delivered", "Waste", "Use", "Withdrawal", "Current", "Actions"].map((head, idx) => (
                   <th key={idx} className="px-4 py-2 whitespace-nowrap text-sm font-medium text-gray-700">
                     {head}
                   </th>
@@ -282,6 +286,7 @@ const BranchInventory = ({ branchName }) => {
                     <tr key={product._id} className="border-t">
                       <td className="px-4 py-2 whitespace-nowrap">{product.name}</td>
                       <td className="px-4 py-2 whitespace-nowrap">{product.category}</td>
+                      <td className="px-4 py-2 whitespace-nowrap">{product.price}</td>
                       <td className="px-4 py-2 whitespace-nowrap">{product.begInventory}</td>
                       <td className="px-4 py-2 whitespace-nowrap">{product.delivered}</td>
                       <td className="px-4 py-2 whitespace-nowrap">{product.waste}</td>
@@ -347,6 +352,16 @@ const BranchInventory = ({ branchName }) => {
                   type="text"
                   value={newProduct.category}
                   onChange={(e) => setNewProduct({ ...newProduct, category: e.target.value })}
+                  className="w-full border border-gray-300 px-3 py-1 rounded-md"
+                />
+              </div>
+
+              <div className="mb-3">
+                <label className="block text-sm font-medium">Price</label>
+                <input
+                  type="number"
+                  value={newProduct.price}
+                  onChange={(e) => setNewProduct({ ...newProduct, price: parseFloat(e.target.value) || 0 })}
                   className="w-full border border-gray-300 px-3 py-1 rounded-md"
                 />
               </div>
