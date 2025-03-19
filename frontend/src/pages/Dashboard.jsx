@@ -23,7 +23,7 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchRecentActivity = async () => {
       try {
-        const response = await fetch(`${VITE_API_BASE_URL}/api/activitylogs`);
+        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/activitylogs`);
         if (!response.ok) throw new Error("Failed to fetch activity logs");
         const data = await response.json();
   
@@ -47,7 +47,7 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchHighInventoryItems = async () => {
       try {
-        const response = await fetch(`${VITE_API_BASE_URL}/api/dashboard/inventory-data`);
+        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/dashboard/inventory-data`);
         const data = await response.json();
         setHighInventoryItems(data);
       } catch (error) {
@@ -57,7 +57,7 @@ const Dashboard = () => {
 
     const fetchLowInventoryItems = async () => {
       try {
-        const response = await fetch(`${VITE_API_BASE_URL}/api/dashboard/lowest-inventory-items`);
+        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/dashboard/lowest-inventory-items`);
         const data = await response.json();
         setLowInventoryItems(data);
       } catch (error) {
@@ -67,7 +67,7 @@ const Dashboard = () => {
 
     const fetchCategoryData = async () => {
       try {
-        const response = await fetch(`${VITE_API_BASE_URL}/api/dashboard/category-distribution`);
+        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/dashboard/category-distribution`);
         const data = await response.json();
         const labels = data.map((category) => category.name);
         const values = data.map((category) => category.count);
@@ -79,7 +79,7 @@ const Dashboard = () => {
 
     const fetchInventoryGraphData = async () => {
       try {
-        const response = await fetch(`${VITE_API_BASE_URL}/api/dashboard/inventory-data`);
+        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/dashboard/inventory-data`);
         const data = await response.json();
     
         console.log("Fetched Inventory Data:", data); // Debug API response
