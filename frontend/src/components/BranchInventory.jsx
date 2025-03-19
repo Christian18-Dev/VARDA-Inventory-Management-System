@@ -264,71 +264,87 @@ const BranchInventory = ({ branchName }) => {
           </div>
         </div>
 
-        <div className="bg-white shadow-md rounded-lg p-4 overflow-x-auto">
-          <table className="min-w-full text-sm text-left">
-            <thead className="bg-gray-100">
-              <tr>
-                {["Name", "Category", "Price", "Beg Inv", "Delivered", "Waste", "Use", "Withdrawal", "Current", "Actions"].map((head, idx) => (
-                  <th key={idx} className="px-4 py-2 whitespace-nowrap text-sm font-medium text-gray-700">
-                    {head}
-                  </th>
-                ))}
+        <div className="bg-white shadow-lg rounded-xl overflow-hidden">
+  <div className="overflow-x-auto">
+    <table className="min-w-full text-sm text-center border-collapse">
+      <thead>
+        <tr className="bg-gray-300 border-b">
+          {[
+            "Name", "Category", "Price", "Beg Inv", "Delivered", 
+            "Waste", "Use", "Withdrawal", "Current", "Actions"
+          ].map((head, idx) => (
+            <th
+              key={idx}
+              className="px-5 py-4 text-black font-semibold uppercase tracking-wider text-sm"
+            >
+              {head}
+            </th>
+          ))}
+        </tr>
+      </thead>
+      <tbody>
+        {products.length > 0 ? (
+          products
+            .filter((p) =>
+              p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+              p.category.toLowerCase().includes(searchQuery.toLowerCase())
+            )
+            .map((product) => (
+              <tr
+                key={product._id}
+                className="border-b hover:bg-gray-100 transition duration-150"
+              >
+                <td className="px-5 py-4 whitespace-nowrap text-black">{product.name}</td>
+                <td className="px-5 py-4 whitespace-nowrap text-black">{product.category}</td>
+                <td className="px-5 py-4 whitespace-nowrap text-green-600 font-medium">
+                  ₱ {product.price}
+                </td>
+                <td className="px-5 py-4 whitespace-nowrap text-black">{product.begInventory}</td>
+                <td className="px-5 py-4 whitespace-nowrap text-black">{product.delivered}</td>
+                <td className="px-5 py-4 whitespace-nowrap text-red-500">{product.waste}</td>
+                <td className="px-5 py-4 whitespace-nowrap text-blue-500">{product.use}</td>
+                <td className="px-5 py-4 whitespace-nowrap text-black">{product.withdrawal}</td>
+                <td className="px-5 py-4 whitespace-nowrap text-black font-semibold">
+                  {product.current}
+                </td>
+                <td className="px-5 py-4 whitespace-nowrap space-x-2">
+                  {(role === "admin" || role === "staff") && (
+                    <button
+                      className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg shadow-md transition duration-150"
+                      onClick={() => {
+                        setEditProduct(product);
+                        setShowEditModal(true);
+                      }}
+                    >
+                      Edit
+                    </button>
+                  )}
+                  {role === "admin" && (
+                    <button
+                      className="bg-rose-500 hover:bg-rose-600 text-white px-4 py-2 rounded-lg shadow-md transition duration-150"
+                      onClick={() => {
+                        setProductToDelete(product);
+                        setShowDeleteConfirm(true);
+                      }}
+                    >
+                      Delete
+                    </button>
+                  )}
+                </td>
               </tr>
-            </thead>
-            <tbody>
-              {products.length > 0 ? (
-                products
-                  .filter((p) =>
-                    p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                    p.category.toLowerCase().includes(searchQuery.toLowerCase())
-                  )
-                  .map((product) => (
-                    <tr key={product._id} className="border-t">
-                      <td className="px-4 py-2 whitespace-nowrap">{product.name}</td>
-                      <td className="px-4 py-2 whitespace-nowrap">{product.category}</td>
-                      <td className="px-4 py-2 whitespace-nowrap">{product.price}</td>
-                      <td className="px-4 py-2 whitespace-nowrap">{product.begInventory}</td>
-                      <td className="px-4 py-2 whitespace-nowrap">{product.delivered}</td>
-                      <td className="px-4 py-2 whitespace-nowrap">{product.waste}</td>
-                      <td className="px-4 py-2 whitespace-nowrap">{product.use}</td>
-                      <td className="px-4 py-2 whitespace-nowrap">{product.withdrawal}</td>
-                      <td className="px-4 py-2 whitespace-nowrap">{product.current}</td>
-                      <td className="px-4 py-2 whitespace-nowrap space-x-2">
-                        {(role === "admin" || role === "staff") && (
-                          <button
-                            className="bg-yellow-400 text-white px-3 py-1 rounded-md"
-                            onClick={() => {
-                              setEditProduct(product);
-                              setShowEditModal(true);
-                            }}
-                          >
-                            Edit
-                          </button>
-                        )}
-                        {role === "admin" && (
-                          <button
-                            className="bg-red-500 text-white px-3 py-1 rounded-md"
-                            onClick={() => {
-                              setProductToDelete(product);
-                              setShowDeleteConfirm(true);
-                            }}
-                          >
-                            Delete
-                          </button>
-                        )}
-                      </td>
-                    </tr>
-                  ))
-              ) : (
-                <tr>
-                  <td colSpan="9" className="text-center p-4 text-gray-500">
-                    No products found
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
+            ))
+        ) : (
+          <tr>
+            <td colSpan="10" className="text-center py-6 text-gray-500">
+              No products found
+            </td>
+          </tr>
+        )}
+      </tbody>
+    </table>
+  </div>
+</div>
+
 
         {/* Add Product Modal */}
         {showAddModal && (
@@ -375,44 +391,66 @@ const BranchInventory = ({ branchName }) => {
         )}
 
 
-        {/* Edit Modal */}
-        {showEditModal && editProduct && (
-          <div className="fixed inset-0 flex items-center justify-center bg-black/30 backdrop-blur-lg z-50">
-            <div className="bg-white rounded-lg p-6 w-full max-w-md">
-              <h2 className="text-xl font-semibold mb-4">Edit Product</h2>
-              {["name", "category", ...(role === "admin" ? ["begInventory", "delivered", "waste", "use", "withdrawal"] : ["delivered", "waste", "use", "withdrawal"])].map((field) => (
-                <div className="mb-3" key={field}>
-                  <label className="block text-sm font-medium capitalize">{field}</label>
-                  <input
-                    type="text"
-                    value={editProduct[field] === 0 ? "" : editProduct[field]}
-                    onChange={(e) => {
-                      const value = e.target.value;
-                    
-                      // Allow any text for name and category
-                      if (["name", "category"].includes(field)) {
-                        setEditProduct({ ...editProduct, [field]: value });
-                      } else {
-                        // Restrict to numbers for numeric fields
-                        if (/^\d*$/.test(value)) {
-                          setEditProduct({ ...editProduct, [field]: value });
-                        }
+          {/* Edit Modal */}
+          {showEditModal && editProduct && (
+            <div className="fixed inset-0 flex items-center justify-center bg-black/30 backdrop-blur-lg z-50">
+              <div className="bg-white rounded-lg p-6 w-full max-w-md">
+                <h2 className="text-xl font-semibold mb-4">Edit Product</h2>
+                {[
+                  "name",
+                  "category",
+                  ...(role === "admin"
+                    ? ["price", "begInventory", "delivered", "waste", "use", "withdrawal"]
+                    : ["price", "delivered", "waste", "use", "withdrawal"]),
+                ].map((field) => (
+                  <div className="mb-3" key={field}>
+                    <label className="block text-sm font-medium capitalize">
+                      {field}
+                    </label>
+                    <input
+                      type={
+                        ["price", "begInventory", "delivered", "waste", "use", "withdrawal"].includes(field)
+                          ? "number"
+                          : "text"
                       }
-                    }}
-                                      
-                    className="w-full border border-gray-300 px-3 py-1 rounded-md"
-                    disabled={role === "staff" && !["name", "category", "delivered", "waste", "use", "withdrawal"].includes(field)}
-                  />
+                      value={editProduct[field] === 0 ? "" : editProduct[field]}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        
+                        if (["name", "category"].includes(field)) {
+                          setEditProduct({ ...editProduct, [field]: value });
+                        } else {
+                          // Only allow numbers for numeric fields
+                          if (/^\d*\.?\d*$/.test(value)) {
+                            setEditProduct({ ...editProduct, [field]: value });
+                          }
+                        }
+                      }}
+                      className="w-full border border-gray-300 px-3 py-1 rounded-md"
+                      disabled={
+                        role === "staff" &&
+                        !["name", "category", "delivered", "waste", "use", "withdrawal"].includes(field)
+                      }
+                    />
+                  </div>
+                ))}
+                <div className="flex justify-end space-x-2 mt-4">
+                  <button
+                    onClick={() => setShowEditModal(false)}
+                    className="bg-gray-300 px-4 py-1 rounded"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleUpdateProduct}
+                    className="bg-yellow-500 text-white px-4 py-1 rounded"
+                  >
+                    Update
+                  </button>
                 </div>
-              ))}
-              <div className="flex justify-end space-x-2 mt-4">
-                <button onClick={() => setShowEditModal(false)} className="bg-gray-300 px-4 py-1 rounded">Cancel</button>
-                <button onClick={handleUpdateProduct} className="bg-yellow-500 text-white px-4 py-1 rounded">Update</button>
               </div>
             </div>
-          </div>
-        )}
-
+          )}
 
         {/* Delete Confirm Modal */}
         {showDeleteConfirm && (
