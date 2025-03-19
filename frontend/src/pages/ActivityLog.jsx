@@ -12,7 +12,7 @@ const ActivityLog = () => {
   // ✅ Fetch logs from backend
   const fetchLogs = async () => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/activitylogs`);
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/activitylogs`);
       if (!response.ok) throw new Error("Failed to fetch logs");
       const data = await response.json();
       setLogs(data);
