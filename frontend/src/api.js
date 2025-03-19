@@ -1,4 +1,4 @@
-export const API_URL = "https://varda-inventory-management-system.onrender.com/api/inventory";
+export const API_URL = import.meta.env.VITE_API_URL;
 
 // Fetch products for a specific branch
 export const fetchProducts = async (branch, page = 1, limit = 25) => {
