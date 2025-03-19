@@ -60,15 +60,14 @@ const BranchInventory = ({ branchName }) => {
     if (!confirmed) return;
   
     try {
-      // 🔸 1. Save current inventory data to history collection
-      const saveHistoryResponse = await fetch("https://varda-inventory-management-system.onrender.com/api/history/save", {
+      const baseUrl = import.meta.env.VITE_API_BASE_URL.replace(/\/$/, ""); // Remove trailing slash if present
+      const saveHistoryResponse = await fetch(`${baseUrl}/api/history/save`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ branch: branchName, products }),
       });
-      
   
       if (!saveHistoryResponse.ok) {
         throw new Error("Failed to save history before reset");

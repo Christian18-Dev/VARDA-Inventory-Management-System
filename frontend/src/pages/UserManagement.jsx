@@ -28,19 +28,23 @@ const UserManagement = () => {
   const fetchUsers = async () => {
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch("https://varda-inventory-management-system.onrender.com/api/auth/users", {
+      const baseUrl = import.meta.env.VITE_API_BASE_URL.replace(/\/$/, ""); // Remove trailing slash if present
+  
+      const response = await fetch(`${baseUrl}/api/auth/users`, {
         headers: { Authorization: `Bearer ${token}` },
       });
+  
       const data = await response.json();
+  
       if (response.ok) {
         setUsers(data);
       } else {
-        console.error("Error fetching users:", data.error);
+        console.error("❌ Error fetching users:", data.error);
       }
     } catch (error) {
-      console.error("Fetch error:", error);
+      console.error("❌ Fetch error:", error);
     }
-  };
+  };  
 
   const resetForm = () => {
     setUserFormData({ username: "", password: "", confirmPassword: "", role: "" });
@@ -107,36 +111,43 @@ const UserManagement = () => {
 
     try {
       const token = localStorage.getItem("token");
+      const baseUrl = import.meta.env.VITE_API_BASE_URL.replace(/\/$/, ""); // Remove trailing slash if present
+    
       const url = isEditing
-        ? `https://varda-inventory-management-system.onrender.com/api/auth/users/${selectedUserId}`
-        : "https://varda-inventory-management-system.onrender.com/api/auth/register";
+        ? `${baseUrl}/api/auth/users/${selectedUserId}`
+        : `${baseUrl}/api/auth/register`;
+    
       const method = isEditing ? "PUT" : "POST";
-
+    
       const body = {
         username: userFormData.username,
         role: userFormData.role,
       };
-
+    
       if (userFormData.password) {
         body.password = userFormData.password;
       }
-
+    
       const response = await fetch(url, {
         method,
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify(body),
       });
-
+    
       const data = await response.json();
-      if (!response.ok) throw new Error(data.error || "Failed to save user");
-
+      if (!response.ok) throw new Error(data.error || "❌ Failed to save user");
+    
+      // ✅ Fetch updated users and reset form after success
       fetchUsers();
       setShowModal(false);
       resetForm();
     } catch (error) {
-      console.error("Error saving user:", error);
-      alert("Unexpected error occurred");
-    }
+      console.error("❌ Error saving user:", error);
+      alert("⚠️ Unexpected error occurred");
+    }    
   };
 
   const handleDeleteUser = (user) => {
@@ -201,19 +212,22 @@ const UserManagement = () => {
                 onClick={async () => {
                   try {
                     const token = localStorage.getItem("token");
-                    const response = await fetch(`https://varda-inventory-management-system.onrender.com/api/auth/users/${userToDelete._id}`, {
+                    const baseUrl = import.meta.env.VITE_API_BASE_URL.replace(/\/$/, ""); // Remove trailing slash if present
+
+                    const response = await fetch(`${baseUrl}/api/auth/users/${userToDelete._id}`, {
                       method: "DELETE",
                       headers: { Authorization: `Bearer ${token}` },
                     });
 
                     const data = await response.json();
-                    if (!response.ok) throw new Error(data.error || "Failed to delete user");
+                    if (!response.ok) throw new Error(data.error || "❌ Failed to delete user");
 
+                    // ✅ Remove deleted user from state
                     setUsers(users.filter((u) => u._id !== userToDelete._id));
                     setShowDeleteModal(false);
                   } catch (error) {
-                    console.error("Error deleting user:", error);
-                    alert("Unexpected error occurred");
+                    console.error("❌ Error deleting user:", error);
+                    alert("⚠️ Unexpected error occurred");
                   }
                 }}
                 className="bg-red-500 text-white px-4 py-2 rounded"
