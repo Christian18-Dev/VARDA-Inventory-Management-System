@@ -16,8 +16,7 @@ const LoginForm = () => {
   
     try {
       // 🎯 Fetch login and get role dynamically
-      const response = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL}/api/auth/login`,
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/auth/login`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -37,8 +36,7 @@ const LoginForm = () => {
       localStorage.setItem("username", username);
   
       // 🎯 Log the login event with the correct role
-      const logResponse = await fetch(
-      `${import.meta.env.VITE_API_BASE_URL}/api/activitylogs/log`,
+      const logResponse = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/activitylogs/log`,
         {
           method: "POST",
           headers: {
