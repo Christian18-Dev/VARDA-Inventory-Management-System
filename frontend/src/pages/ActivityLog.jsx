@@ -130,45 +130,30 @@ const ActivityLog = () => {
         </div>
 
         {/* ✅ Pagination Controls */}
-        <div className="flex flex-col md:flex-row justify-between items-center mt-6 space-y-4 md:space-y-0">
-          <div className="text-xs md:text-sm text-gray-700">
-            Showing {indexOfFirstLog + 1} to {Math.min(indexOfLastLog, logs.length)} of {logs.length} logs
-          </div>
-          <div className="flex flex-wrap gap-2">
-            {/* Previous Button */}
-            <button
-              onClick={() => paginate(currentPage - 1)}
-              disabled={currentPage === 1}
-              className="px-3 py-1.5 md:px-4 md:py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-md disabled:opacity-50 disabled:cursor-not-allowed text-xs md:text-sm"
-            >
-              Previous
-            </button>
-
-            {/* Page Numbers */}
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+        {logs.length > logsPerPage && (
+          <div className="flex justify-between items-center mt-6">
+            <div className="text-gray-700">
+              Showing {indexOfFirstLog + 1} to {Math.min(indexOfLastLog, logs.length)} of {logs.length} logs
+            </div>
+            <div className="flex gap-2">
               <button
-                key={page}
-                onClick={() => paginate(page)}
-                className={`px-3 py-1.5 md:px-4 md:py-2 ${
-                  currentPage === page
-                    ? "bg-blue-600 text-white"
-                    : "bg-gray-200 hover:bg-gray-300 text-gray-700"
-                } rounded-md text-xs md:text-sm`}
+                onClick={() => paginate(currentPage - 1)}
+                disabled={currentPage === 1}
+                className="px-4 py-2 bg-gray-200 rounded-lg disabled:opacity-50"
               >
-                {page}
+                Previous
               </button>
-            ))}
-
-            {/* Next Button */}
-            <button
-              onClick={() => paginate(currentPage + 1)}
-              disabled={currentPage === totalPages}
-              className="px-3 py-1.5 md:px-4 md:py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-md disabled:opacity-50 disabled:cursor-not-allowed text-xs md:text-sm"
-            >
-              Next
-            </button>
+              <span className="px-4 py-2 bg-gray-200 rounded-lg">{currentPage}</span>
+              <button
+                onClick={() => paginate(currentPage + 1)}
+                disabled={currentPage === totalPages}
+                className="px-4 py-2 bg-gray-200 rounded-lg disabled:opacity-50"
+              >
+                Next
+              </button>
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );
