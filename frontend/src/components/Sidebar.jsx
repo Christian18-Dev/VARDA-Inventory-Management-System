@@ -35,28 +35,26 @@ const Sidebar = () => {
   }, [location.pathname]);
 
   const handleLogout = async () => {
-    const username = localStorage.getItem("username"); // Get username from local storage
-    const role = localStorage.getItem("role"); // Get role from local storage
-  
+    const username = localStorage.getItem("username");
+    const role = localStorage.getItem("role");
+
     try {
-      // Send a log to the backend before clearing
       await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/activitylogs/log`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          username: username || "Unknown User", // Fallback to "Unknown User" if username is not found
-          role: role || "Unknown Role", // Fallback to "Unknown Role" if role is not found
-          action: "Logged out", // Action being logged
-          timestamp: new Date().toISOString(), // Add timestamp for the log
+          username: username || "Unknown User",
+          role: role || "Unknown Role",
+          action: "Logged out",
+          timestamp: new Date().toISOString(),
         }),
       });
     } catch (error) {
       console.error("Failed to log logout action:", error);
     }
-  
-    // Clear local storage and reload
+
     localStorage.clear();
     navigate("/");
     window.location.reload();
@@ -76,13 +74,13 @@ const Sidebar = () => {
   return (
     <>
       {/* ✅ Desktop Sidebar */}
-      <div className="hidden md:flex flex-col w-64 h-full bg-[#1E1E1E] text-[#EAEAEA] p-5 fixed top-0 left-0 overflow-y-auto shadow-lg shadow-[#3A3A3A] z-40">
+      <div className="hidden md:flex flex-col w-64 h-full bg-gradient-to-b from-[#1E1E1E] to-[#0A0A0A] text-[#EAEAEA] p-5 fixed top-0 left-0 overflow-y-auto shadow-lg shadow-[#3A3A3A] z-40">
         <div className="flex items-center gap-3 mb-6">
           <img src={logo} alt="Logo" className="w-10" />
           <span className="text-xl font-bold">VARDA ENTERPRISE</span>
         </div>
 
-        <nav className="flex flex-col space-y-4 flex-grow">
+        <nav className="flex flex-col space-y-2 flex-grow">
           <SidebarLink to="/dashboard" label="Dashboard" currentPath={location.pathname} />
 
           <button
@@ -111,9 +109,6 @@ const Sidebar = () => {
             </div>
           )}
 
-          {/*} <SidebarLink to="/supplier" label="Supplier" currentPath={location.pathname} />
-          <SidebarLink to="/reports" label="Reports" currentPath={location.pathname} />
-          <SidebarLink to="/purchase-orders" label="Purchase Order" currentPath={location.pathname} /> */}
           <SidebarLink to="/history" label="History" currentPath={location.pathname} />
           <SidebarLink to="/activitylogs" label="Activity Logs" currentPath={location.pathname} />
 
@@ -134,8 +129,9 @@ const Sidebar = () => {
       {/* ✅ Mobile Menu Button */}
       {!isOpen && (
         <button
-          className="md:hidden fixed top-5 left-5 bg-gray-900 text-white p-2 rounded-md z-50"
+          className="md:hidden fixed top-2 left-2 bg-[#1E1E1E] text-white p-2 rounded-md z-50 shadow-lg"
           onClick={() => setIsOpen(true)}
+          aria-label="Open menu"
         >
           <Menu size={24} />
         </button>
@@ -143,14 +139,15 @@ const Sidebar = () => {
 
       {/* ✅ Mobile Sidebar */}
       <div
-        className={`fixed top-0 left-0 h-full w-64 bg-gray-900 text-white p-5 transition-transform ${
+        className={`fixed top-0 left-0 h-full w-64 bg-gradient-to-b from-[#1E1E1E] to-[#0A0A0A] text-white p-5 transition-transform duration-300 ease-in-out ${
           isOpen ? "translate-x-0" : "-translate-x-full"
-        } md:hidden z-50`}
+        } md:hidden z-50 shadow-lg`}
       >
         {/* Close Button */}
         <button
-          className="absolute top-5 right-5 text-white"
+          className="absolute top-2 right-2 text-white p-2 rounded-md hover:bg-[#3A3A3A] transition"
           onClick={() => setIsOpen(false)}
+          aria-label="Close menu"
         >
           <X size={24} />
         </button>
@@ -160,7 +157,7 @@ const Sidebar = () => {
           <span className="text-lg font-bold">VARDA ENTERPRISE</span>
         </div>
 
-        <nav className="flex flex-col space-y-4 flex-grow">
+        <nav className="flex flex-col space-y-2 flex-grow">
           <SidebarLink
             to="/dashboard"
             label="Dashboard"
@@ -195,13 +192,25 @@ const Sidebar = () => {
             </div>
           )}
 
-         {/*} <SidebarLink to="/supplier" label="Supplier" currentPath={location.pathname} onClick={() => setIsOpen(false)} />
-          <SidebarLink to="/reports" label="Reports" currentPath={location.pathname} onClick={() => setIsOpen(false)} />
-          <SidebarLink to="/purchase-orders" label="Purchase Order" currentPath={location.pathname} onClick={() => setIsOpen(false)} /> */}
-          <SidebarLink to="/history" label="History" currentPath={location.pathname} onClick={() => setIsOpen(false)} />
-
+          <SidebarLink
+            to="/history"
+            label="History"
+            currentPath={location.pathname}
+            onClick={() => setIsOpen(false)}
+          />
+          <SidebarLink
+            to="/activitylogs"
+            label="Activity Logs"
+            currentPath={location.pathname}
+            onClick={() => setIsOpen(false)}
+          />
           {userRole === "Admin" && (
-            <SidebarLink to="/users" label="Users" currentPath={location.pathname} onClick={() => setIsOpen(false)} />
+            <SidebarLink
+              to="/users"
+              label="Users"
+              currentPath={location.pathname}
+              onClick={() => setIsOpen(false)}
+            />
           )}
         </nav>
 
@@ -244,7 +253,7 @@ const Sidebar = () => {
   );
 };
 
-// ✅ SidebarLink Component (updated to support optional onClick for mobile close)
+// ✅ SidebarLink Component
 const SidebarLink = ({ to, label, currentPath, onClick }) => (
   <Link
     to={to}

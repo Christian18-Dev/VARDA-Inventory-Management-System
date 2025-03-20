@@ -60,33 +60,37 @@ const ActivityLog = () => {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 p-8">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-3xl font-bold text-gray-800">Activity Log</h2>
+      <div className="flex-1 p-4 md:p-8">
+        {/* Header and Clear Button */}
+        <div className="flex flex-col md:flex-row justify-between items-center mb-6">
+          <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-4 md:mb-0">
+            Activity Log
+          </h2>
 
           {/* ✅ Clear Logs Button */}
           <button
             onClick={clearLogs}
-            className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-6 py-2 rounded-lg shadow-md transition-all duration-300 transform hover:scale-105"
+            className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-4 py-2 rounded-lg shadow-md transition-all duration-300 transform hover:scale-105"
           >
             Clear Logs
           </button>
         </div>
 
+        {/* Table Container */}
         <div className="overflow-x-auto bg-white rounded-xl shadow-lg">
           <table className="min-w-full">
             <thead className="bg-gradient-to-r from-blue-600 to-blue-700">
               <tr>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-white uppercase tracking-wider">
+                <th className="px-4 py-3 md:px-6 md:py-4 text-left text-xs md:text-sm font-semibold text-white uppercase tracking-wider">
                   Username
                 </th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-white uppercase tracking-wider">
+                <th className="px-4 py-3 md:px-6 md:py-4 text-left text-xs md:text-sm font-semibold text-white uppercase tracking-wider">
                   Role
                 </th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-white uppercase tracking-wider">
+                <th className="px-4 py-3 md:px-6 md:py-4 text-left text-xs md:text-sm font-semibold text-white uppercase tracking-wider">
                   Action
                 </th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-white uppercase tracking-wider">
+                <th className="px-4 py-3 md:px-6 md:py-4 text-left text-xs md:text-sm font-semibold text-white uppercase tracking-wider">
                   Timestamp
                 </th>
               </tr>
@@ -98,10 +102,18 @@ const ActivityLog = () => {
                     key={log._id}
                     className="hover:bg-gray-50 transition-colors duration-200"
                   >
-                    <td className="px-6 py-4 text-sm text-gray-700">{log.username}</td>
-                    <td className="px-6 py-4 text-sm text-gray-700">{log.role}</td>
-                    <td className="px-6 py-4 text-sm text-gray-700">{log.action}</td>
-                    <td className="px-6 py-4 text-sm text-gray-700">
+                    <td className="px-4 py-3 md:px-6 md:py-4 text-xs md:text-sm text-gray-700">
+                      {log.username}
+                    </td>
+                    <td className="px-4 py-3 md:px-6 md:py-4 text-xs md:text-sm text-gray-700">
+                      {log.role}
+                    </td>
+                    <td className="px-4 py-3 md:px-6 md:py-4 text-xs md:text-sm text-gray-700 whitespace-normal max-w-[200px]">
+                      <div className="truncate hover:whitespace-normal" title={log.action}>
+                        {log.action}
+                      </div>
+                    </td>
+                    <td className="px-4 py-3 md:px-6 md:py-4 text-xs md:text-sm text-gray-700">
                       {new Date(log.timestamp).toLocaleString()}
                     </td>
                   </tr>
@@ -118,16 +130,16 @@ const ActivityLog = () => {
         </div>
 
         {/* ✅ Pagination Controls */}
-        <div className="flex justify-between items-center mt-6">
-          <div className="text-sm text-gray-700">
+        <div className="flex flex-col md:flex-row justify-between items-center mt-6 space-y-4 md:space-y-0">
+          <div className="text-xs md:text-sm text-gray-700">
             Showing {indexOfFirstLog + 1} to {Math.min(indexOfLastLog, logs.length)} of {logs.length} logs
           </div>
-          <div className="flex space-x-2">
+          <div className="flex flex-wrap gap-2">
             {/* Previous Button */}
             <button
               onClick={() => paginate(currentPage - 1)}
               disabled={currentPage === 1}
-              className="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-md disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-3 py-1.5 md:px-4 md:py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-md disabled:opacity-50 disabled:cursor-not-allowed text-xs md:text-sm"
             >
               Previous
             </button>
@@ -137,11 +149,11 @@ const ActivityLog = () => {
               <button
                 key={page}
                 onClick={() => paginate(page)}
-                className={`px-4 py-2 ${
+                className={`px-3 py-1.5 md:px-4 md:py-2 ${
                   currentPage === page
                     ? "bg-blue-600 text-white"
                     : "bg-gray-200 hover:bg-gray-300 text-gray-700"
-                } rounded-md`}
+                } rounded-md text-xs md:text-sm`}
               >
                 {page}
               </button>
@@ -151,7 +163,7 @@ const ActivityLog = () => {
             <button
               onClick={() => paginate(currentPage + 1)}
               disabled={currentPage === totalPages}
-              className="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-md disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-3 py-1.5 md:px-4 md:py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-md disabled:opacity-50 disabled:cursor-not-allowed text-xs md:text-sm"
             >
               Next
             </button>
