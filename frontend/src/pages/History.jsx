@@ -18,10 +18,16 @@ const branches = [
   "INTRAMUROS VARDA",
 ];
 
+const ITEMS_PER_PAGE = 10; // Number of items per page
+
 const History = () => {
   const [selectedBranch, setSelectedBranch] = useState("");
   const [historyData, setHistoryData] = useState([]);
+  const [filteredData, setFilteredData] = useState([]);
   const [openTables, setOpenTables] = useState({});
+  const [currentPage, setCurrentPage] = useState(1);
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
 
   useEffect(() => {
     if (selectedBranch) {
@@ -29,6 +35,10 @@ const History = () => {
       setOpenTables({}); // Reset expanded tables when switching branches
     }
   }, [selectedBranch]);
+
+  useEffect(() => {
+    filterDataByDateRange();
+  }, [historyData, startDate, endDate]);
 
   const fetchHistory = async (branch) => {
     const branchKey = branch.toUpperCase();
@@ -39,11 +49,28 @@ const History = () => {
       if (!response.ok) throw new Error("Failed to fetch history");
       const data = await response.json();
       setHistoryData(data);
+      setFilteredData(data);
     } catch (err) {
       console.error("❌ Failed to fetch history:", err);
     }
   };
-  
+
+  const filterDataByDateRange = () => {
+    if (!startDate || !endDate) {
+      setFilteredData(historyData);
+      return;
+    }
+
+    const filtered = historyData.filter((record) => {
+      const recordDate = new Date(record.date);
+      const start = new Date(startDate);
+      const end = new Date(endDate);
+      return recordDate >= start && recordDate <= end;
+    });
+
+    setFilteredData(filtered);
+    setCurrentPage(1); // Reset to first page after filtering
+  };
 
   const toggleTable = (idx) => {
     setOpenTables((prev) => ({
@@ -113,6 +140,25 @@ const History = () => {
     }
   };
 
+  // Pagination logic
+  const indexOfLastItem = currentPage * ITEMS_PER_PAGE;
+  const indexOfFirstItem = indexOfLastItem - ITEMS_PER_PAGE;
+  const currentItems = filteredData.slice(indexOfFirstItem, indexOfLastItem);
+
+  const totalPages = Math.ceil(filteredData.length / ITEMS_PER_PAGE);
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
+  const handlePreviousPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
   return (
     <div className="flex bg-gray-100 min-h-screen">
       {/* Sidebar */}
@@ -123,25 +169,47 @@ const History = () => {
         <div className="bg-white p-6 shadow-md rounded-lg">
           <h2 className="text-2xl font-bold mb-5">📜 Inventory History</h2>
 
-          {/* Branch Selection */}
-          <div className="mb-5 border p-4 rounded-lg bg-gray-50">
-            <label className="block text-lg font-semibold mb-2">Select Branch: </label>
-            <select
-              value={selectedBranch}
-              onChange={(e) => setSelectedBranch(e.target.value)}
-              className="w-full p-2 border border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="">-- Select Branch --</option>
-              {branches.map((branch, idx) => (
-                <option key={idx} value={branch}>
-                  {branch}
-                </option>
-              ))}
-            </select>
+          {/* Branch Selection and Date Range Filter */}
+          <div className="flex flex-wrap justify-between items-center mb-5">
+            {/* Branch Selection */}
+            <div className="w-full md:w-1/3 mb-4 md:mb-0">
+              <label className="block text-lg font-semibold mb-2">Select Branch: </label>
+              <select
+                value={selectedBranch}
+                onChange={(e) => setSelectedBranch(e.target.value)}
+                className="w-full p-2 border border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="">-- Select Branch --</option>
+                {branches.map((branch, idx) => (
+                  <option key={idx} value={branch}>
+                    {branch}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Date Range Filter */}
+            <div className="w-full md:w-1/3">
+              <label className="block text-lg font-semibold mb-2">Filter by Date Range: </label>
+              <div className="flex gap-2">
+                <input
+                  type="date"
+                  value={startDate}
+                  onChange={(e) => setStartDate(e.target.value)}
+                  className="w-1/2 p-2 border border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+                <input
+                  type="date"
+                  value={endDate}
+                  onChange={(e) => setEndDate(e.target.value)}
+                  className="w-1/2 p-2 border border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+            </div>
           </div>
 
-          {selectedBranch && historyData.length > 0 ? (
-            historyData.map((record, idx) => (
+          {selectedBranch && currentItems.length > 0 ? (
+            currentItems.map((record, idx) => (
               <div key={idx} className="mb-5 border border-gray-300 rounded-lg bg-white shadow-md">
                 <div
                   onClick={() => toggleTable(idx)}
@@ -206,6 +274,32 @@ const History = () => {
             ))
           ) : (
             selectedBranch && <p className="text-gray-500 text-center">No history data available for this branch yet.</p>
+          )}
+
+          {/* Pagination */}
+          {filteredData.length > ITEMS_PER_PAGE && (
+            <div className="flex justify-between items-center mt-6">
+              <div className="text-gray-700">
+                Showing {indexOfFirstItem + 1} to {Math.min(indexOfLastItem, filteredData.length)} of {filteredData.length} logs
+              </div>
+              <div className="flex gap-2">
+                <button
+                  onClick={handlePreviousPage}
+                  disabled={currentPage === 1}
+                  className="px-4 py-2 bg-gray-200 rounded-lg disabled:opacity-50"
+                >
+                  Previous
+                </button>
+                <span className="px-4 py-2 bg-gray-200 rounded-lg">{currentPage}</span>
+                <button
+                  onClick={handleNextPage}
+                  disabled={currentPage === totalPages}
+                  className="px-4 py-2 bg-gray-200 rounded-lg disabled:opacity-50"
+                >
+                  Next
+                </button>
+              </div>
+            </div>
           )}
         </div>
       </div>

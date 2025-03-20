@@ -108,16 +108,16 @@ router.get("/inventory-data", async (req, res) => {
 
     for (const collectionName of branchCollections) {
       const collection = mongoose.connection.db.collection(collectionName);
-      const items = await collection.find({}, { projection: { name: 1, current: 1 } }).toArray();
+      const items = await collection.find({}, { projection: { name: 1, use: 1 } }).toArray();
 
       if (items.length === 0) continue;
 
       inventoryData.push(
         ...items
-          .filter(item => typeof item.current === "number")
+          .filter(item => typeof item.use === "number")
           .map(item => ({
             name: item.name || "Unknown",
-            stock: item.current || 0,
+            stock: item.use || 0,
             branch: collectionName
               .replace("_inventory", "") // Remove `_inventory`
               .replace(/(^|\s)\S/g, (letter) => letter.toUpperCase()) // Capitalize first letter of each word

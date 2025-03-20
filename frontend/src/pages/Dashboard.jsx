@@ -191,9 +191,9 @@ const Dashboard = () => {
         </div>
         </div>
   
-        {/* Middle Section (Graph Chart) */}
+        {/* Middle Section (Bar Graph Chart) */}
         <div className="bg-white p-6 mt-6 rounded-xl shadow-lg">
-          <h2 className="text-xl font-semibold mb-4 text-gray-800">Product Inventory Levels</h2>
+          <h2 className="text-xl font-semibold mb-4 text-gray-800">Used Stock Overview</h2>
           <div className="w-full h-[300px]">
             {inventoryGraphData.labels.length > 0 ? (
               <Bar
