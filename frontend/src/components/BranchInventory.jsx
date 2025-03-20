@@ -247,154 +247,195 @@ const BranchInventory = ({ branchName }) => {
       <Sidebar />
       <div className="flex-1 pt-16 p-4 md:ml-64">
         <Navbar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
-        <div className="flex justify-between mt-6 mb-4">
-          <h1 className="text-2xl font-bold">{branchName}</h1>
+        <div className="flex flex-col md:flex-row justify-between items-center mt-6 mb-4">
+          <h1 className="text-2xl font-bold mb-4 md:mb-0">{branchName}</h1>
           <div className="space-x-2">
             {(role === "admin" || role === "staff") && (
-              <button onClick={() => setShowAddModal(true)} className="bg-blue-500 text-white px-4 py-2 rounded-md">
+              <button
+                onClick={() => setShowAddModal(true)}
+                className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition"
+              >
                 Add Item
               </button>
             )}
             {role === "admin" && (
-              <button onClick={handleResetInventory} className="bg-red-600 text-white px-4 py-2 rounded-md">
+              <button
+                onClick={handleResetInventory}
+                className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition"
+              >
                 Submit
               </button>
             )}
           </div>
         </div>
-
+  
+        {/* Responsive Table Container */}
         <div className="bg-white shadow-lg rounded-xl overflow-hidden">
-  <div className="overflow-x-auto">
-    <table className="min-w-full text-sm text-center border-collapse">
-      <thead>
-        <tr className="bg-gray-300 border-b">
-          {[
-            "Name", "Category", "Price", "Beg Inv", "Delivered", 
-            "Waste", "Use", "Withdrawal", "Current", "Actions"
-          ].map((head, idx) => (
-            <th
-              key={idx}
-              className="px-5 py-4 text-black font-semibold uppercase tracking-wider text-sm"
-            >
-              {head}
-            </th>
-          ))}
-        </tr>
-      </thead>
-      <tbody>
-        {products.length > 0 ? (
-          products
-            .filter((p) =>
-              p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-              p.category.toLowerCase().includes(searchQuery.toLowerCase())
-            )
-            .map((product) => (
-              <tr
-                key={product._id}
-                className="border-b hover:bg-gray-100 transition duration-150"
-              >
-                <td className="px-5 py-4 whitespace-nowrap text-black">{product.name}</td>
-                <td className="px-5 py-4 whitespace-nowrap text-black">{product.category}</td>
-                <td className="px-5 py-4 whitespace-nowrap text-green-600 font-medium">
-                  ₱ {product.price}
-                </td>
-                <td className="px-5 py-4 whitespace-nowrap text-black">{product.begInventory}</td>
-                <td className="px-5 py-4 whitespace-nowrap text-black">{product.delivered}</td>
-                <td className="px-5 py-4 whitespace-nowrap text-red-500">{product.waste}</td>
-                <td className="px-5 py-4 whitespace-nowrap text-blue-500">{product.use}</td>
-                <td className="px-5 py-4 whitespace-nowrap text-black">{product.withdrawal}</td>
-                <td className="px-5 py-4 whitespace-nowrap text-black font-semibold">
-                  {product.current}
-                </td>
-                <td className="px-5 py-4 whitespace-nowrap space-x-2">
-                  {(role === "admin" || role === "staff") && (
-                    <button
-                      className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg shadow-md transition duration-150"
-                      onClick={() => {
-                        setEditProduct(product);
-                        setShowEditModal(true);
-                      }}
+          <div className="overflow-x-auto">
+            <table className="min-w-full text-sm text-center border-collapse">
+              <thead>
+                <tr className="bg-gray-300 border-b">
+                  {[
+                    "Name",
+                    "Category",
+                    "Price",
+                    "Beg Inv",
+                    "Delivered",
+                    "Waste",
+                    "Use",
+                    "Withdrawal",
+                    "Current",
+                    "Actions",
+                  ].map((head, idx) => (
+                    <th
+                      key={idx}
+                      className="px-5 py-4 text-black font-semibold uppercase tracking-wider text-xs md:text-sm"
                     >
-                      Edit
-                    </button>
-                  )}
-                  {role === "admin" && (
-                    <button
-                      className="bg-rose-500 hover:bg-rose-600 text-white px-4 py-2 rounded-lg shadow-md transition duration-150"
-                      onClick={() => {
-                        setProductToDelete(product);
-                        setShowDeleteConfirm(true);
-                      }}
-                    >
-                      Delete
-                    </button>
-                  )}
-                </td>
-              </tr>
-            ))
-        ) : (
-          <tr>
-            <td colSpan="10" className="text-center py-6 text-gray-500">
-              No products found
-            </td>
-          </tr>
-        )}
-      </tbody>
-    </table>
-  </div>
-</div>
-
-
+                      {head}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {products.length > 0 ? (
+                  products
+                    .filter(
+                      (p) =>
+                        p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                        p.category.toLowerCase().includes(searchQuery.toLowerCase())
+                    )
+                    .map((product) => (
+                      <tr
+                        key={product._id}
+                        className="border-b hover:bg-gray-100 transition duration-150"
+                      >
+                        {[
+                          product.name,
+                          product.category,
+                          `₱ ${product.price}`,
+                          product.begInventory,
+                          product.delivered,
+                          product.waste,
+                          product.use,
+                          product.withdrawal,
+                          product.current,
+                        ].map((item, i) => (
+                          <td
+                            key={i}
+                            className={`px-5 py-4 whitespace-nowrap text-black ${
+                              i === 2
+                                ? "text-green-600 font-medium"
+                                : i === 5
+                                ? "text-red-500"
+                                : i === 6
+                                ? "text-blue-500"
+                                : ""
+                            }`}
+                          >
+                            {item}
+                          </td>
+                        ))}
+                        <td className="px-5 py-4 whitespace-nowrap space-x-2">
+                          {(role === "admin" || role === "staff") && (
+                            <button
+                              className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg shadow-md transition duration-150"
+                              onClick={() => {
+                                setEditProduct(product);
+                                setShowEditModal(true);
+                              }}
+                            >
+                              Edit
+                            </button>
+                          )}
+                          {role === "admin" && (
+                            <button
+                              className="bg-rose-500 hover:bg-rose-600 text-white px-4 py-2 rounded-lg shadow-md transition duration-150"
+                              onClick={() => {
+                                setProductToDelete(product);
+                                setShowDeleteConfirm(true);
+                              }}
+                            >
+                              Delete
+                            </button>
+                          )}
+                        </td>
+                      </tr>
+                    ))
+                ) : (
+                  <tr>
+                    <td colSpan="10" className="text-center py-6 text-gray-500">
+                      No products found
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+  
         {/* Add Product Modal */}
         {showAddModal && (
-          <div className="fixed inset-0 flex items-center justify-center bg-black/30 backdrop-blur-lg z-50">
-            <div className="bg-white rounded-lg p-6 w-full max-w-md">
+          <div className="fixed inset-0 flex items-center justify-center bg-black/30 backdrop-blur-sm z-50 p-4">
+            <div className="bg-white rounded-lg p-6 w-full max-w-lg">
               <h2 className="text-xl font-semibold mb-4">Add Product</h2>
-
-              {/* Common Fields: Name and Category */}
-              <div className="mb-3">
-                <label className="block text-sm font-medium">Name</label>
-                <input
-                  type="text"
-                  value={newProduct.name}
-                  onChange={(e) => setNewProduct({ ...newProduct, name: e.target.value })}
-                  className="w-full border border-gray-300 px-3 py-1 rounded-md"
-                />
+              <div className="grid grid-cols-1 gap-4">
+                <div>
+                  <label className="block text-sm font-medium">Name</label>
+                  <input
+                    type="text"
+                    value={newProduct.name}
+                    onChange={(e) => setNewProduct({ ...newProduct, name: e.target.value })}
+                    className="w-full border border-gray-300 px-3 py-2 rounded-md"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium">Category</label>
+                  <input
+                    type="text"
+                    value={newProduct.category}
+                    onChange={(e) => setNewProduct({ ...newProduct, category: e.target.value })}
+                    className="w-full border border-gray-300 px-3 py-2 rounded-md"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium">Price</label>
+                  <input
+                    type="number"
+                    value={newProduct.price}
+                    onChange={(e) =>
+                      setNewProduct({
+                        ...newProduct,
+                        price: parseFloat(e.target.value) || 0,
+                      })
+                    }
+                    className="w-full border border-gray-300 px-3 py-2 rounded-md"
+                  />
+                </div>
               </div>
-              <div className="mb-3">
-                <label className="block text-sm font-medium">Category</label>
-                <input
-                  type="text"
-                  value={newProduct.category}
-                  onChange={(e) => setNewProduct({ ...newProduct, category: e.target.value })}
-                  className="w-full border border-gray-300 px-3 py-1 rounded-md"
-                />
-              </div>
-
-              <div className="mb-3">
-                <label className="block text-sm font-medium">Price</label>
-                <input
-                  type="number"
-                  value={newProduct.price}
-                  onChange={(e) => setNewProduct({ ...newProduct, price: parseFloat(e.target.value) || 0 })}
-                  className="w-full border border-gray-300 px-3 py-1 rounded-md"
-                />
-              </div>
-
               <div className="flex justify-end space-x-2 mt-4">
-                <button onClick={() => setShowAddModal(false)} className="bg-gray-300 px-4 py-1 rounded">Cancel</button>
-                <button onClick={handleAddProduct} className="bg-blue-500 text-white px-4 py-1 rounded">Add</button>
+                <button
+                  onClick={() => setShowAddModal(false)}
+                  className="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleAddProduct}
+                  className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+                >
+                  Add
+                </button>
               </div>
             </div>
           </div>
         )}
-
-
-          {/* Edit Modal */}
-          {showEditModal && editProduct && (
-            <div className="fixed inset-0 flex items-center justify-center bg-black/30 backdrop-blur-lg z-50">
-              <div className="bg-white rounded-lg p-6 w-full max-w-md">
-                <h2 className="text-xl font-semibold mb-4">Edit Product</h2>
+  
+        {/* Edit Modal */}
+        {showEditModal && editProduct && (
+          <div className="fixed inset-0 flex items-center justify-center bg-black/30 backdrop-blur-sm z-50 p-4">
+            <div className="bg-white rounded-lg p-6 w-full max-w-lg">
+              <h2 className="text-xl font-semibold mb-4">Edit Product</h2>
+              <div className="grid grid-cols-1 gap-4">
                 {[
                   "name",
                   "category",
@@ -402,66 +443,78 @@ const BranchInventory = ({ branchName }) => {
                     ? ["price", "begInventory", "delivered", "waste", "use", "withdrawal"]
                     : ["price", "delivered", "waste", "use", "withdrawal"]),
                 ].map((field) => (
-                  <div className="mb-3" key={field}>
-                    <label className="block text-sm font-medium capitalize">
-                      {field}
-                    </label>
+                  <div key={field}>
+                    <label className="block text-sm font-medium capitalize">{field}</label>
                     <input
                       type={
-                        ["price", "begInventory", "delivered", "waste", "use", "withdrawal"].includes(field)
+                        [
+                          "price",
+                          "begInventory",
+                          "delivered",
+                          "waste",
+                          "use",
+                          "withdrawal",
+                        ].includes(field)
                           ? "number"
                           : "text"
                       }
                       value={editProduct[field] === 0 ? "" : editProduct[field]}
                       onChange={(e) => {
                         const value = e.target.value;
-                        
                         if (["name", "category"].includes(field)) {
                           setEditProduct({ ...editProduct, [field]: value });
                         } else {
-                          // Only allow numbers for numeric fields
                           if (/^\d*\.?\d*$/.test(value)) {
                             setEditProduct({ ...editProduct, [field]: value });
                           }
                         }
                       }}
-                      className="w-full border border-gray-300 px-3 py-1 rounded-md"
+                      className="w-full border border-gray-300 px-3 py-2 rounded-md"
                       disabled={
                         role === "staff" &&
-                        !["name", "category", "delivered", "waste", "use", "withdrawal"].includes(field)
+                        !["name", "category", "delivered", "waste", "use", "withdrawal"].includes(
+                          field
+                        )
                       }
                     />
                   </div>
                 ))}
-                <div className="flex justify-end space-x-2 mt-4">
-                  <button
-                    onClick={() => setShowEditModal(false)}
-                    className="bg-gray-300 px-4 py-1 rounded"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    onClick={handleUpdateProduct}
-                    className="bg-yellow-500 text-white px-4 py-1 rounded"
-                  >
-                    Update
-                  </button>
-                </div>
+              </div>
+              <div className="flex justify-end space-x-2 mt-4">
+                <button
+                  onClick={() => setShowEditModal(false)}
+                  className="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleUpdateProduct}
+                  className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600"
+                >
+                  Update
+                </button>
               </div>
             </div>
-          )}
-
+          </div>
+        )}
+  
         {/* Delete Confirm Modal */}
         {showDeleteConfirm && (
-          <div className="fixed inset-0 flex items-center justify-center bg-black/30 backdrop-blur-lg z-50">
+          <div className="fixed inset-0 flex items-center justify-center bg-black/30 backdrop-blur-sm z-50 p-4">
             <div className="bg-white rounded-lg p-6 w-full max-w-sm text-center">
               <h2 className="text-lg font-semibold mb-4">Confirm Delete</h2>
               <p className="mb-4 text-gray-600">Are you sure you want to delete this product?</p>
               <div className="flex justify-center space-x-4">
-                <button onClick={() => setShowDeleteConfirm(false)} className="bg-gray-300 px-4 py-1 rounded">
+                <button
+                  onClick={() => setShowDeleteConfirm(false)}
+                  className="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400"
+                >
                   Cancel
                 </button>
-                <button onClick={handleDeleteProduct} className="bg-red-500 text-white px-4 py-1 rounded">
+                <button
+                  onClick={handleDeleteProduct}
+                  className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+                >
                   Delete
                 </button>
               </div>
@@ -471,6 +524,7 @@ const BranchInventory = ({ branchName }) => {
       </div>
     </div>
   );
-};
+  
+  };
 
 export default BranchInventory;
