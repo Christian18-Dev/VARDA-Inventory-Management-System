@@ -53,13 +53,43 @@ const BranchInventory = ({ branchName }) => {
     getProducts();
   }, [branchName]);
 
+  const logActivity = async (action, details = {}) => {
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/activitylogs/log`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          username: localStorage.getItem("username") || "Unknown User",
+          role: role,
+          action: action,
+          branch: branchName,
+          details: details,
+          timestamp: new Date().toISOString(),
+        }),
+      });
+  
+      if (!response.ok) {
+        console.error("Failed to log activity:", response.statusText);
+        throw new Error("Failed to log activity");
+      }
+  
+      const result = await response.json();
+      console.log("Activity log response:", result);
+    } catch (err) {
+      console.error("Activity logging error:", err);
+    }
+  };
+
   const handleResetInventory = async () => {
     if (role !== "admin") return;
   
-    const confirmed = window.confirm("Are you sure you want to reset inventory?");
+    const confirmed = window.confirm("Are you sure you want to submit the inventory?");
     if (!confirmed) return;
   
     try {
+      // Save inventory history before resetting
       const baseUrl = import.meta.env.VITE_API_BASE_URL.replace(/\/$/, ""); // Remove trailing slash if present
       const saveHistoryResponse = await fetch(`${baseUrl}/api/history/save`, {
         method: "POST",
@@ -75,19 +105,24 @@ const BranchInventory = ({ branchName }) => {
   
       console.log("✅ Inventory history saved before reset.");
   
-      // 🔸 2. Proceed to reset inventory
+      // Log the inventory submission
+      await logActivity(`Submitted Inventory for ${branchName}`, {
+        productsCount: products.length,
+        timestamp: new Date().toISOString(),
+      });
+  
+      // Proceed to reset inventory
       const result = await resetInventory(branchName);
       if (result) {
-        alert("Inventory reset successfully!");
+        alert("Inventory submitted successfully!");
         const data = await fetchProducts(branchName);
         setProducts(data.products);
       } else {
-        alert("Failed to reset inventory.");
+        alert("Failed to submit inventory.");
       }
-  
     } catch (error) {
-      console.error("❌ Error during reset process:", error);
-      alert("Something went wrong during inventory reset.");
+      console.error("❌ Error during inventory submission:", error);
+      alert("Something went wrong during inventory submission.");
     }
   };
   
@@ -123,18 +158,18 @@ const BranchInventory = ({ branchName }) => {
         });
         setShowAddModal(false);
   
-        // ✅ Log to Activity Log
-        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/activitylogs/log`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            username: localStorage.getItem("username") || "Unknown User",
-            role: role,
-            action: `Added ${productToAdd.name} from the Inventory at ${branchName}`,
-          }),
-        });
+          // ✅ Log to Activity Log
+          const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/activitylogs/log`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              username: localStorage.getItem("username") || "Unknown User",
+              role: role,
+              action: `Added ${productToAdd.name} from the Inventory at ${branchName}`,
+            }),
+          });
   
         if (!response.ok) {
           console.error("Failed to log activity:", response.statusText);
