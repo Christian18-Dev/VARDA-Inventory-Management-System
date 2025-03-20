@@ -2,6 +2,41 @@ const express = require("express");
 const router = express.Router();
 const getInventoryModel = require("../models/BranchInventory");
 
+// ✅ Route to reset inventory for a branch
+router.post("/:branch/reset", async (req, res) => {
+  try {
+    const branch = req.params.branch.toUpperCase();
+    console.log(`🔄 Resetting inventory for branch: ${branch}`);
+
+    // ✅ Get the correct model for the branch
+    const Inventory = getInventoryModel(branch);
+
+    // ✅ Reset relevant fields and set `current` equal to `begInventory`
+    const result = await Inventory.updateMany(
+      {},
+      [
+        {
+          $set: {
+            delivered: 0,
+            waste: 0,
+            use: 0,
+            withdrawal: 0,
+            begInventory: "$current", // ✅ Set `current` equal to `begInventory`
+          },
+        },
+      ]
+    );
+
+    res.json({
+      message: `✅ Inventory reset for branch: ${branch}`,
+      modifiedCount: result.modifiedCount,
+    });
+  } catch (error) {
+    console.error("❌ Error resetting inventory:", error);
+    res.status(500).json({ message: "Error resetting inventory" });
+  }
+});
+
 // ✅ Get all products for a branch (with pagination)
 router.get("/", async (req, res) => {
   try {
