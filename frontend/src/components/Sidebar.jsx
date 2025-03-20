@@ -36,19 +36,20 @@ const Sidebar = () => {
 
   const handleLogout = async () => {
     const username = localStorage.getItem("username"); // Get username from local storage
-    const role = localStorage.getItem("role"); // Get role if needed
+    const role = localStorage.getItem("role"); // Get role from local storage
   
     try {
       // Send a log to the backend before clearing
-      await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/activitylogs/log`, {
+      await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/activitylogs/log`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          username: username || "Unknown User",
-          role: role || "Unknown Role",
-          action: "has Logged out",
+          username: username || "Unknown User", // Fallback to "Unknown User" if username is not found
+          role: role || "Unknown Role", // Fallback to "Unknown Role" if role is not found
+          action: "Logged out", // Action being logged
+          timestamp: new Date().toISOString(), // Add timestamp for the log
         }),
       });
     } catch (error) {
@@ -59,7 +60,7 @@ const Sidebar = () => {
     localStorage.clear();
     navigate("/");
     window.location.reload();
-  };  
+  };
 
   const inventoryBranches = [
     { label: "CHKN CHOP", path: "/inventory/chkn-chop" },
