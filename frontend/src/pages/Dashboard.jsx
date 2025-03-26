@@ -26,24 +26,17 @@ const Dashboard = () => {
         const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/activitylogs`);
         if (!response.ok) throw new Error("Failed to fetch activity logs");
         const data = await response.json();
-  
-        // ✅ Only keep the most recent 5 activities
         setRecentActivity(data.slice(0, 7));
       } catch (error) {
         console.error("Error fetching recent activity:", error);
       }
     };
   
-    // 🕒 Fetch logs on load and every 5 seconds
     fetchRecentActivity();
-    const interval = setInterval(fetchRecentActivity, 5000); // Poll every 5 seconds
-  
-    // 🧹 Cleanup interval on unmount
+    const interval = setInterval(fetchRecentActivity, 5000);
     return () => clearInterval(interval);
   }, []);
   
-  
-
   useEffect(() => {
     const fetchHighInventoryItems = async () => {
       try {
@@ -82,28 +75,21 @@ const Dashboard = () => {
         const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/dashboard/inventory-data`);
         const data = await response.json();
     
-        console.log("Fetched Inventory Data:", data); // Debug API response
-    
-        // Ensure the API response includes "branch" field
         if (!data.every(item => item.branch)) {
           console.error("Missing branch field in API response");
           return;
         }
     
-        // Extract unique product names and branches
         const productNames = [...new Set(data.map(item => item.name))];
         const branches = [...new Set(data.map(item => item.branch))];
     
-        // Group data by branch
         const datasets = branches.map(branch => ({
-          label: branch, // Branch name as the dataset label
+          label: branch,
           data: productNames.map(
             product => data.find(item => item.name === product && item.branch === branch)?.stock || 0
           ),
-          backgroundColor: `#${Math.floor(Math.random() * 16777215).toString(16)}`, // Random color
+          backgroundColor: `#${Math.floor(Math.random() * 16777215).toString(16)}`,
         }));
-    
-        console.log("Processed Chart Data:", { labels: productNames, datasets });
     
         setInventoryGraphData({ labels: productNames, datasets });
       } catch (error) {
@@ -122,18 +108,20 @@ const Dashboard = () => {
       <Sidebar />
       <div className="flex-1 p-6 bg-gray-50 min-h-screen md:ml-64 w-full">
   
-        {/* Top Section (Recent Activity + Pie Chart) */}
+        {/* Top Section */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           
-          {/* Recent Activity */}
-          <div className="bg-white p-6 rounded-xl shadow-lg col-span-2">
-            <h2 className="text-xl font-semibold mb-4 text-gray-800">Recent Activity</h2>
+          {/* Recent Activity Card */}
+          <div className="bg-white p-6 rounded-xl shadow-md border border-gray-100 lg:col-span-2 hover:shadow-lg transition-shadow duration-200">
+            <h2 className="text-xl font-semibold mb-4 text-indigo-700 border-b border-indigo-100 pb-2">
+              Recent Activity
+            </h2>
             <ul className="space-y-3">
               {recentActivity.length > 0 ? (
                 recentActivity.map((activity, index) => (
                   <li
                     key={index}
-                    className="border-b border-gray-200 pb-2 flex justify-start items-center text-sm text-gray-700 hover:bg-gray-50 transition-colors p-2 rounded-md gap-4"
+                    className="border-b border-gray-100 pb-2 flex justify-start items-center text-sm text-gray-700 hover:bg-indigo-50/50 transition-colors p-2 rounded-md gap-4"
                   >
                     <span className="font-medium text-gray-800 w-1/4">{activity.username}</span>
                     <span className="w-1/2 truncate">{activity.action}</span>
@@ -147,53 +135,79 @@ const Dashboard = () => {
               )}
             </ul>
           </div>
-
-          {/* Pie Chart */}
-          <div className="bg-white p-6 rounded-xl shadow-lg flex items-center justify-center">
-          <div className="w-full max-w-[350px] h-[350px]">
-            <h2 className="text-lg font-semibold mb-3 text-gray-800 text-center">Categories</h2>
-            {categoryData.labels.length > 0 ? (
-              <Pie
-                data={{
-                  labels: categoryData.labels,
-                  datasets: [
-                    {
-                      data: categoryData.values,
-                      backgroundColor: ["#FF6384", "#36A2EB", "#FFCE56", "#4CAF50", "#9966FF"],
-                    },
-                  ],
-                }}
-                options={{
-                  responsive: true,
-                  maintainAspectRatio: false,
-                  plugins: {
-                    legend: {
-                      display: true,
-                      position: "bottom",
-                      labels: {
-                        boxWidth: 20,
-                        padding: 20, // Added padding for better spacing
-                        font: {
-                          size: 14,
-                          weight: '500',
+          
+          {/* Pie Chart Card */}
+          <div className="bg-white p-6 rounded-xl shadow-md border border-gray-100 hover:shadow-lg transition-shadow duration-200">
+            <h2 className="text-lg font-semibold mb-3 text-indigo-700">
+              Categories
+            </h2>
+            <div className="flex-grow flex items-center justify-center relative">
+              {categoryData.labels.length > 0 ? (
+                <div className="w-full h-[250px] md:h-[300px] relative">
+                  {/* 3D Shadow Effect */}
+                  <div className="absolute inset-0 transform translate-y-2 opacity-20 blur-sm">
+                    <Pie
+                      data={{
+                        labels: categoryData.labels,
+                        datasets: [{
+                          data: categoryData.values,
+                          backgroundColor: ["#4f46e5", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6"].map(c => `${c}80`),
+                          borderWidth: 0
+                        }],
+                      }}
+                      options={{
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        cutout: '60%'
+                      }}
+                    />
+                  </div>
+                  
+                  {/* Main 3D Pie Chart */}
+                  <div className="absolute inset-0">
+                    <Pie
+                      data={{
+                        labels: categoryData.labels,
+                        datasets: [{
+                          data: categoryData.values,
+                          backgroundColor: ["#4f46e5", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6"],
+                          borderWidth: 2,
+                          borderColor: '#fff',
+                          weight: 0.5
+                        }],
+                      }}
+                      options={{
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { 
+                          legend: { display: false },
+                          tooltip: {
+                            callbacks: {
+                              label: (context) => `${context.label}: ${context.raw}`
+                            }
+                          }
                         },
-                        color: "#555", // Softer gray color for better contrast
-                      },
-                      align: "center",
-                    },
-                  },
-                }}
-              />
-            ) : (
-              <p className="text-gray-500 text-center">Loading...</p>
-            )}
+                        rotation: -15,
+                        borderRadius: 6,
+                        spacing: 2,
+                        radius: '90%'
+                      }}
+                    />
+                  </div>
+                </div>
+              ) : (
+                <p className="text-gray-500 text-center">Loading...</p>
+              )}
+            </div>
           </div>
         </div>
-        </div>
   
-        {/* Middle Section (Bar Graph Chart) */}
-        <div className="bg-white p-6 mt-6 rounded-xl shadow-lg">
-          <h2 className="text-xl font-semibold mb-4 text-gray-800">Used Stock Overview</h2>
+        {/* Bar Graph Card */}
+        <div className="bg-white p-6 mt-6 rounded-xl shadow-md border border-gray-100 hover:shadow-lg transition-shadow duration-200">
+          <h2 className="text-xl font-semibold mb-4 text-indigo-700 border-b border-indigo-100 pb-2">
+            Used Stock Overview
+          </h2>
           <div className="w-full h-[300px]">
             {inventoryGraphData.labels.length > 0 ? (
               <Bar
@@ -218,16 +232,18 @@ const Dashboard = () => {
           </div>
         </div>
   
-        {/* Bottom Section (Tables) */}
+        {/* Tables Section */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
           
-          {/* Highest Inventory Items */}
-          <div className="bg-white p-5 rounded-xl shadow-lg">
-            <h2 className="text-xl font-semibold mb-4 text-gray-800">Top Highest Inventory Items</h2>
+          {/* Slow Moving Items */}
+          <div className="bg-white p-5 rounded-xl shadow-md border border-gray-100 hover:shadow-lg transition-shadow duration-200">
+            <h2 className="text-xl font-semibold mb-4 text-emerald-600 border-b border-emerald-100 pb-2">
+              Slow Moving Items
+            </h2>
             <div className="overflow-x-auto">
               <table className="w-full border-collapse">
                 <thead>
-                  <tr className="bg-gray-200 text-gray-700">
+                  <tr className="bg-indigo-50 text-indigo-700">
                     <th className="p-3 text-left font-medium">Item Name</th>
                     <th className="p-3 text-left font-medium">Inventory</th>
                     <th className="p-3 text-left font-medium">Branch</th>
@@ -236,7 +252,7 @@ const Dashboard = () => {
                 <tbody>
                   {highInventoryItems.length > 0 ? (
                     highInventoryItems.map((item, index) => (
-                      <tr key={index} className="border-b border-gray-200">
+                      <tr key={index} className="border-b border-gray-100 hover:bg-indigo-50/50 transition-colors">
                         <td className="p-3 text-gray-800">{item.name}</td>
                         <td className="p-3 text-gray-800">{item.stock}</td>
                         <td className="p-3 text-gray-800">{item.branch}</td>
@@ -254,13 +270,15 @@ const Dashboard = () => {
             </div>
           </div>
   
-          {/* Lowest Inventory Items */}
-          <div className="bg-white p-5 rounded-xl shadow-lg">
-            <h2 className="text-xl font-semibold mb-4 text-gray-800">Top Lowest Inventory Items</h2>
+          {/* Fast Moving Items */}
+          <div className="bg-white p-5 rounded-xl shadow-md border border-gray-100 hover:shadow-lg transition-shadow duration-200">
+            <h2 className="text-xl font-semibold mb-4 text-amber-500 border-b border-amber-100 pb-2">
+              Fast Moving Items
+            </h2>
             <div className="overflow-x-auto">
               <table className="w-full border-collapse">
                 <thead>
-                  <tr className="bg-gray-200 text-gray-700">
+                  <tr className="bg-amber-50 text-amber-700">
                     <th className="p-3 text-left font-medium">Item Name</th>
                     <th className="p-3 text-left font-medium">Inventory</th>
                     <th className="p-3 text-left font-medium">Branch</th>
@@ -269,7 +287,7 @@ const Dashboard = () => {
                 <tbody>
                   {lowInventoryItems.length > 0 ? (
                     lowInventoryItems.map((item, index) => (
-                      <tr key={index} className="border-b border-gray-200">
+                      <tr key={index} className="border-b border-gray-100 hover:bg-amber-50/50 transition-colors">
                         <td className="p-3 text-gray-800">{item.name}</td>
                         <td className="p-3 text-gray-800">{item.stock}</td>
                         <td className="p-3 text-gray-800">{item.branch}</td>
@@ -291,6 +309,5 @@ const Dashboard = () => {
     </div>
   );
 };  
-    
 
 export default Dashboard;

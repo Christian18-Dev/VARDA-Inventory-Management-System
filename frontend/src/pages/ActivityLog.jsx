@@ -1,17 +1,31 @@
 import { useEffect, useState } from "react";
 import Sidebar from "../components/Sidebar";
+import Navbar from "../components/Navbar";
 
 const ActivityLog = () => {
   const [logs, setLogs] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1); // Track current page
-  const [logsPerPage] = useState(15); // Number of logs per page
+  const [currentPage, setCurrentPage] = useState(1);
+  const [logsPerPage] = useState(15);
+  const [searchQuery, setSearchQuery] = useState("");
 
-  // ✅ Fetch logs on page load
+  // Filter logs based on search query
+  const filteredLogs = logs.filter(log => 
+    log.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    log.role.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    log.action.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    new Date(log.timestamp).toLocaleString().toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  // Reset to first page when search query changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery]);
+
+  // Fetch logs on page load
   useEffect(() => {
     fetchLogs();
   }, []);
 
-  // ✅ Fetch logs from backend
   const fetchLogs = async () => {
     try {
       const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/activitylogs`);
@@ -23,7 +37,6 @@ const ActivityLog = () => {
     }
   };
 
-  // ✅ Clear logs from backend and UI
   const clearLogs = async () => {
     try {
       const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/activitylogs/clear`, {
@@ -31,7 +44,8 @@ const ActivityLog = () => {
       });
 
       if (response.ok) {
-        setLogs([]); // Clear logs from UI
+        setLogs([]);
+        setSearchQuery("");
         console.log("Logs cleared successfully!");
       } else {
         console.error("Failed to clear logs.");
@@ -41,119 +55,121 @@ const ActivityLog = () => {
     }
   };
 
-  // ✅ Pagination Logic
+  // Pagination Logic
   const indexOfLastLog = currentPage * logsPerPage;
   const indexOfFirstLog = indexOfLastLog - logsPerPage;
-  const currentLogs = logs.slice(indexOfFirstLog, indexOfLastLog);
+  const currentLogs = filteredLogs.slice(indexOfFirstLog, indexOfLastLog);
+  const totalPages = Math.ceil(filteredLogs.length / logsPerPage);
 
-  // ✅ Change page
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
-
-  // ✅ Calculate total pages
-  const totalPages = Math.ceil(logs.length / logsPerPage);
 
   return (
     <div className="flex min-h-screen bg-gray-50">
-      {/* Sidebar - Fixed Width */}
+      {/* Sidebar */}
       <div className="w-64">
         <Sidebar />
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 p-4 md:p-8">
-        {/* Header and Clear Button */}
-        <div className="flex flex-col md:flex-row justify-between items-center mb-6">
-          <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-4 md:mb-0">
-            Activity Log
-          </h2>
-
-          {/* ✅ Clear Logs Button */}
-          <button
-            onClick={clearLogs}
-            className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-4 py-2 rounded-lg shadow-md transition-all duration-300 transform hover:scale-105"
-          >
-            Clear Logs
-          </button>
+      <div className="flex-1 flex flex-col">
+        {/* Navbar */}
+        <div className="h-16">
+          <Navbar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
         </div>
 
-        {/* Table Container */}
-        <div className="overflow-x-auto bg-white rounded-xl shadow-lg">
-          <table className="min-w-full">
-            <thead className="bg-gradient-to-r from-blue-600 to-blue-700">
-              <tr>
-                <th className="px-4 py-3 md:px-6 md:py-4 text-left text-xs md:text-sm font-semibold text-white uppercase tracking-wider">
-                  Username
-                </th>
-                <th className="px-4 py-3 md:px-6 md:py-4 text-left text-xs md:text-sm font-semibold text-white uppercase tracking-wider">
-                  Role
-                </th>
-                <th className="px-4 py-3 md:px-6 md:py-4 text-left text-xs md:text-sm font-semibold text-white uppercase tracking-wider">
-                  Action
-                </th>
-                <th className="px-4 py-3 md:px-6 md:py-4 text-left text-xs md:text-sm font-semibold text-white uppercase tracking-wider">
-                  Timestamp
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200">
-              {currentLogs.length > 0 ? (
-                currentLogs.map((log) => (
-                  <tr
-                    key={log._id}
-                    className="hover:bg-gray-50 transition-colors duration-200"
-                  >
-                    <td className="px-4 py-3 md:px-6 md:py-4 text-xs md:text-sm text-gray-700">
-                      {log.username}
-                    </td>
-                    <td className="px-4 py-3 md:px-6 md:py-4 text-xs md:text-sm text-gray-700">
-                      {log.role}
-                    </td>
-                    <td className="px-4 py-3 md:px-6 md:py-4 text-xs md:text-sm text-gray-700 whitespace-normal max-w-[200px]">
-                      <div className="truncate hover:whitespace-normal" title={log.action}>
-                        {log.action}
-                      </div>
-                    </td>
-                    <td className="px-4 py-3 md:px-6 md:py-4 text-xs md:text-sm text-gray-700">
-                      {new Date(log.timestamp).toLocaleString()}
+        {/* Content */}
+        <div className="p-4 md:p-8 mt-4">
+          {/* Header and Clear Button */}
+          <div className="flex flex-col md:flex-row justify-between items-center mb-6">
+            <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-4 md:mb-0">
+              Activity Log
+            </h2>
+            <button
+              onClick={clearLogs}
+              className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-4 py-2 rounded-lg shadow-md transition-all duration-300 transform hover:scale-105"
+            >
+              Clear Logs
+            </button>
+          </div>
+
+          {/* Table */}
+          <div className="overflow-x-auto bg-white rounded-xl shadow-lg">
+            <table className="min-w-full">
+              <thead className="bg-gradient-to-r from-blue-600 to-blue-700">
+                <tr>
+                  <th className="px-4 py-3 md:px-6 md:py-4 text-left text-xs md:text-sm font-semibold text-white uppercase tracking-wider">
+                    Username
+                  </th>
+                  <th className="px-4 py-3 md:px-6 md:py-4 text-left text-xs md:text-sm font-semibold text-white uppercase tracking-wider">
+                    Role
+                  </th>
+                  <th className="px-4 py-3 md:px-6 md:py-4 text-left text-xs md:text-sm font-semibold text-white uppercase tracking-wider">
+                    Action
+                  </th>
+                  <th className="px-4 py-3 md:px-6 md:py-4 text-left text-xs md:text-sm font-semibold text-white uppercase tracking-wider">
+                    Timestamp
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-200">
+                {currentLogs.length > 0 ? (
+                  currentLogs.map((log) => (
+                    <tr key={log._id} className="hover:bg-gray-50 transition-colors duration-200">
+                      <td className="px-4 py-3 md:px-6 md:py-4 text-xs md:text-sm text-gray-700">
+                        {log.username}
+                      </td>
+                      <td className="px-4 py-3 md:px-6 md:py-4 text-xs md:text-sm text-gray-700">
+                        {log.role}
+                      </td>
+                      <td className="px-4 py-3 md:px-6 md:py-4 text-xs md:text-sm text-gray-700 whitespace-normal max-w-[200px]">
+                        <div className="truncate hover:whitespace-normal" title={log.action}>
+                          {log.action}
+                        </div>
+                      </td>
+                      <td className="px-4 py-3 md:px-6 md:py-4 text-xs md:text-sm text-gray-700">
+                        {new Date(log.timestamp).toLocaleString()}
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="4" className="text-center p-6 text-gray-500">
+                      {searchQuery ? "No matching logs found" : "No activity logs yet"}
                     </td>
                   </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan="4" className="text-center p-6 text-gray-500">
-                    No activity logs yet.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-
-        {/* ✅ Pagination Controls */}
-        {logs.length > logsPerPage && (
-          <div className="flex justify-between items-center mt-6">
-            <div className="text-gray-700">
-              Showing {indexOfFirstLog + 1} to {Math.min(indexOfLastLog, logs.length)} of {logs.length} logs
-            </div>
-            <div className="flex gap-2">
-              <button
-                onClick={() => paginate(currentPage - 1)}
-                disabled={currentPage === 1}
-                className="px-4 py-2 bg-gray-200 rounded-lg disabled:opacity-50"
-              >
-                Previous
-              </button>
-              <span className="px-4 py-2 bg-gray-200 rounded-lg">{currentPage}</span>
-              <button
-                onClick={() => paginate(currentPage + 1)}
-                disabled={currentPage === totalPages}
-                className="px-4 py-2 bg-gray-200 rounded-lg disabled:opacity-50"
-              >
-                Next
-              </button>
-            </div>
+                )}
+              </tbody>
+            </table>
           </div>
-        )}
+
+          {/* Pagination */}
+          {filteredLogs.length > logsPerPage && (
+            <div className="flex justify-between items-center mt-6">
+              <div className="text-gray-700">
+                Showing {indexOfFirstLog + 1} to {Math.min(indexOfLastLog, filteredLogs.length)} of {filteredLogs.length} logs
+              </div>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => paginate(currentPage - 1)}
+                  disabled={currentPage === 1}
+                  className="px-4 py-2 bg-gray-200 rounded-lg disabled:opacity-50"
+                >
+                  Previous
+                </button>
+                <span className="px-4 py-2 bg-gray-200 rounded-lg">
+                  {currentPage} of {totalPages}
+                </span>
+                <button
+                  onClick={() => paginate(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                  className="px-4 py-2 bg-gray-200 rounded-lg disabled:opacity-50"
+                >
+                  Next
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

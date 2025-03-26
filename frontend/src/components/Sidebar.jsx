@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Menu, X, ChevronDown, ChevronUp, LogOut } from "lucide-react";
-import logo from "../assets/logoplaceholder.png"; // Replace with actual logo path
+import logo from "../assets/logoplaceholder.png";
 
 const Sidebar = () => {
   const location = useLocation();
@@ -73,18 +73,18 @@ const Sidebar = () => {
 
   return (
     <>
-      {/* ✅ Desktop Sidebar */}
-      <div className="hidden md:flex flex-col w-64 h-full bg-gradient-to-b from-[#1E1E1E] to-[#0A0A0A] text-[#EAEAEA] p-5 fixed top-0 left-0 overflow-y-auto shadow-lg shadow-[#3A3A3A] z-40">
+      {/* Desktop Sidebar */}
+      <div className="hidden md:flex flex-col w-64 h-full bg-gradient-to-b from-indigo-900 to-indigo-950 text-white p-5 fixed top-0 left-0 overflow-y-auto shadow-lg z-40">
         <div className="flex items-center gap-3 mb-6">
           <img src={logo} alt="Logo" className="w-10" />
-          <span className="text-xl font-bold">VARDA ENTERPRISE</span>
+          <span className="text-xl font-bold text-white">VARDA ENTERPRISE</span>
         </div>
 
         <nav className="flex flex-col space-y-2 flex-grow">
           <SidebarLink to="/dashboard" label="Dashboard" currentPath={location.pathname} />
 
           <button
-            className="flex justify-between items-center w-full px-4 py-2 rounded-md hover:bg-[#4F46E5] transition"
+            className="flex justify-between items-center w-full px-4 py-2 rounded-md hover:bg-indigo-700 transition"
             onClick={toggleInventoryDropdown}
           >
             <span>Inventory</span>
@@ -99,8 +99,8 @@ const Sidebar = () => {
                   to={branch.path}
                   className={`text-sm px-4 py-1 rounded-md transition ${
                     location.pathname === branch.path
-                      ? "bg-[#4F46E5] text-white"
-                      : "hover:bg-[#3A3A3A] text-gray-200"
+                      ? "bg-indigo-600 text-white"
+                      : "hover:bg-indigo-800/50 text-gray-200"
                   }`}
                 >
                   {branch.label}
@@ -110,7 +110,10 @@ const Sidebar = () => {
           )}
 
           <SidebarLink to="/history" label="History" currentPath={location.pathname} />
-          <SidebarLink to="/activitylogs" label="Activity Logs" currentPath={location.pathname} />
+          
+          {userRole === "Admin" && (
+            <SidebarLink to="/activitylogs" label="Activity Logs" currentPath={location.pathname} />
+          )}
 
           {userRole === "Admin" && (
             <SidebarLink to="/users" label="Users" currentPath={location.pathname} />
@@ -119,17 +122,17 @@ const Sidebar = () => {
 
         <button
           onClick={() => setIsLogoutModalOpen(true)}
-          className="mt-auto flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-md transition"
+          className="mt-auto flex items-center justify-center gap-2 bg-rose-600 hover:bg-rose-700 text-white py-2 px-4 rounded-md transition"
         >
           <LogOut size={18} />
           Logout
         </button>
       </div>
 
-      {/* ✅ Mobile Menu Button */}
+      {/* Mobile Menu Button */}
       {!isOpen && (
         <button
-          className="md:hidden fixed top-2 left-2 bg-[#1E1E1E] text-white p-2 rounded-md z-50 shadow-lg"
+          className="md:hidden fixed top-4 left-4 bg-indigo-900 text-white p-3 rounded-md z-50 shadow-lg hover:bg-indigo-800 transition"
           onClick={() => setIsOpen(true)}
           aria-label="Open menu"
         >
@@ -137,15 +140,15 @@ const Sidebar = () => {
         </button>
       )}
 
-      {/* ✅ Mobile Sidebar */}
+      {/* Mobile Sidebar */}
       <div
-        className={`fixed top-0 left-0 h-full w-64 bg-gradient-to-b from-[#1E1E1E] to-[#0A0A0A] text-white p-5 transition-transform duration-300 ease-in-out ${
+        className={`fixed top-0 left-0 h-full w-64 bg-gradient-to-b from-indigo-900 to-indigo-950 text-white p-5 transition-transform duration-300 ease-in-out ${
           isOpen ? "translate-x-0" : "-translate-x-full"
-        } md:hidden z-50 shadow-lg`}
+        } md:hidden z-50 shadow-lg flex flex-col`}
       >
         {/* Close Button */}
         <button
-          className="absolute top-2 right-2 text-white p-2 rounded-md hover:bg-[#3A3A3A] transition"
+          className="absolute top-4 right-4 text-white p-2 rounded-md hover:bg-indigo-800 transition"
           onClick={() => setIsOpen(false)}
           aria-label="Close menu"
         >
@@ -154,10 +157,10 @@ const Sidebar = () => {
 
         <div className="flex items-center gap-3 mb-6 mt-6">
           <img src={logo} alt="Logo" className="w-8" />
-          <span className="text-lg font-bold">VARDA ENTERPRISE</span>
+          <span className="text-lg font-bold text-white">VARDA ENTERPRISE</span>
         </div>
 
-        <nav className="flex flex-col space-y-2 flex-grow">
+        <nav className="flex flex-col space-y-2 flex-grow overflow-y-auto">
           <SidebarLink
             to="/dashboard"
             label="Dashboard"
@@ -166,7 +169,7 @@ const Sidebar = () => {
           />
 
           <button
-            className="flex justify-between items-center w-full px-4 py-2 rounded-md hover:bg-[#4F46E5] transition"
+            className="flex justify-between items-center w-full px-4 py-2 rounded-md hover:bg-indigo-700 transition"
             onClick={toggleInventoryDropdown}
           >
             <span>Inventory</span>
@@ -182,8 +185,8 @@ const Sidebar = () => {
                   onClick={() => setIsOpen(false)}
                   className={`text-sm px-4 py-1 rounded-md transition ${
                     location.pathname === branch.path
-                      ? "bg-[#4F46E5] text-white"
-                      : "hover:bg-[#3A3A3A] text-gray-200"
+                      ? "bg-indigo-600 text-white"
+                      : "hover:bg-indigo-800/50 text-gray-200"
                   }`}
                 >
                   {branch.label}
@@ -198,12 +201,16 @@ const Sidebar = () => {
             currentPath={location.pathname}
             onClick={() => setIsOpen(false)}
           />
-          <SidebarLink
-            to="/activitylogs"
-            label="Activity Logs"
-            currentPath={location.pathname}
-            onClick={() => setIsOpen(false)}
-          />
+
+          {userRole === "Admin" && (
+            <SidebarLink
+              to="/activitylogs"
+              label="Activity Logs"
+              currentPath={location.pathname}
+              onClick={() => setIsOpen(false)}
+            />
+          )}
+
           {userRole === "Admin" && (
             <SidebarLink
               to="/users"
@@ -214,19 +221,22 @@ const Sidebar = () => {
           )}
         </nav>
 
-        <button
-          onClick={() => {
-            setIsOpen(false);
-            setIsLogoutModalOpen(true);
-          }}
-          className="mt-auto flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-md transition"
-        >
-          <LogOut size={18} />
-          Logout
-        </button>
+        {/* Logout Button - Fixed at bottom */}
+        <div className="mt-auto pt-4">
+          <button
+            onClick={() => {
+              setIsOpen(false);
+              setIsLogoutModalOpen(true);
+            }}
+            className="w-full flex items-center justify-center gap-2 bg-rose-600 hover:bg-rose-700 text-white py-2 px-4 rounded-md transition"
+          >
+            <LogOut size={18} />
+            Logout
+          </button>
+        </div>
       </div>
 
-      {/* ✅ Logout Modal */}
+      {/* Logout Modal */}
       {isLogoutModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-black/30 backdrop-blur-lg z-50">
           <div className="bg-white p-5 rounded-lg shadow-lg w-80">
@@ -235,13 +245,13 @@ const Sidebar = () => {
             <div className="mt-4 flex justify-end gap-3">
               <button
                 onClick={handleLogout}
-                className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md"
+                className="bg-rose-600 hover:bg-rose-700 text-white px-4 py-2 rounded-md"
               >
                 Yes, Logout
               </button>
               <button
                 onClick={() => setIsLogoutModalOpen(false)}
-                className="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-md"
+                className="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-md"
               >
                 Cancel
               </button>
@@ -253,13 +263,14 @@ const Sidebar = () => {
   );
 };
 
-// ✅ SidebarLink Component
 const SidebarLink = ({ to, label, currentPath, onClick }) => (
   <Link
     to={to}
     onClick={onClick}
     className={`block px-4 py-2 rounded-md transition ${
-      currentPath === to ? "bg-[#4F46E5] text-white" : "hover:bg-[#3A3A3A] text-gray-200"
+      currentPath === to 
+        ? "bg-indigo-600 text-white shadow-md" 
+        : "hover:bg-indigo-800/50 text-gray-200"
     }`}
   >
     {label}
