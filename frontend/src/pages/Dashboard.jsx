@@ -106,7 +106,7 @@ const Dashboard = () => {
   return (
     <div className="flex">
       <Sidebar />
-      <div className="flex-1 p-6 bg-gray-50 min-h-screen md:ml-64 w-full">
+      <div className="flex-1 p-6 bg-gray-100 min-h-screen md:ml-64 w-full">
   
         {/* Top Section */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

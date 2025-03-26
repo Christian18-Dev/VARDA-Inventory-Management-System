@@ -132,7 +132,7 @@ const Sidebar = () => {
       {/* Mobile Menu Button */}
       {!isOpen && (
         <button
-          className="md:hidden fixed top-4 left-4 bg-indigo-900 text-white p-3 rounded-md z-50 shadow-lg hover:bg-indigo-800 transition"
+          className="md:hidden fixed top-2 left-2 bg-indigo-900 text-white p-3 rounded-md z-60 shadow-lg hover:bg-indigo-800 transition"
           onClick={() => setIsOpen(true)}
           aria-label="Open menu"
         >

@@ -37,7 +37,7 @@ const LoginForm = () => {
         body: JSON.stringify({
           username: username,
           role: data.role,
-          action: "has logged in",
+          action: "Logged in",
         }),
       });
   
