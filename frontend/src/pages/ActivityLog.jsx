@@ -7,6 +7,7 @@ const ActivityLog = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [logsPerPage] = useState(15);
   const [searchQuery, setSearchQuery] = useState("");
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   // Filter logs based on search query
   const filteredLogs = logs.filter(log => 
@@ -64,21 +65,25 @@ const ActivityLog = () => {
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
-      {/* Sidebar */}
-      <div className="w-64">
+    <div className="flex min-h-screen bg-gray-50 relative">
+      {/* Sidebar - Fixed position that overlaps content */}
+      <div className={`w-64`}>
         <Sidebar />
       </div>
 
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col">
-        {/* Navbar */}
+      {/* Main Content - Full width */}
+      <div className="flex-1 flex flex-col w-full">
+        {/* Navbar - Pass the sidebar toggle function */}
         <div className="h-16">
-          <Navbar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+          <Navbar 
+            searchQuery={searchQuery} 
+            setSearchQuery={setSearchQuery}
+            onMenuClick={() => setSidebarOpen(!sidebarOpen)}
+          />
         </div>
 
-        {/* Content */}
-        <div className="p-4 md:p-8 mt-4">
+        {/* Content - Centered with max-width */}
+        <div className="p-4 md:p-8 mt-4 w-full max-w-[1800px] mx-auto">
           {/* Header and Clear Button */}
           <div className="flex flex-col md:flex-row justify-between items-center mb-6">
             <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-4 md:mb-0">
@@ -92,21 +97,21 @@ const ActivityLog = () => {
             </button>
           </div>
 
-          {/* Table */}
-          <div className="overflow-x-auto bg-white rounded-xl shadow-lg">
+          {/* Table Container */}
+          <div className="w-full overflow-x-auto bg-white rounded-xl shadow-lg">
             <table className="min-w-full">
               <thead className="bg-gradient-to-r from-blue-600 to-blue-700">
                 <tr>
-                  <th className="px-4 py-3 md:px-6 md:py-4 text-left text-xs md:text-sm font-semibold text-white uppercase tracking-wider">
+                  <th className="px-3 py-2 md:px-6 md:py-4 text-left text-xs md:text-sm font-semibold text-white uppercase tracking-wider">
                     Username
                   </th>
-                  <th className="px-4 py-3 md:px-6 md:py-4 text-left text-xs md:text-sm font-semibold text-white uppercase tracking-wider">
+                  <th className="px-3 py-2 md:px-6 md:py-4 text-left text-xs md:text-sm font-semibold text-white uppercase tracking-wider">
                     Role
                   </th>
-                  <th className="px-4 py-3 md:px-6 md:py-4 text-left text-xs md:text-sm font-semibold text-white uppercase tracking-wider">
+                  <th className="px-3 py-2 md:px-6 md:py-4 text-left text-xs md:text-sm font-semibold text-white uppercase tracking-wider">
                     Action
                   </th>
-                  <th className="px-4 py-3 md:px-6 md:py-4 text-left text-xs md:text-sm font-semibold text-white uppercase tracking-wider">
+                  <th className="px-3 py-2 md:px-6 md:py-4 text-left text-xs md:text-sm font-semibold text-white uppercase tracking-wider">
                     Timestamp
                   </th>
                 </tr>
@@ -115,18 +120,16 @@ const ActivityLog = () => {
                 {currentLogs.length > 0 ? (
                   currentLogs.map((log) => (
                     <tr key={log._id} className="hover:bg-gray-50 transition-colors duration-200">
-                      <td className="px-4 py-3 md:px-6 md:py-4 text-xs md:text-sm text-gray-700">
+                      <td className="px-3 py-2 md:px-6 md:py-4 text-xs md:text-sm text-gray-700">
                         {log.username}
                       </td>
-                      <td className="px-4 py-3 md:px-6 md:py-4 text-xs md:text-sm text-gray-700">
+                      <td className="px-3 py-2 md:px-6 md:py-4 text-xs md:text-sm text-gray-700">
                         {log.role}
                       </td>
-                      <td className="px-4 py-3 md:px-6 md:py-4 text-xs md:text-sm text-gray-700 whitespace-normal max-w-[200px]">
-                        <div className="truncate hover:whitespace-normal" title={log.action}>
-                          {log.action}
-                        </div>
+                      <td className="px-3 py-2 md:px-6 md:py-4 text-xs md:text-sm text-gray-700 max-w-[150px] md:max-w-[200px] truncate hover:whitespace-normal">
+                        {log.action}
                       </td>
-                      <td className="px-4 py-3 md:px-6 md:py-4 text-xs md:text-sm text-gray-700">
+                      <td className="px-3 py-2 md:px-6 md:py-4 text-xs md:text-sm text-gray-700">
                         {new Date(log.timestamp).toLocaleString()}
                       </td>
                     </tr>
@@ -144,25 +147,25 @@ const ActivityLog = () => {
 
           {/* Pagination */}
           {filteredLogs.length > logsPerPage && (
-            <div className="flex justify-between items-center mt-6">
-              <div className="text-gray-700">
+            <div className="flex flex-col md:flex-row justify-between items-center mt-6 gap-4">
+              <div className="text-gray-700 text-sm md:text-base">
                 Showing {indexOfFirstLog + 1} to {Math.min(indexOfLastLog, filteredLogs.length)} of {filteredLogs.length} logs
               </div>
               <div className="flex gap-2">
                 <button
                   onClick={() => paginate(currentPage - 1)}
                   disabled={currentPage === 1}
-                  className="px-4 py-2 bg-gray-200 rounded-lg disabled:opacity-50"
+                  className="px-3 py-1 md:px-4 md:py-2 bg-gray-200 rounded-lg disabled:opacity-50 text-sm md:text-base"
                 >
                   Previous
                 </button>
-                <span className="px-4 py-2 bg-gray-200 rounded-lg">
+                <span className="px-3 py-1 md:px-4 md:py-2 bg-gray-200 rounded-lg text-sm md:text-base">
                   {currentPage} of {totalPages}
                 </span>
                 <button
                   onClick={() => paginate(currentPage + 1)}
                   disabled={currentPage === totalPages}
-                  className="px-4 py-2 bg-gray-200 rounded-lg disabled:opacity-50"
+                  className="px-3 py-1 md:px-4 md:py-2 bg-gray-200 rounded-lg disabled:opacity-50 text-sm md:text-base"
                 >
                   Next
                 </button>
