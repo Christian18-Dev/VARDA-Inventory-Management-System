@@ -8,7 +8,6 @@ router.post("/:branch/reset", async (req, res) => {
     const branch = req.params.branch.toUpperCase();
     console.log(`🔄 Resetting inventory for branch: ${branch}`);
 
-    // ✅ Get the correct model for the branch
     const Inventory = getInventoryModel(branch);
 
     // ✅ Reset relevant fields and set `current` equal to `begInventory`
@@ -19,9 +18,8 @@ router.post("/:branch/reset", async (req, res) => {
           $set: {
             delivered: 0,
             waste: 0,
-            use: 0,
             withdrawal: 0,
-            begInventory: "$current", // ✅ Set `current` equal to `begInventory`
+            begInventory: "$current", // Set current as new begInventory
           },
         },
       ]
@@ -46,7 +44,6 @@ router.get("/", async (req, res) => {
     const Inventory = getInventoryModel(branch);
     const skip = (parseInt(page) - 1) * parseInt(limit);
 
-    // ✅ Explicitly select `price` field
     const products = await Inventory.find()
       .select("name category price begInventory delivered waste use withdrawal current")
       .sort({ createdAt: -1 })
@@ -55,7 +52,12 @@ router.get("/", async (req, res) => {
 
     const total = await Inventory.countDocuments();
 
-    res.json({ products, total, page: parseInt(page), totalPages: Math.ceil(total / limit) });
+    res.json({
+      products,
+      total,
+      page: parseInt(page),
+      totalPages: Math.ceil(total / limit),
+    });
   } catch (error) {
     console.error("❌ Error fetching products:", error);
     res.status(500).json({ message: "Error fetching products", error: error.message });
@@ -83,11 +85,9 @@ router.post("/", async (req, res) => {
 
     const Inventory = getInventoryModel(branch);
 
-    // ✅ Calculate current inventory
     const current =
       (begInventory || 0) + (delivered || 0) - (waste || 0) - (use || 0) - (withdrawal || 0);
 
-    // ✅ Create new product
     const newProduct = new Inventory({
       name,
       category,
@@ -100,10 +100,8 @@ router.post("/", async (req, res) => {
       current,
     });
 
-    // ✅ Save the product
     const savedProduct = await newProduct.save();
 
-    // ✅ Ensure price is included in the response
     const responseProduct = await Inventory.findById(savedProduct._id).select("+price");
 
     res.status(201).json(responseProduct);
@@ -113,7 +111,7 @@ router.post("/", async (req, res) => {
   }
 });
 
-// ✅ Update product in a branch
+// ✅ Update product in a branch (with delivered - use logic)
 router.put("/:id", async (req, res) => {
   try {
     const { branch } = req.query;
@@ -132,11 +130,24 @@ router.put("/:id", async (req, res) => {
 
     const Inventory = getInventoryModel(branch);
 
-    // ✅ Calculate current inventory
-    const current =
-      (begInventory || 0) + (delivered || 0) - (waste || 0) - (use || 0) - (withdrawal || 0);
+    const existingProduct = await Inventory.findById(req.params.id);
+    if (!existingProduct) {
+      return res.status(404).json({ message: "Product not found" });
+    }
 
-    // ✅ Update product
+    const deliveredDiff = (delivered || 0) - (existingProduct.delivered || 0);
+
+    // 👇 Subtract deliveredDiff from existing or provided 'use'
+    let updatedUse = (use !== undefined ? use : existingProduct.use || 0) - deliveredDiff;
+    if (updatedUse < 0) updatedUse = 0;
+
+    const current =
+      (begInventory || 0) +
+      (delivered || 0) -
+      (waste || 0) -
+      updatedUse -
+      (withdrawal || 0);
+
     const updatedProduct = await Inventory.findByIdAndUpdate(
       req.params.id,
       {
@@ -146,16 +157,12 @@ router.put("/:id", async (req, res) => {
         begInventory: begInventory || 0,
         delivered: delivered || 0,
         waste: waste || 0,
-        use: use || 0,
+        use: updatedUse,
         withdrawal: withdrawal || 0,
         current,
       },
       { new: true }
     ).select("+price");
-
-    if (!updatedProduct) {
-      return res.status(404).json({ message: "Product not found" });
-    }
 
     res.json(updatedProduct);
   } catch (error) {
@@ -180,7 +187,7 @@ router.delete("/:id", async (req, res) => {
   }
 });
 
-// ✅ Check if the database is connected
+// ✅ Check DB connection
 router.get("/check-db", (req, res) => {
   if (!req.app.locals.db) {
     return res.status(500).json({ message: "Native DB not initialized" });

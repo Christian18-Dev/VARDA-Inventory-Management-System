@@ -6,7 +6,7 @@ const Navbar = ({ searchQuery, setSearchQuery }) => {
       {/* Search Bar */}
       <input
         type="text"
-        placeholder="Search products..."
+        placeholder="Search here..."
         value={searchQuery}
         onChange={(e) => setSearchQuery(e.target.value)}
         className="p-2 rounded-md text-black bg-white w-full max-w-xs sm:max-w-md focus:outline-none"
@@ -14,8 +14,7 @@ const Navbar = ({ searchQuery, setSearchQuery }) => {
 
       {/* Icons */}
       <div className="flex items-center space-x-4">
-        <FaBell className="cursor-pointer text-xl ml-2" />
-        <FaCog className="cursor-pointer text-xl" />
+        <FaBell className="cursor-pointer text-xl ml-2" />  
       </div>
     </nav>
   );
