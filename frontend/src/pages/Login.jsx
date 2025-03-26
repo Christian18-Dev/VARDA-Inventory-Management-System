@@ -93,7 +93,7 @@ const LoginForm = () => {
           </p>
           <div className="mt-8 w-full">
             <div className="h-1 bg-indigo-400/30 w-full mb-2">
-              <div className="h-1 bg-white/80 w-3/4"></div>
+              <div className="h-1 bg-white/80 w-4/4"></div>
             </div>
           </div>
         </div>
