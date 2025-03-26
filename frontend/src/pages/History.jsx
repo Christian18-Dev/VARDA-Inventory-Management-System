@@ -60,14 +60,20 @@ const History = () => {
       setFilteredData(historyData);
       return;
     }
-
+  
     const filtered = historyData.filter((record) => {
       const recordDate = new Date(record.date);
       const start = new Date(startDate);
       const end = new Date(endDate);
+      
+      // Set time to midnight for proper date comparison
+      start.setHours(0, 0, 0, 0);
+      end.setHours(23, 59, 59, 999); // Include entire end date
+      recordDate.setHours(0, 0, 0, 0);
+      
       return recordDate >= start && recordDate <= end;
     });
-
+  
     setFilteredData(filtered);
     setCurrentPage(1); // Reset to first page after filtering
   };
