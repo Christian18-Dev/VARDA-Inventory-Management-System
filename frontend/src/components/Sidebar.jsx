@@ -61,15 +61,31 @@ const Sidebar = () => {
   };
 
   const inventoryBranches = [
-    { label: "CHKN CHOP", path: "/inventory/chkn-chop" },
-    { label: "VARDA BURGER", path: "/inventory/varda-burger" },
-    { label: "THE GOOD JUICE", path: "/inventory/the-good-juice" },
-    { label: "THE GOOD NOODLES", path: "/inventory/the-good-noodles" },
-    { label: "NRB VARDA", path: "/inventory/nrb-varda" },
-    { label: "PUP VARDA", path: "/inventory/pup-varda" },
-    { label: "ST JUDE VARDA", path: "/inventory/st-jude-varda" },
-    { label: "INTRAMUROS VARDA", path: "/inventory/intramuros-varda" },
+    { label: "CHKN CHOP", path: "/inventory/chkn-chop", roleMatch: "ChknChop" },
+    { label: "VARDA BURGER", path: "/inventory/varda-burger", roleMatch: "VardaBurger" },
+    { label: "THE GOOD JUICE", path: "/inventory/the-good-juice", roleMatch: "GoodJuice" },
+    { label: "THE GOOD NOODLES", path: "/inventory/the-good-noodles", roleMatch: "GoodNoodles" },
+    { label: "NRB VARDA", path: "/inventory/nrb-varda", roleMatch: "NRB" },
+    { label: "PUP VARDA", path: "/inventory/pup-varda", roleMatch: "PUP" },
+    { label: "ST JUDE VARDA", path: "/inventory/st-jude-varda", roleMatch: "STJude" },
+    { label: "INTRAMUROS VARDA", path: "/inventory/intramuros-varda", roleMatch: "Intramuros" },
   ];
+
+  const getAccessibleBranches = () => {
+    if (!userRole) return [];
+    if (userRole === "Admin" || userRole === "Manager") return inventoryBranches;
+
+    if (userRole.startsWith("Staff-")) {
+      const staffBranch = userRole.replace("Staff-", "");
+      return inventoryBranches.filter(branch => 
+        branch.roleMatch === staffBranch
+      );
+    }
+
+    return [];
+  };
+
+  const accessibleBranches = getAccessibleBranches();
 
   return (
     <>
@@ -83,30 +99,34 @@ const Sidebar = () => {
         <nav className="flex flex-col space-y-2 flex-grow">
           <SidebarLink to="/dashboard" label="Dashboard" currentPath={location.pathname} />
 
-          <button
-            className="flex justify-between items-center w-full px-4 py-2 rounded-md hover:bg-indigo-700 transition"
-            onClick={toggleInventoryDropdown}
-          >
-            <span>Inventory</span>
-            {showInventoryDropdown ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-          </button>
+          {accessibleBranches.length > 0 && (
+            <>
+              <button
+                className="flex justify-between items-center w-full px-4 py-2 rounded-md hover:bg-indigo-700 transition"
+                onClick={toggleInventoryDropdown}
+              >
+                <span>Inventory</span>
+                {showInventoryDropdown ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+              </button>
 
-          {showInventoryDropdown && (
-            <div className="ml-4 flex flex-col space-y-1">
-              {inventoryBranches.map((branch) => (
-                <Link
-                  key={branch.path}
-                  to={branch.path}
-                  className={`text-sm px-4 py-1 rounded-md transition ${
-                    location.pathname === branch.path
-                      ? "bg-indigo-600 text-white"
-                      : "hover:bg-indigo-800/50 text-gray-200"
-                  }`}
-                >
-                  {branch.label}
-                </Link>
-              ))}
-            </div>
+              {showInventoryDropdown && (
+                <div className="ml-4 flex flex-col space-y-1">
+                  {accessibleBranches.map((branch) => (
+                    <Link
+                      key={branch.path}
+                      to={branch.path}
+                      className={`text-sm px-4 py-1 rounded-md transition ${
+                        location.pathname === branch.path
+                          ? "bg-indigo-600 text-white"
+                          : "hover:bg-indigo-800/50 text-gray-200"
+                      }`}
+                    >
+                      {branch.label}
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </>
           )}
 
           <SidebarLink to="/history" label="History" currentPath={location.pathname} />
@@ -168,31 +188,35 @@ const Sidebar = () => {
             onClick={() => setIsOpen(false)}
           />
 
-          <button
-            className="flex justify-between items-center w-full px-4 py-2 rounded-md hover:bg-indigo-700 transition"
-            onClick={toggleInventoryDropdown}
-          >
-            <span>Inventory</span>
-            {showInventoryDropdown ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-          </button>
+          {accessibleBranches.length > 0 && (
+            <>
+              <button
+                className="flex justify-between items-center w-full px-4 py-2 rounded-md hover:bg-indigo-700 transition"
+                onClick={toggleInventoryDropdown}
+              >
+                <span>Inventory</span>
+                {showInventoryDropdown ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+              </button>
 
-          {showInventoryDropdown && (
-            <div className="ml-4 flex flex-col space-y-1">
-              {inventoryBranches.map((branch) => (
-                <Link
-                  key={branch.path}
-                  to={branch.path}
-                  onClick={() => setIsOpen(false)}
-                  className={`text-sm px-4 py-1 rounded-md transition ${
-                    location.pathname === branch.path
-                      ? "bg-indigo-600 text-white"
-                      : "hover:bg-indigo-800/50 text-gray-200"
-                  }`}
-                >
-                  {branch.label}
-                </Link>
-              ))}
-            </div>
+              {showInventoryDropdown && (
+                <div className="ml-4 flex flex-col space-y-1">
+                  {accessibleBranches.map((branch) => (
+                    <Link
+                      key={branch.path}
+                      to={branch.path}
+                      onClick={() => setIsOpen(false)}
+                      className={`text-sm px-4 py-1 rounded-md transition ${
+                        location.pathname === branch.path
+                          ? "bg-indigo-600 text-white"
+                          : "hover:bg-indigo-800/50 text-gray-200"
+                      }`}
+                    >
+                      {branch.label}
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </>
           )}
 
           <SidebarLink

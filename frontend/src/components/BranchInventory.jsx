@@ -83,19 +83,16 @@ const BranchInventory = ({ branchName }) => {
   };
 
   const handleResetInventory = async () => {
-    if (role !== "admin") return;
-  
+    
     const confirmed = window.confirm("Are you sure you want to submit the inventory?");
     if (!confirmed) return;
   
     try {
       // Save inventory history before resetting
-      const baseUrl = import.meta.env.VITE_API_BASE_URL.replace(/\/$/, ""); // Remove trailing slash if present
+      const baseUrl = import.meta.env.VITE_API_BASE_URL.replace(/\/$/, ""); // Remove trailing slash
       const saveHistoryResponse = await fetch(`${baseUrl}/api/history/save`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ branch: branchName, products }),
       });
   
@@ -125,7 +122,6 @@ const BranchInventory = ({ branchName }) => {
       alert("Something went wrong during inventory submission.");
     }
   };
-  
 
   const handleAddProduct = async () => {
     const parsedProduct = {
@@ -285,22 +281,18 @@ const BranchInventory = ({ branchName }) => {
         <div className="flex flex-col md:flex-row justify-between items-center mt-6 mb-4">
           <h1 className="text-2xl font-bold mb-4 md:mb-0">{branchName}</h1>
           <div className="space-x-2">
-            {(role === "admin" || role === "staff") && (
               <button
                 onClick={() => setShowAddModal(true)}
                 className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition"
               >
                 Add Item
-              </button>
-            )}
-            {role === "admin" && (
+              </button>    
               <button
                 onClick={handleResetInventory}
                 className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition"
               >
                 Submit
               </button>
-            )}
           </div>
         </div>
   
@@ -371,7 +363,7 @@ const BranchInventory = ({ branchName }) => {
                           </td>
                         ))}
                         <td className="px-5 py-4 whitespace-nowrap space-x-2">
-                          {(role === "admin" || role === "staff") && (
+
                             <button
                               className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg shadow-md transition duration-150"
                               onClick={() => {
@@ -381,7 +373,7 @@ const BranchInventory = ({ branchName }) => {
                             >
                               Edit
                             </button>
-                          )}
+                          
                           {role === "admin" && (
                             <button
                               className="bg-rose-500 hover:bg-rose-600 text-white px-4 py-2 rounded-lg shadow-md transition duration-150"
