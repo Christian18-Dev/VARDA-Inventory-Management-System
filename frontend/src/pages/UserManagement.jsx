@@ -337,6 +337,14 @@ const UserManagement = () => {
                   <option value="">Select Role</option>
                   <option value="Admin">Admin</option>
                   <option value="Staff">Staff</option>
+                  <option value="Staff-ChknChop">Staff-ChknChop</option>
+                  <option value="Staff-VardaBurger">Staff-VardaBurger</option>
+                  <option value="Staff-GoodJuice">Staff-GoodJuice</option>
+                  <option value="Staff-GoodNoodles">Staff-GoodNoodles</option>
+                  <option value="Staff-NRB">Staff-NRB</option>
+                  <option value="Staff-PUP">Staff-PUP</option>
+                  <option value="Staff-STJude">Staff-STJude</option>
+                  <option value="Staff-Intramuros">Staff-Intramuros</option>
                 </select>
                 <div className="flex justify-end">
                   <button
