@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Logo from "../assets/logoplaceholder.png";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const LoginForm = () => {
   const navigate = useNavigate();
