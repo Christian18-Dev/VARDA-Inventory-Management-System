@@ -95,7 +95,7 @@ const History = () => {
     const worksheet = workbook.addWorksheet("Inventory History");
 
     // Define headers
-    const headers = ["Name", "Category", "Price", "Beg Inventory", "Delivered", "Waste", "Use", "Withdrawal", "Current"];
+    const headers = ["Name", "Category", "Price", "Beg Inventory", "Delivered", "Waste", "Yesterday Use", "Today's Use", "Withdrawal", "Current"];
 
     // Add header row
     const headerRow = worksheet.addRow(headers);
@@ -115,7 +115,8 @@ const History = () => {
         item.begInventory || 0,
         item.delivered || 0,
         item.waste || 0,
-        item.use || 0,
+        item.yesterdayUse || 0,
+        item.todayUse || 0,
         item.withdrawal || 0,
         item.current || 0,
       ]);
@@ -252,7 +253,8 @@ const History = () => {
                             <th className="px-4 py-3 border">Beg Inventory</th>
                             <th className="px-4 py-3 border">Delivered</th>
                             <th className="px-4 py-3 border">Waste</th>
-                            <th className="px-4 py-3 border">Use</th>
+                            <th className="px-4 py-3 border">Yesterday's Use</th>
+                            <th className="px-4 py-3 border">Today's Use</th>
                             <th className="px-4 py-3 border">Withdrawal</th>
                             <th className="px-4 py-3 border">Current</th>
                           </tr>
@@ -266,7 +268,8 @@ const History = () => {
                               <td className="px-4 py-3 border">{item.begInventory}</td>
                               <td className="px-4 py-3 border">{item.delivered}</td>
                               <td className="px-4 py-3 border">{item.waste}</td>
-                              <td className="px-4 py-3 border">{item.use}</td>
+                              <td className="px-4 py-3 border">{item.yesterdayUse}</td>
+                              <td className="px-4 py-3 border">{item.todayUse}</td>
                               <td className="px-4 py-3 border">{item.withdrawal}</td>
                               <td className="px-4 py-3 border">{item.current}</td>
                             </tr>

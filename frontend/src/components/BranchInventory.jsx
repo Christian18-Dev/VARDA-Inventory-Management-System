@@ -94,38 +94,60 @@ const BranchInventory = ({ branchName }) => {
     if (!confirmed) return;
   
     try {
-      // Prepare the update for all products
-      const updates = products.map(product => ({
-        _id: product._id,
-        yesterdayUse: product.todayUse,  // Set yesterdayUse to today's value
-        todayUse: 0,                    // Reset todayUse to 0
-        current: product.current,       // Keep current value
-        begInventory: product.current   // Update beginning inventory
+      // 1. Prepare history data with correct usage tracking
+      const historyData = products.map(product => ({
+        ...product,
+        // Historical snapshot should show:
+        begInventory: product.begInventory,  // Original beginning inventory
+        yesterdayUse: product.yesterdayUse, // Previous day's usage (from inventory)
+        todayUse: product.todayUse,        // Current day's usage
+        current: product.current,          // Ending inventory
+        // Reset these for clarity in history
+        delivered: 0,
+        waste: 0,
+        withdrawal: 0
       }));
   
-      // Send to backend
-      const result = await resetInventory(branchName, updates);
+      // 2. Save to history FIRST
+      const historyResponse = await fetch(`${API_BASE_URL}/api/history/save`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          branch: branchName,
+          products: historyData
+        }),
+      });
+  
+      if (!historyResponse.ok) throw new Error("Failed to save history");
+  
+      // 3. Prepare inventory updates for NEXT period
+      const updates = products.map(product => ({
+        _id: product._id,
+        yesterdayUse: product.todayUse,  // Current usage becomes yesterday's
+        todayUse: 0,                    // Reset today's usage
+        begInventory: product.current,   // Current becomes next period's beginning
+        delivered: 0,
+        waste: 0,
+        withdrawal: 0
+      }));
+  
+      // 4. Update the actual inventory
+      const resetResponse = await resetInventory(branchName, updates);
       
-      if (result.modifiedCount > 0) {
-        // Update local state immediately
+      if (resetResponse.modifiedCount > 0) {
+        // 5. Update local state
         setProducts(prevProducts => 
-          prevProducts.map(p => {
-            const updatedProduct = updates.find(u => u._id === p._id) || p;
-            return {
-              ...p,
-              yesterdayUse: updatedProduct.yesterdayUse,
-              todayUse: 0,
-              begInventory: updatedProduct.begInventory
-            };
-          })
+          prevProducts.map(p => ({
+            ...p,
+            ...updates.find(u => u._id === p._id),
+            current: p.current // Maintain ending inventory
+          }))
         );
         alert("Inventory submitted successfully!");
-      } else {
-        alert("No changes were made to the inventory.");
       }
     } catch (error) {
-      console.error("❌ Error during inventory submission:", error);
-      alert(`Failed to submit inventory: ${error.message}`);
+      console.error("Submission error:", error);
+      alert(`Failed: ${error.message}`);
     }
   };
 
