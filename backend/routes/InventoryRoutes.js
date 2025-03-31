@@ -2,40 +2,49 @@ const express = require("express");
 const router = express.Router();
 const getInventoryModel = require("../models/BranchInventory");
 
-// ✅ Route to reset inventory for a branch
 router.post("/:branch/reset", async (req, res) => {
   try {
     const branch = req.params.branch.toUpperCase();
-    console.log(`🔄 Resetting inventory for branch: ${branch}`);
+    const { products } = req.body;
+
+    if (!products) {
+      return res.status(400).json({ message: "Products data is required" });
+    }
 
     const Inventory = getInventoryModel(branch);
-
-    // ✅ Reset relevant fields and set `current` equal to `begInventory`
-    const result = await Inventory.updateMany(
-      {},
-      [
-        {
+    
+    const bulkOps = products.map(product => ({
+      updateOne: {
+        filter: { _id: product._id },
+        update: {
           $set: {
+            yesterdayUse: product.yesterdayUse,
+            todayUse: product.todayUse,
+            begInventory: product.begInventory,
             delivered: 0,
             waste: 0,
-            withdrawal: 0,
-            begInventory: "$current", // Set current as new begInventory
-          },
-        },
-      ]
-    );
+            withdrawal: 0
+          }
+        }
+      }
+    }));
+
+    const result = await Inventory.bulkWrite(bulkOps);
 
     res.json({
-      message: `✅ Inventory reset for branch: ${branch}`,
-      modifiedCount: result.modifiedCount,
+      message: `Inventory reset for ${branch}`,
+      modifiedCount: result.modifiedCount
     });
   } catch (error) {
-    console.error("❌ Error resetting inventory:", error);
-    res.status(500).json({ message: "Error resetting inventory" });
+    console.error("Reset error:", error);
+    res.status(500).json({ 
+      message: "Error resetting inventory",
+      error: error.message 
+    });
   }
 });
 
-// ✅ Get all products for a branch (with pagination)
+// ✅ Get all products for a branch (updated fields)
 router.get("/", async (req, res) => {
   try {
     const { branch, page = 1, limit = 15 } = req.query;
@@ -45,7 +54,7 @@ router.get("/", async (req, res) => {
     const skip = (parseInt(page) - 1) * parseInt(limit);
 
     const products = await Inventory.find()
-      .select("name category price begInventory delivered waste use withdrawal current")
+      .select("name category price begInventory delivered waste yesterdayUse todayUse withdrawal current")
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(parseInt(limit));
@@ -64,7 +73,7 @@ router.get("/", async (req, res) => {
   }
 });
 
-// ✅ Add a new product to a branch
+// ✅ Add a new product to a branch (updated for new fields)
 router.post("/", async (req, res) => {
   try {
     const { branch } = req.query;
@@ -75,7 +84,8 @@ router.post("/", async (req, res) => {
       begInventory,
       delivered,
       waste,
-      use,
+      yesterdayUse,
+      todayUse,
       withdrawal,
     } = req.body;
 
@@ -86,7 +96,11 @@ router.post("/", async (req, res) => {
     const Inventory = getInventoryModel(branch);
 
     const current =
-      (begInventory || 0) + (delivered || 0) - (waste || 0) - (use || 0) - (withdrawal || 0);
+      (begInventory || 0) + 
+      (delivered || 0) - 
+      (waste || 0) - 
+      (todayUse || 0) - 
+      (withdrawal || 0);
 
     const newProduct = new Inventory({
       name,
@@ -95,7 +109,8 @@ router.post("/", async (req, res) => {
       begInventory: begInventory || 0,
       delivered: delivered || 0,
       waste: waste || 0,
-      use: use || 0,
+      yesterdayUse: yesterdayUse || 0,
+      todayUse: todayUse || 0,
       withdrawal: withdrawal || 0,
       current,
     });
@@ -111,7 +126,7 @@ router.post("/", async (req, res) => {
   }
 });
 
-// ✅ Update product in a branch (with delivered - use logic)
+// ✅ Update product in a branch (updated for new fields)
 router.put("/:id", async (req, res) => {
   try {
     const { branch } = req.query;
@@ -122,7 +137,8 @@ router.put("/:id", async (req, res) => {
       begInventory,
       delivered,
       waste,
-      use,
+      yesterdayUse,
+      todayUse,
       withdrawal,
     } = req.body;
 
@@ -135,30 +151,26 @@ router.put("/:id", async (req, res) => {
       return res.status(404).json({ message: "Product not found" });
     }
 
-    const deliveredDiff = (delivered || 0) - (existingProduct.delivered || 0);
-
-    // 👇 Subtract deliveredDiff from existing or provided 'use'
-    let updatedUse = (use !== undefined ? use : existingProduct.use || 0) - deliveredDiff;
-    if (updatedUse < 0) updatedUse = 0;
-
+    // Calculate current inventory with new fields
     const current =
-      (begInventory || 0) +
-      (delivered || 0) -
-      (waste || 0) -
-      updatedUse -
-      (withdrawal || 0);
+      (begInventory || existingProduct.begInventory || 0) +
+      (delivered || existingProduct.delivered || 0) -
+      (waste || existingProduct.waste || 0) -
+      (todayUse || existingProduct.todayUse || 0) -
+      (withdrawal || existingProduct.withdrawal || 0);
 
     const updatedProduct = await Inventory.findByIdAndUpdate(
       req.params.id,
       {
         name,
         category,
-        price: parseFloat(price) || 0,
-        begInventory: begInventory || 0,
-        delivered: delivered || 0,
-        waste: waste || 0,
-        use: updatedUse,
-        withdrawal: withdrawal || 0,
+        price: parseFloat(price) || existingProduct.price || 0,
+        begInventory: begInventory || existingProduct.begInventory || 0,
+        delivered: delivered || existingProduct.delivered || 0,
+        waste: waste || existingProduct.waste || 0,
+        yesterdayUse: yesterdayUse || existingProduct.yesterdayUse || 0,
+        todayUse: todayUse || existingProduct.todayUse || 0,
+        withdrawal: withdrawal || existingProduct.withdrawal || 0,
         current,
       },
       { new: true }
@@ -171,7 +183,7 @@ router.put("/:id", async (req, res) => {
   }
 });
 
-// ✅ Delete a product from a branch
+// ✅ Delete a product from a branch (unchanged)
 router.delete("/:id", async (req, res) => {
   try {
     const { branch } = req.query;
@@ -187,7 +199,7 @@ router.delete("/:id", async (req, res) => {
   }
 });
 
-// ✅ Check DB connection
+// ✅ Check DB connection (unchanged)
 router.get("/check-db", (req, res) => {
   if (!req.app.locals.db) {
     return res.status(500).json({ message: "Native DB not initialized" });
