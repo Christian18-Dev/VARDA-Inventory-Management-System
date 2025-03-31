@@ -102,25 +102,34 @@ router.get("/category-distribution", async (req, res) => {
 });
 
 // Fetch inventory data for graph (✅ FIXED: Added `branch` field)
+// Fetch inventory data for graph (updated to use yesterdayUse)
 router.get("/inventory-data", async (req, res) => {
   try {
     let inventoryData = [];
 
     for (const collectionName of branchCollections) {
       const collection = mongoose.connection.db.collection(collectionName);
-      const items = await collection.find({}, { projection: { name: 1, use: 1 } }).toArray();
+      // Include both yesterdayUse and use (for backward compatibility)
+      const items = await collection.find({}, { 
+        projection: { 
+          name: 1, 
+          yesterdayUse: 1,
+          use: 1 
+        } 
+      }).toArray();
 
       if (items.length === 0) continue;
 
       inventoryData.push(
         ...items
-          .filter(item => typeof item.use === "number")
+          .filter(item => typeof item.yesterdayUse === "number" || typeof item.use === "number")
           .map(item => ({
             name: item.name || "Unknown",
-            stock: item.use || 0,
+            // Use yesterdayUse if available, fallback to use for backward compatibility
+            stock: item.yesterdayUse ?? item.use ?? 0,
             branch: collectionName
-              .replace("_inventory", "") // Remove `_inventory`
-              .replace(/(^|\s)\S/g, (letter) => letter.toUpperCase()) // Capitalize first letter of each word
+              .replace("_inventory", "")
+              .replace(/(^|\s)\S/g, letter => letter.toUpperCase())
           }))
       );
     }

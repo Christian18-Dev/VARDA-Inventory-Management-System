@@ -40,7 +40,7 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchHighInventoryItems = async () => {
       try {
-        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/dashboard/inventory-data`);
+        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/dashboard/highest-inventory-items`);
         const data = await response.json();
         setHighInventoryItems(data);
       } catch (error) {
