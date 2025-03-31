@@ -19,7 +19,9 @@ export const addProduct = async (branch, product) => {
 
     const cleanProduct = {
       ...product,
-      price: parseFloat(product.price) || 0 // ✅ Force price to be a number
+      price: parseFloat(product.price) || 0, // ✅ Force price to be a number
+      yesterdayUse: parseFloat(product.yesterdayUse) || 0, // Add new fields
+      todayUse: parseFloat(product.todayUse) || 0
     };
     
     const response = await fetch(`${API_URL}?branch=${encodeURIComponent(branch)}`, {
@@ -28,7 +30,6 @@ export const addProduct = async (branch, product) => {
       body: JSON.stringify(cleanProduct),
     });
     
-
     const data = await response.json();
     console.log("🔍 Response from API:", data);
 
@@ -54,13 +55,19 @@ export const deleteProduct = async (branch, id) => {
   }
 };
 
-// ✅ Update product for a specific branch
+// Update product for a specific branch
 export const updateProduct = async (branch, id, updatedProduct) => {
   try {
+    const cleanProduct = {
+      ...updatedProduct,
+      yesterdayUse: parseFloat(updatedProduct.yesterdayUse) || 0, // Add new fields
+      todayUse: parseFloat(updatedProduct.todayUse) || 0
+    };
+
     const response = await fetch(`${API_URL}/${id}?branch=${encodeURIComponent(branch)}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(updatedProduct),
+      body: JSON.stringify(cleanProduct),
     });
 
     const data = await response.json();
@@ -76,25 +83,22 @@ export const updateProduct = async (branch, id, updatedProduct) => {
   }
 };
 
-// Reset inventory for a specific branch
-export const resetInventory = async (branch) => {
+export const resetInventory = async (branch, productsToUpdate) => {
   try {
     const response = await fetch(`${API_URL}/${encodeURIComponent(branch)}/reset`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ products: productsToUpdate }),
     });
 
-    const data = await response.json();
-
     if (!response.ok) {
-      throw new Error(data.message || "Failed to reset inventory");
+      const errorData = await response.json();
+      throw new Error(errorData.message || "Failed to reset inventory");
     }
 
-    return data;
+    return await response.json();
   } catch (error) {
     console.error("❌ Error resetting inventory:", error);
-    return null;
+    throw error;
   }
 };
-
-
