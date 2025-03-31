@@ -94,21 +94,15 @@ const BranchInventory = ({ branchName }) => {
     if (!confirmed) return;
   
     try {
-      // 1. Prepare history data with correct usage tracking
+      // 1. Prepare history data with ALL original values
       const historyData = products.map(product => ({
-        ...product,
-        // Historical snapshot should show:
-        begInventory: product.begInventory,  // Original beginning inventory
-        yesterdayUse: product.yesterdayUse, // Previous day's usage (from inventory)
+        ...product, // Keep all original product data
+        yesterdayUse: product.yesterdayUse, // Previous day's usage
         todayUse: product.todayUse,        // Current day's usage
-        current: product.current,          // Ending inventory
-        // Reset these for clarity in history
-        delivered: 0,
-        waste: 0,
-        withdrawal: 0
+        // DO NOT reset any values for history
       }));
   
-      // 2. Save to history FIRST
+      // 2. Save to history FIRST with complete data
       const historyResponse = await fetch(`${API_BASE_URL}/api/history/save`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -126,9 +120,9 @@ const BranchInventory = ({ branchName }) => {
         yesterdayUse: product.todayUse,  // Current usage becomes yesterday's
         todayUse: 0,                    // Reset today's usage
         begInventory: product.current,   // Current becomes next period's beginning
-        delivered: 0,
-        waste: 0,
-        withdrawal: 0
+        delivered: 0,                   // Reset for new period
+        waste: 0,                       // Reset for new period
+        withdrawal: 0                   // Reset for new period
       }));
   
       // 4. Update the actual inventory
