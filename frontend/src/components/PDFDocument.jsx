@@ -25,6 +25,7 @@ const PDFDocument = ({ data, branch }) => (
         <View style={[styles.row, styles.header]}>
           <Text style={styles.cell}>Name</Text>
           <Text style={styles.cell}>Category</Text>
+          <Text style={styles.cell}>Price</Text>
           <Text style={styles.cell}>Beg Inventory</Text>
           <Text style={styles.cell}>Delivered</Text>
           <Text style={styles.cell}>Waste</Text>
@@ -38,6 +39,7 @@ const PDFDocument = ({ data, branch }) => (
           <View key={index} style={[styles.row, index % 2 === 0 ? styles.alternateRow : null]}>
             <Text style={styles.cell}>{item.name}</Text>
             <Text style={styles.cell}>{item.category}</Text>
+            <Text style={styles.cell}>{item.price}</Text>
             <Text style={styles.cell}>{item.begInventory}</Text>
             <Text style={styles.cell}>{item.delivered}</Text>
             <Text style={styles.cell}>{item.waste}</Text>

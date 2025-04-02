@@ -8,6 +8,10 @@ const Sidebar = () => {
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const [showInventoryDropdown, setShowInventoryDropdown] = useState(false);
+  const [expandedBranches, setExpandedBranches] = useState({
+    "Laguna Branch": false,
+    "Lipa Batangas Branch": false
+  });
   const [userRole, setUserRole] = useState(null);
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
 
@@ -16,23 +20,58 @@ const Sidebar = () => {
     setUserRole(role);
   }, []);
 
-  const toggleInventoryDropdown = () => {
-    setShowInventoryDropdown(!showInventoryDropdown);
-    localStorage.setItem("showInventoryDropdown", !showInventoryDropdown);
+  const inventoryStructure = {
+    "Laguna Branch": [
+      { label: "CHKN CHOP", path: "/inventory/laguna-chkn-chop", roleMatch: "Laguna-ChknChop" },
+      { label: "VARDA BURGER", path: "/inventory/laguna-varda-burger", roleMatch: "Laguna-VardaBurger" },
+      { label: "THE GOOD JUICE", path: "/inventory/laguna-the-good-juice", roleMatch: "laguna-the-good-juice" },
+      { label: "THE GOOD NOODLE BAR", path: "/inventory/laguna-the-good-noodle-bar", roleMatch: "laguna-the-good-noodle-bar" },
+      // Add more Laguna stores here
+    ],
+    "Lipa Batangas Branch": [
+      { label: "CHKN CHOP", path: "/inventory/lipabatangas-chkn-chop", roleMatch: "Lipa-ChknChop" },
+      { label: "VARDA BURGER", path: "/inventory/lipabatangas-varda-burger", roleMatch: "Lipa-VardaBurger" },
+      { label: "SILOG", path: "/inventory/lipabatangas-silog", roleMatch: "Lipa-Silog" },
+      { label: "NRB", path: "/inventory/lipabatangas-nrb", roleMatch: "Lipa-NRB" },
+      // Add more Lipa stores here
+    ]
   };
 
-  useEffect(() => {
-    const savedDropdownState = localStorage.getItem("showInventoryDropdown");
-    if (savedDropdownState !== null) {
-      setShowInventoryDropdown(JSON.parse(savedDropdownState));
-    }
-  }, []);
+  const toggleInventoryDropdown = () => {
+    setShowInventoryDropdown(!showInventoryDropdown);
+  };
 
-  useEffect(() => {
-    if (location.pathname === "/dashboard") {
-      setShowInventoryDropdown(false);
+  const toggleBranchDropdown = (branch) => {
+    setExpandedBranches(prev => ({
+      ...prev,
+      [branch]: !prev[branch]
+    }));
+  };
+
+  const getAccessibleBranches = () => {
+    if (!userRole) return {};
+    if (userRole === "Admin" || userRole === "Manager") return inventoryStructure;
+
+    if (userRole.startsWith("Staff-")) {
+      const staffBranch = userRole.replace("Staff-", "");
+      const accessibleBranches = {};
+      
+      Object.keys(inventoryStructure).forEach(branch => {
+        const accessibleStores = inventoryStructure[branch].filter(
+          store => store.roleMatch === staffBranch
+        );
+        if (accessibleStores.length > 0) {
+          accessibleBranches[branch] = accessibleStores;
+        }
+      });
+
+      return accessibleBranches;
     }
-  }, [location.pathname]);
+
+    return {};
+  };
+
+  const accessibleBranches = getAccessibleBranches();
 
   const handleLogout = async () => {
     const username = localStorage.getItem("username");
@@ -60,33 +99,6 @@ const Sidebar = () => {
     window.location.reload();
   };
 
-  const inventoryBranches = [
-    { label: "CHKN CHOP", path: "/inventory/chkn-chop", roleMatch: "ChknChop" },
-    { label: "VARDA BURGER", path: "/inventory/varda-burger", roleMatch: "VardaBurger" },
-    { label: "THE GOOD JUICE", path: "/inventory/the-good-juice", roleMatch: "GoodJuice" },
-    { label: "THE GOOD NOODLES", path: "/inventory/the-good-noodles", roleMatch: "GoodNoodles" },
-    { label: "NRB VARDA", path: "/inventory/nrb-varda", roleMatch: "NRB" },
-    { label: "PUP VARDA", path: "/inventory/pup-varda", roleMatch: "PUP" },
-    { label: "ST JUDE VARDA", path: "/inventory/st-jude-varda", roleMatch: "STJude" },
-    { label: "INTRAMUROS VARDA", path: "/inventory/intramuros-varda", roleMatch: "Intramuros" },
-  ];
-
-  const getAccessibleBranches = () => {
-    if (!userRole) return [];
-    if (userRole === "Admin" || userRole === "Manager") return inventoryBranches;
-
-    if (userRole.startsWith("Staff-")) {
-      const staffBranch = userRole.replace("Staff-", "");
-      return inventoryBranches.filter(branch => 
-        branch.roleMatch === staffBranch
-      );
-    }
-
-    return [];
-  };
-
-  const accessibleBranches = getAccessibleBranches();
-
   return (
     <>
       {/* Desktop Sidebar */}
@@ -99,7 +111,7 @@ const Sidebar = () => {
         <nav className="flex flex-col space-y-2 flex-grow">
           <SidebarLink to="/dashboard" label="Dashboard" currentPath={location.pathname} />
 
-          {accessibleBranches.length > 0 && (
+          {Object.keys(accessibleBranches).length > 0 && (
             <>
               <button
                 className="flex justify-between items-center w-full px-4 py-2 rounded-md hover:bg-indigo-700 transition"
@@ -110,19 +122,35 @@ const Sidebar = () => {
               </button>
 
               {showInventoryDropdown && (
-                <div className="ml-4 flex flex-col space-y-1">
-                  {accessibleBranches.map((branch) => (
-                    <Link
-                      key={branch.path}
-                      to={branch.path}
-                      className={`text-sm px-4 py-1 rounded-md transition ${
-                        location.pathname === branch.path
-                          ? "bg-indigo-600 text-white"
-                          : "hover:bg-indigo-800/50 text-gray-200"
-                      }`}
-                    >
-                      {branch.label}
-                    </Link>
+                <div className="ml-4 flex flex-col space-y-2">
+                  {Object.keys(accessibleBranches).map((branch) => (
+                    <div key={branch} className="flex flex-col">
+                      <button
+                        className="flex justify-between items-center w-full px-3 py-1 rounded-md hover:bg-indigo-800/50 transition"
+                        onClick={() => toggleBranchDropdown(branch)}
+                      >
+                        <span>{branch}</span>
+                        {expandedBranches[branch] ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+                      </button>
+
+                      {expandedBranches[branch] && (
+                        <div className="ml-4 flex flex-col space-y-1">
+                          {accessibleBranches[branch].map((store) => (
+                            <Link
+                              key={store.path}
+                              to={store.path}
+                              className={`text-sm px-3 py-1 rounded-md transition ${
+                                location.pathname === store.path
+                                  ? "bg-indigo-600 text-white"
+                                  : "hover:bg-indigo-800/30 text-gray-200"
+                              }`}
+                            >
+                              {store.label}
+                            </Link>
+                          ))}
+                        </div>
+                      )}
+                    </div>
                   ))}
                 </div>
               )}
@@ -188,7 +216,7 @@ const Sidebar = () => {
             onClick={() => setIsOpen(false)}
           />
 
-          {accessibleBranches.length > 0 && (
+          {Object.keys(accessibleBranches).length > 0 && (
             <>
               <button
                 className="flex justify-between items-center w-full px-4 py-2 rounded-md hover:bg-indigo-700 transition"
@@ -199,20 +227,36 @@ const Sidebar = () => {
               </button>
 
               {showInventoryDropdown && (
-                <div className="ml-4 flex flex-col space-y-1">
-                  {accessibleBranches.map((branch) => (
-                    <Link
-                      key={branch.path}
-                      to={branch.path}
-                      onClick={() => setIsOpen(false)}
-                      className={`text-sm px-4 py-1 rounded-md transition ${
-                        location.pathname === branch.path
-                          ? "bg-indigo-600 text-white"
-                          : "hover:bg-indigo-800/50 text-gray-200"
-                      }`}
-                    >
-                      {branch.label}
-                    </Link>
+                <div className="ml-4 flex flex-col space-y-2">
+                  {Object.keys(accessibleBranches).map((branch) => (
+                    <div key={branch} className="flex flex-col">
+                      <button
+                        className="flex justify-between items-center w-full px-3 py-1 rounded-md hover:bg-indigo-800/50 transition"
+                        onClick={() => toggleBranchDropdown(branch)}
+                      >
+                        <span>{branch}</span>
+                        {expandedBranches[branch] ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+                      </button>
+
+                      {expandedBranches[branch] && (
+                        <div className="ml-4 flex flex-col space-y-1">
+                          {accessibleBranches[branch].map((store) => (
+                            <Link
+                              key={store.path}
+                              to={store.path}
+                              onClick={() => setIsOpen(false)}
+                              className={`text-sm px-3 py-1 rounded-md transition ${
+                                location.pathname === store.path
+                                  ? "bg-indigo-600 text-white"
+                                  : "hover:bg-indigo-800/30 text-gray-200"
+                              }`}
+                            >
+                              {store.label}
+                            </Link>
+                          ))}
+                        </div>
+                      )}
+                    </div>
                   ))}
                 </div>
               )}

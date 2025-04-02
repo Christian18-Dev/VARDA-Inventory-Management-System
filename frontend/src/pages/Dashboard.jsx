@@ -13,12 +13,52 @@ import {
 
 ChartJS.register(ArcElement, Tooltip, Legend, BarElement, CategoryScale, LinearScale);
 
+const regions = [
+  {
+    name: "LAGUNA",
+    branches: [
+      "LAGUNA CHKN CHOP",
+      "LAGUNA VARDA BURGER",
+      "LAGUNA THE GOOD JUICE",
+      "LAGUNA THE GOOD NOODLE BAR"
+    ]
+  },
+  {
+    name: "LIPA BATANGAS",
+    branches: [
+      "LIPA BATANGAS CHKN CHOP",
+      "LIPA BATANGAS VARDA BURGER",
+      "LIPA BATANGAS SILOG",
+      "LIPA BATANGAS NRB"
+    ]
+  }
+];
+
+const allBranches = regions.flatMap(region => region.branches);
+
 const Dashboard = () => {
   const [highInventoryItems, setHighInventoryItems] = useState([]);
   const [lowInventoryItems, setLowInventoryItems] = useState([]);
   const [categoryData, setCategoryData] = useState({ labels: [], values: [] });
   const [recentActivity, setRecentActivity] = useState([]);
-  const [inventoryGraphData, setInventoryGraphData] = useState({ labels: [], values: [] });
+  const [inventoryGraphData, setInventoryGraphData] = useState({ labels: [], datasets: [] });
+  const [selectedRegion, setSelectedRegion] = useState("");
+  const [selectedBranch, setSelectedBranch] = useState("");
+  const [availableBranches, setAvailableBranches] = useState(allBranches);
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    if (selectedRegion) {
+      const region = regions.find(r => r.name === selectedRegion);
+      if (region) {
+        setAvailableBranches(region.branches);
+        setSelectedBranch(""); // Reset branch when region changes
+      }
+    } else {
+      setAvailableBranches(allBranches);
+      setSelectedBranch("");
+    }
+  }, [selectedRegion]);
 
   useEffect(() => {
     const fetchRecentActivity = async () => {
@@ -38,75 +78,148 @@ const Dashboard = () => {
   }, []);
   
   useEffect(() => {
-    const fetchHighInventoryItems = async () => {
+    const fetchDashboardData = async () => {
+      setIsLoading(true);
       try {
-        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/dashboard/highest-inventory-items`);
-        const data = await response.json();
-        setHighInventoryItems(data);
-      } catch (error) {
-        console.error("Error fetching highest inventory items:", error);
-      }
-    };
+        const params = new URLSearchParams();
+        if (selectedBranch) {
+          params.append('branch', selectedBranch);
+        } else if (selectedRegion) {
+          params.append('region', selectedRegion);
+        }
 
-    const fetchLowInventoryItems = async () => {
-      try {
-        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/dashboard/lowest-inventory-items`);
-        const data = await response.json();
-        setLowInventoryItems(data);
-      } catch (error) {
-        console.error("Error fetching lowest inventory items:", error);
-      }
-    };
+        // Fetch high inventory items
+        const highResponse = await fetch(
+          `${import.meta.env.VITE_API_BASE_URL}/api/dashboard/highest-inventory-items?${params}`
+        );
+        const highData = await highResponse.json();
+        setHighInventoryItems(highData);
 
-    const fetchCategoryData = async () => {
-      try {
-        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/dashboard/category-distribution`);
-        const data = await response.json();
-        const labels = data.map((category) => category.name);
-        const values = data.map((category) => category.count);
+        // Fetch low inventory items
+        const lowResponse = await fetch(
+          `${import.meta.env.VITE_API_BASE_URL}/api/dashboard/lowest-inventory-items?${params}`
+        );
+        const lowData = await lowResponse.json();
+        setLowInventoryItems(lowData);
+
+        // Fetch category data
+        const categoryResponse = await fetch(
+          `${import.meta.env.VITE_API_BASE_URL}/api/dashboard/category-distribution?${params}`
+        );
+        const categoryData = await categoryResponse.json();
+        const labels = categoryData.map((category) => category.name);
+        const values = categoryData.map((category) => category.count);
         setCategoryData({ labels, values });
-      } catch (error) {
-        console.error("Error fetching category data:", error);
-      }
-    };
 
-    const fetchInventoryGraphData = async () => {
-      try {
-        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/dashboard/inventory-data`);
-        const data = await response.json();
+        // Fetch inventory graph data
+        const graphResponse = await fetch(
+          `${import.meta.env.VITE_API_BASE_URL}/api/dashboard/inventory-data?${params}&limit=50`
+        );
+        const graphData = await graphResponse.json();
     
-        if (!data.every(item => item.branch)) {
+        if (!graphData.every(item => item.branch)) {
           console.error("Missing branch field in API response");
           return;
         }
     
-        const productNames = [...new Set(data.map(item => item.name))];
-        const branches = [...new Set(data.map(item => item.branch))];
+        // Filter data to only include selected region's branches if a region is selected
+        const filteredGraphData = selectedRegion && !selectedBranch
+          ? graphData.filter(item => 
+              regions.find(r => r.name === selectedRegion)?.branches.includes(item.branch))
+          : graphData;
+    
+        // Group by product and show top products across branches
+        const productNames = [...new Set(filteredGraphData.map(item => item.name))].slice(0, 10);
+        const branches = [...new Set(filteredGraphData.map(item => item.branch))];
     
         const datasets = branches.map(branch => ({
           label: branch,
           data: productNames.map(
-            product => data.find(item => item.name === product && item.branch === branch)?.stock || 0
+            product => filteredGraphData.find(item => item.name === product && item.branch === branch)?.stock || 0
           ),
           backgroundColor: `#${Math.floor(Math.random() * 16777215).toString(16)}`,
         }));
     
-        setInventoryGraphData({ labels: productNames, datasets });
+        setInventoryGraphData({ 
+          labels: productNames, 
+          datasets: datasets.slice(0, 10) // Limit to 10 branches
+        });
       } catch (error) {
-        console.error("Error fetching inventory graph data:", error);
+        console.error("Error fetching dashboard data:", error);
+      } finally {
+        setIsLoading(false);
       }
-    };    
-    
-    fetchHighInventoryItems();
-    fetchLowInventoryItems();
-    fetchCategoryData();
-    fetchInventoryGraphData();
-  }, []);
+    };
+
+    fetchDashboardData();
+  }, [selectedBranch, selectedRegion]);
 
   return (
     <div className="flex">
       <Sidebar />
       <div className="flex-1 p-6 bg-gray-100 min-h-screen md:ml-64 w-full">
+        {/* Region and Branch Selection */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+          {/* Region Selection */}
+          <div>
+            <label className="block text-lg font-semibold mb-2">Select Region</label>
+            <select
+              value={selectedRegion}
+              onChange={(e) => setSelectedRegion(e.target.value)}
+              className="w-full p-2 border border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">All Regions</option>
+              {regions.map((region, idx) => (
+                <option key={idx} value={region.name}>
+                  {region.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Branch Selection */}
+          <div>
+            <label className="block text-lg font-semibold mb-2">Select Branch</label>
+            <select
+              value={selectedBranch}
+              onChange={(e) => setSelectedBranch(e.target.value)}
+              className="w-full p-2 border border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">All Branches</option>
+              {availableBranches.map((branch, idx) => (
+                <option key={idx} value={branch}>
+                  {branch}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Summary Card */}
+          <div className="bg-white p-4 rounded-lg shadow-md border border-gray-200 flex items-center justify-center">
+            <div className="text-center">
+              <h3 className="text-lg font-semibold text-gray-700">
+                {selectedBranch 
+                  ? selectedBranch 
+                  : selectedRegion 
+                    ? `${selectedRegion} (All Branches)` 
+                    : "All Locations"}
+              </h3>
+              <p className="text-sm text-gray-500 mt-1">
+                {selectedBranch 
+                  ? "Single Branch View" 
+                  : selectedRegion 
+                    ? "Regional View" 
+                    : "Global View"}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {isLoading && (
+          <div className="fixed inset-0 flex items-center justify-center z-50 w-full h-full">
+            <div className="w-12 h-12 border-4 border-blue-500 border-solid border-t-transparent rounded-full animate-spin"></div>
+          </div>
+        )}
   
         {/* Top Section */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -206,7 +319,7 @@ const Dashboard = () => {
         {/* Bar Graph Card */}
         <div className="bg-white p-6 mt-6 rounded-xl shadow-md border border-gray-100 hover:shadow-lg transition-shadow duration-200">
           <h2 className="text-xl font-semibold mb-4 text-indigo-700 border-b border-indigo-100 pb-2">
-            Today's Used Stocks
+            {selectedBranch ? `${selectedBranch} Inventory` : "Inventory Overview"}
           </h2>
           <div className="w-full h-[300px]">
             {inventoryGraphData.labels.length > 0 ? (
@@ -219,7 +332,14 @@ const Dashboard = () => {
                   responsive: true,
                   maintainAspectRatio: false,
                   plugins: {
-                    legend: { display: true, position: "top" },
+                    legend: { 
+                      display: true, 
+                      position: "top",
+                      labels: {
+                        boxWidth: 12,
+                        padding: 20
+                      }
+                    },
                   },
                   scales: {
                     y: { beginAtZero: true },
@@ -238,7 +358,7 @@ const Dashboard = () => {
           {/* Slow Moving Items */}
           <div className="bg-white p-5 rounded-xl shadow-md border border-gray-100 hover:shadow-lg transition-shadow duration-200">
             <h2 className="text-xl font-semibold mb-4 text-emerald-600 border-b border-emerald-100 pb-2">
-              Slow Moving Items
+              {selectedBranch ? `${selectedBranch} Slow Movers` : "Slow Moving Items"}
             </h2>
             <div className="overflow-x-auto">
               <table className="w-full border-collapse">
@@ -246,7 +366,7 @@ const Dashboard = () => {
                   <tr className="bg-indigo-50 text-indigo-700">
                     <th className="p-3 text-left font-medium">Item Name</th>
                     <th className="p-3 text-left font-medium">Inventory</th>
-                    <th className="p-3 text-left font-medium">Branch</th>
+                    {!selectedBranch && <th className="p-3 text-left font-medium">Branch</th>}
                   </tr>
                 </thead>
                 <tbody>
@@ -255,12 +375,12 @@ const Dashboard = () => {
                       <tr key={index} className="border-b border-gray-100 hover:bg-indigo-50/50 transition-colors">
                         <td className="p-3 text-gray-800">{item.name}</td>
                         <td className="p-3 text-gray-800">{item.stock}</td>
-                        <td className="p-3 text-gray-800">{item.branch}</td>
+                        {!selectedBranch && <td className="p-3 text-gray-800">{item.branch}</td>}
                       </tr>
                     ))
                   ) : (
                     <tr>
-                      <td colSpan="3" className="p-3 text-center text-gray-500">
+                      <td colSpan={selectedBranch ? 2 : 3} className="p-3 text-center text-gray-500">
                         No data available
                       </td>
                     </tr>
@@ -273,7 +393,7 @@ const Dashboard = () => {
           {/* Fast Moving Items */}
           <div className="bg-white p-5 rounded-xl shadow-md border border-gray-100 hover:shadow-lg transition-shadow duration-200">
             <h2 className="text-xl font-semibold mb-4 text-amber-500 border-b border-amber-100 pb-2">
-              Fast Moving Items
+              {selectedBranch ? `${selectedBranch} Fast Movers` : "Fast Moving Items"}
             </h2>
             <div className="overflow-x-auto">
               <table className="w-full border-collapse">
@@ -281,7 +401,7 @@ const Dashboard = () => {
                   <tr className="bg-amber-50 text-amber-700">
                     <th className="p-3 text-left font-medium">Item Name</th>
                     <th className="p-3 text-left font-medium">Inventory</th>
-                    <th className="p-3 text-left font-medium">Branch</th>
+                    {!selectedBranch && <th className="p-3 text-left font-medium">Branch</th>}
                   </tr>
                 </thead>
                 <tbody>
@@ -290,12 +410,12 @@ const Dashboard = () => {
                       <tr key={index} className="border-b border-gray-100 hover:bg-amber-50/50 transition-colors">
                         <td className="p-3 text-gray-800">{item.name}</td>
                         <td className="p-3 text-gray-800">{item.stock}</td>
-                        <td className="p-3 text-gray-800">{item.branch}</td>
+                        {!selectedBranch && <td className="p-3 text-gray-800">{item.branch}</td>}
                       </tr>
                     ))
                   ) : (
                     <tr>
-                      <td colSpan="3" className="p-3 text-center text-gray-500">
+                      <td colSpan={selectedBranch ? 2 : 3} className="p-3 text-center text-gray-500">
                         No data available
                       </td>
                     </tr>
@@ -308,6 +428,6 @@ const Dashboard = () => {
       </div>
     </div>
   );
-};  
+};
 
 export default Dashboard;

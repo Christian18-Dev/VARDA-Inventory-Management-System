@@ -338,6 +338,7 @@ const UserManagement = () => {
                   <option value="Admin">Admin</option>
                   <option value="Staff">Staff</option>
                   <option value="Staff-ChknChop">Staff-ChknChop</option>
+                  <option value="Staff-Laguna-ChknChop">Staff-Laguna-ChknChop</option>
                   <option value="Staff-VardaBurger">Staff-VardaBurger</option>
                   <option value="Staff-GoodJuice">Staff-GoodJuice</option>
                   <option value="Staff-GoodNoodles">Staff-GoodNoodles</option>
