@@ -28,8 +28,7 @@ const PDFDocument = ({ data, branch }) => (
           <Text style={styles.cell}>Beg Inventory</Text>
           <Text style={styles.cell}>Delivered</Text>
           <Text style={styles.cell}>Waste</Text>
-          <Text style={styles.cell}>Yesterday's Use</Text>
-          <Text style={styles.cell}>Today's Use</Text>
+          <Text style={styles.cell}>Use</Text>
           <Text style={styles.cell}>Withdrawal</Text>
           <Text style={styles.cell}>Current</Text>
         </View>
@@ -42,8 +41,7 @@ const PDFDocument = ({ data, branch }) => (
             <Text style={styles.cell}>{item.begInventory}</Text>
             <Text style={styles.cell}>{item.delivered}</Text>
             <Text style={styles.cell}>{item.waste}</Text>
-            <Text style={styles.cell}>{item.yesterdayUse}</Text> 
-            <Text style={styles.cell}>{item.todayUse}</Text>
+            <Text style={styles.cell}>{item.use}</Text>
             <Text style={styles.cell}>{item.withdrawal}</Text>
             <Text style={styles.cell}>{item.current}</Text>
           </View>

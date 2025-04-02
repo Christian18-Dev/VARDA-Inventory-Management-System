@@ -4,46 +4,19 @@ const inventorySchema = new mongoose.Schema(
   {
     name: { type: String, required: true },
     category: { type: String, required: true },
-    price: { type: Number, required: true, default: 0, select: true },
+    price: { type: Number, required: true, default: 0, select: true }, // ✅ Add select: true
     begInventory: { type: Number, default: 0 },
     delivered: { type: Number, default: 0 },
     waste: { type: Number, default: 0 },
-    yesterdayUse: { type: Number, default: 0 },  // New field
-    todayUse: { type: Number, default: 0 },     // New field
+    use: { type: Number, default: 0 },
     withdrawal: { type: Number, default: 0 },
     current: { type: Number, default: 0 },
   },
   { timestamps: true }
 );
 
-// Virtual for backward compatibility with old 'use' field
-inventorySchema.virtual('use').get(function() {
-  return this.todayUse; // Default to todayUse for backward compatibility
-});
-
-// Ensure price is always included in the response
-inventorySchema.set('toJSON', { 
-  virtuals: true, 
-  versionKey: false,
-  transform: function(doc, ret) {
-    // Include virtual fields in output
-    ret.use = doc.todayUse; // Map to todayUse for backward compatibility
-    return ret;
-  }
-}); 
-
-// Pre-save hook to calculate current inventory
-inventorySchema.pre('save', function(next) {
-  this.current = Math.max(
-    (this.begInventory || 0) + 
-    (this.delivered || 0) - 
-    (this.waste || 0) - 
-    (this.todayUse || 0) - 
-    (this.withdrawal || 0),
-    0
-  );
-  next();
-});
+// ✅ Ensure price is always included in the response
+inventorySchema.set('toJSON', { virtuals: true, versionKey: false }); 
 
 const inventoryModels = {};
 const getInventoryModel = (branch) => {
