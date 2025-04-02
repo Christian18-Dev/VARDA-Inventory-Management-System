@@ -6,22 +6,34 @@ import { saveAs } from "file-saver";
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import PDFDocument from "../components/PDFDocument";
 
-// Branch list
-const branches = [
-  "CHKN CHOP",
-  "VARDA BURGER",
-  "THE GOOD JUICE",
-  "THE GOOD NOODLES",
-  "NRB VARDA",
-  "PUP VARDA",
-  "ST JUDE VARDA",
-  "INTRAMUROS VARDA",
+// Region and branch structure
+const regions = [
+  {
+    name: "LAGUNA",
+    branches: [
+      "LAGUNA CHKN CHOP",
+      "LAGUNA VARDA BURGER",
+      "LAGUNA THE GOOD JUICE",
+      "LAGUNA THE GOOD NOODLE BAR"
+    ]
+  },
+  {
+    name: "LIPA BATANGAS",
+    branches: [
+      "LIPA BATANGAS CHKN CHOP",
+      "LIPA BATANGAS VARDA BURGER",
+      "LIPA BATANGAS SILOG",
+      "LIPA BATANGAS NRB"
+    ]
+  },
 ];
 
-const ITEMS_PER_PAGE = 10; // Number of items per page
+const ITEMS_PER_PAGE = 10;
 
 const History = () => {
+  const [selectedRegion, setSelectedRegion] = useState("");
   const [selectedBranch, setSelectedBranch] = useState("");
+  const [availableBranches, setAvailableBranches] = useState([]);
   const [historyData, setHistoryData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [openTables, setOpenTables] = useState({});
@@ -30,9 +42,22 @@ const History = () => {
   const [endDate, setEndDate] = useState("");
 
   useEffect(() => {
+    if (selectedRegion) {
+      const region = regions.find(r => r.name === selectedRegion);
+      if (region) {
+        setAvailableBranches(region.branches);
+        setSelectedBranch("");
+      }
+    } else {
+      setAvailableBranches([]);
+      setSelectedBranch("");
+    }
+  }, [selectedRegion]);
+
+  useEffect(() => {
     if (selectedBranch) {
       fetchHistory(selectedBranch);
-      setOpenTables({}); // Reset expanded tables when switching branches
+      setOpenTables({});
     }
   }, [selectedBranch]);
 
@@ -66,16 +91,15 @@ const History = () => {
       const start = new Date(startDate);
       const end = new Date(endDate);
       
-      // Set time to midnight for proper date comparison
       start.setHours(0, 0, 0, 0);
-      end.setHours(23, 59, 59, 999); // Include entire end date
+      end.setHours(23, 59, 59, 999);
       recordDate.setHours(0, 0, 0, 0);
       
       return recordDate >= start && recordDate <= end;
     });
   
     setFilteredData(filtered);
-    setCurrentPage(1); // Reset to first page after filtering
+    setCurrentPage(1);
   };
 
   const toggleTable = (idx) => {
@@ -87,7 +111,7 @@ const History = () => {
 
   const exportToExcel = async (record) => {
     if (!record || !Array.isArray(record.products)) {
-      console.error("❌ Error: Invalid data structure. 'products' is missing or not an array.", record);
+      console.error("❌ Error: Invalid data structure.", record);
       return;
     }
 
@@ -175,18 +199,36 @@ const History = () => {
         <div className="bg-white p-6 shadow-md rounded-lg">
           <h2 className="text-2xl font-bold mb-5">📜 Inventory History</h2>
 
-          {/* Branch Selection and Date Range Filter */}
-          <div className="flex flex-wrap justify-between items-center mb-5">
+          {/* Filter Controls */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+            {/* Region Selection */}
+            <div>
+              <label className="block text-lg font-semibold mb-2">Select Region</label>
+              <select
+                value={selectedRegion}
+                onChange={(e) => setSelectedRegion(e.target.value)}
+                className="w-full p-2 border border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="">-- Select Region --</option>
+                {regions.map((region, idx) => (
+                  <option key={idx} value={region.name}>
+                    {region.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
             {/* Branch Selection */}
-            <div className="w-full md:w-1/3 mb-4 md:mb-0">
-              <label className="block text-lg font-semibold mb-2">Select Branch: </label>
+            <div>
+              <label className="block text-lg font-semibold mb-2">Select Branch</label>
               <select
                 value={selectedBranch}
                 onChange={(e) => setSelectedBranch(e.target.value)}
                 className="w-full p-2 border border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                disabled={!selectedRegion}
               >
                 <option value="">-- Select Branch --</option>
-                {branches.map((branch, idx) => (
+                {availableBranches.map((branch, idx) => (
                   <option key={idx} value={branch}>
                     {branch}
                   </option>
@@ -195,8 +237,8 @@ const History = () => {
             </div>
 
             {/* Date Range Filter */}
-            <div className="w-full md:w-1/3">
-              <label className="block text-lg font-semibold mb-2">Filter by Date Range: </label>
+            <div>
+              <label className="block text-lg font-semibold mb-2">Filter by Date Range</label>
               <div className="flex gap-2">
                 <input
                   type="date"
@@ -214,6 +256,7 @@ const History = () => {
             </div>
           </div>
 
+          {/* History Records */}
           {selectedBranch && currentItems.length > 0 ? (
             currentItems.map((record, idx) => (
               <div key={idx} className="mb-5 border border-gray-300 rounded-lg bg-white shadow-md">
@@ -236,12 +279,15 @@ const History = () => {
                       >
                         <FaFilePdf /> PDF
                       </PDFDownloadLink>
-                      <button onClick={() => exportToExcel(record)} className="flex items-center gap-2 px-3 py-2 bg-green-500 text-white font-bold rounded">
+                      <button 
+                        onClick={() => exportToExcel(record)} 
+                        className="flex items-center gap-2 px-3 py-2 bg-green-500 text-white font-bold rounded"
+                      >
                         <FaFileExcel /> Excel
                       </button>
                     </div>
 
-                    {/* Table - Responsive */}
+                    {/* Table */}
                     <div className="overflow-x-auto">
                       <table className="w-full min-w-[600px] border border-gray-300 bg-white shadow-md rounded-lg">
                         <thead className="bg-gray-300 text-gray-700 text-md">
