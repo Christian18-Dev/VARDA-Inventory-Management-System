@@ -15,7 +15,6 @@ const inventorySchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// ✅ Ensure price is always included in the response
 inventorySchema.set('toJSON', { virtuals: true, versionKey: false }); 
 
 const inventoryModels = {};
