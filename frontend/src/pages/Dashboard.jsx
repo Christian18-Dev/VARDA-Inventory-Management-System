@@ -206,7 +206,7 @@ const Dashboard = () => {
         {/* Bar Graph Card */}
         <div className="bg-white p-6 mt-6 rounded-xl shadow-md border border-gray-100 hover:shadow-lg transition-shadow duration-200">
           <h2 className="text-xl font-semibold mb-4 text-indigo-700 border-b border-indigo-100 pb-2">
-            Used Stock Overview
+            Today's Used Stocks
           </h2>
           <div className="w-full h-[300px]">
             {inventoryGraphData.labels.length > 0 ? (

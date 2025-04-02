@@ -4,9 +4,9 @@ import Navbar from "./Navbar";
 import { fetchProducts, addProduct, deleteProduct, updateProduct, resetInventory, API_URL } from "../api";
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
-// Updated calculation to use todayUse instead of use
-const calculateInventory = ({ begInventory = 0, delivered = 0, waste = 0, todayUse = 0, withdrawal = 0 }) => {
-  const current = begInventory + delivered - waste - todayUse - withdrawal; 
+
+const calculateInventory = ({ begInventory = 0, delivered = 0, waste = 0, use = 0, withdrawal = 0 }) => {
+  const current = begInventory + delivered - waste - use - withdrawal; 
   return { current: Math.max(current, 0) };
 };
 
@@ -21,8 +21,7 @@ const BranchInventory = ({ branchName }) => {
     begInventory: "",
     delivered: "",
     waste: "",
-    yesterdayUse: "",  // New field
-    todayUse: "",     // New field
+    use: "",
     withdrawal: "",
     current: 0,
   });
@@ -46,13 +45,7 @@ const BranchInventory = ({ branchName }) => {
     const getProducts = async () => {
       try {
         const data = await fetchProducts(branchName);
-        // Initialize todayUse to 0 for existing products if not present
-        const productsWithDefaults = data.products.map(product => ({
-          ...product,
-          yesterdayUse: product.yesterdayUse || product.use || 0, // Migrate from old 'use' field
-          todayUse: product.todayUse || 0
-        }));
-        setProducts(productsWithDefaults);
+        setProducts(data.products);
       } catch (error) {
         console.error("Error fetching products:", error);
       }
@@ -94,54 +87,64 @@ const BranchInventory = ({ branchName }) => {
     if (!confirmed) return;
   
     try {
-      // 1. Prepare history data with ALL original values
-      const historyData = products.map(product => ({
-        ...product, // Keep all original product data
-        yesterdayUse: product.yesterdayUse, // Previous day's usage
-        todayUse: product.todayUse,        // Current day's usage
-        // DO NOT reset any values for history
-      }));
-  
-      // 2. Save to history FIRST with complete data
-      const historyResponse = await fetch(`${API_BASE_URL}/api/history/save`, {
+      // 1. Save current inventory to history
+      const baseUrl = import.meta.env.VITE_API_BASE_URL.replace(/\/$/, "");
+      const saveHistoryResponse = await fetch(`${baseUrl}/api/history/save`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          branch: branchName,
-          products: historyData
+        body: JSON.stringify({ 
+          branch: branchName, 
+          products: products.map(p => ({
+            ...p,
+            // Include all current values in history
+            use: p.use // This preserves the current usage before reset
+          }))
         }),
       });
   
-      if (!historyResponse.ok) throw new Error("Failed to save history");
+      if (!saveHistoryResponse.ok) {
+        throw new Error("Failed to save history before reset");
+      }
   
-      // 3. Prepare inventory updates for NEXT period
+      // 2. Prepare updates - reset all operational fields and carry forward current as begInventory
       const updates = products.map(product => ({
         _id: product._id,
-        yesterdayUse: product.todayUse,  // Current usage becomes yesterday's
-        todayUse: 0,                    // Reset today's usage
-        begInventory: product.current,   // Current becomes next period's beginning
-        delivered: 0,                   // Reset for new period
-        waste: 0,                       // Reset for new period
-        withdrawal: 0                   // Reset for new period
+        begInventory: product.current, // Carry forward current as new beginning inventory
+        delivered: 0,                 // Reset delivered
+        waste: 0,                     // Reset waste
+        use: 0,                       // Reset use to 0
+        withdrawal: 0,                // Reset withdrawal
       }));
   
-      // 4. Update the actual inventory
+      // 3. Update the inventory with reset values
       const resetResponse = await resetInventory(branchName, updates);
       
       if (resetResponse.modifiedCount > 0) {
-        // 5. Update local state
+        // 4. Update local state
         setProducts(prevProducts => 
-          prevProducts.map(p => ({
-            ...p,
-            ...updates.find(u => u._id === p._id),
-            current: p.current // Maintain ending inventory
-          }))
+          prevProducts.map(p => {
+            const update = updates.find(u => u._id === p._id);
+            return {
+              ...p,
+              ...update,
+              current: p.current // Maintain the same current value (it will recalculate on next render)
+            };
+          })
         );
+        
+        // 5. Log the submission
+        await logActivity(`Submitted Inventory for ${branchName}`, {
+          productsCount: products.length,
+          timestamp: new Date().toISOString(),
+        });
+  
         alert("Inventory submitted successfully!");
+      } else {
+        alert("Failed to submit inventory.");
       }
     } catch (error) {
-      console.error("Submission error:", error);
-      alert(`Failed: ${error.message}`);
+      console.error("❌ Error during inventory submission:", error);
+      alert("Something went wrong during inventory submission.");
     }
   };
 
@@ -149,12 +152,11 @@ const BranchInventory = ({ branchName }) => {
     const parsedProduct = {
       name: newProduct.name,
       category: newProduct.category,
-      price: parseFloat(newProduct.price) || 0,
+      price: parseFloat(newProduct.price) || 0, // Include price field
       begInventory: role === "admin" ? parseFloat(newProduct.begInventory) || 0 : 0,
       delivered: parseFloat(newProduct.delivered) || 0,
       waste: role === "admin" ? parseFloat(newProduct.waste) || 0 : 0,
-      yesterdayUse: role === "admin" ? parseFloat(newProduct.yesterdayUse) || 0 : 0,
-      todayUse: role === "admin" ? parseFloat(newProduct.todayUse) || 0 : 0,
+      use: role === "admin" ? parseFloat(newProduct.use) || 0 : 0,
       withdrawal: role === "admin" ? parseFloat(newProduct.withdrawal) || 0 : 0,
     };
     const { current } = calculateInventory(parsedProduct);
@@ -171,33 +173,54 @@ const BranchInventory = ({ branchName }) => {
           begInventory: "",
           delivered: "",
           waste: "",
-          yesterdayUse: "",
-          todayUse: "",
+          use: "",
           withdrawal: "",
           current: 0,
         });
         setShowAddModal(false);
   
-        await logActivity(`Added ${productToAdd.name} from the Inventory at ${branchName}`, {
-          productDetails: productToAdd
-        });
+          // ✅ Log to Activity Log
+          const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/activitylogs/log`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              username: localStorage.getItem("username") || "Unknown User",
+              role: role,
+              action: `Added ${productToAdd.name} from the Inventory at ${branchName}`,
+            }),
+          });
+  
+        if (!response.ok) {
+          console.error("Failed to log activity:", response.statusText);
+          throw new Error("Failed to log activity");
+        }
+  
+        const result = await response.json();
+        console.log("Activity log response:", result);
       }
     } catch (err) {
       console.error("Add error:", err);
     }
   };
-
+  
   const handleUpdateProduct = async () => {
+    // First preserve the existing use value
+    const currentUseValue = editProduct.use || 0;
+  
     const parsedProduct = {
-      ...editProduct,
+      ...editProduct, // Spread all existing product data first
       price: parseFloat(editProduct.price) || 0,
       begInventory: role === "admin" ? parseFloat(editProduct.begInventory) || 0 : editProduct.begInventory,
       delivered: parseFloat(editProduct.delivered) || 0,
       waste: role === "admin" ? parseFloat(editProduct.waste) || 0 : editProduct.waste,
-      yesterdayUse: role === "admin" ? parseFloat(editProduct.yesterdayUse) || 0 : editProduct.yesterdayUse,
-      todayUse: role === "admin" ? parseFloat(editProduct.todayUse) || 0 : editProduct.todayUse,
+      // Explicitly preserve the use value - only change if admin is modifying it
+      use: role === "admin" ? parseFloat(editProduct.use) || currentUseValue : currentUseValue,
       withdrawal: role === "admin" ? parseFloat(editProduct.withdrawal) || 0 : editProduct.withdrawal,
     };
+  
+    // Calculate current inventory
     const { current } = calculateInventory(parsedProduct);
     const updatedProduct = { ...parsedProduct, current };
   
@@ -208,15 +231,25 @@ const BranchInventory = ({ branchName }) => {
         setShowEditModal(false);
         setEditProduct(null);
   
-        await logActivity(`Updated ${updatedProduct.name} in ${branchName} inventory`, {
-          changes: updatedProduct
+        // Log the update action
+        await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/activitylogs/log`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            username: localStorage.getItem("username") || "Unknown User",
+            role: role,
+            action: `Updated the product ${updatedProduct.name} from the inventory at ${branchName}`,
+            branch: branchName,
+          }),
         });
       }
     } catch (err) {
       console.error("Update error:", err);
     }
   };
-
+  
   const handleDeleteProduct = async () => {
     if (!productToDelete || typeof productToDelete !== "object") {
       console.error("Product to delete is not defined or invalid");
@@ -266,6 +299,7 @@ const BranchInventory = ({ branchName }) => {
       console.error("Delete error:", err);
     }
   };
+  
 
   if (!role) return null;
 
@@ -277,18 +311,18 @@ const BranchInventory = ({ branchName }) => {
         <div className="flex flex-col md:flex-row justify-between items-center mt-6 mb-4">
           <h1 className="text-2xl font-bold mb-4 md:mb-0">{branchName}</h1>
           <div className="space-x-2">
-            <button
-              onClick={() => setShowAddModal(true)}
-              className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition"
-            >
-              Add Item
-            </button>    
-            <button
-              onClick={handleResetInventory}
-              className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition"
-            >
-              Submit
-            </button>
+              <button
+                onClick={() => setShowAddModal(true)}
+                className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition"
+              >
+                Add Item
+              </button>    
+              <button
+                onClick={handleResetInventory}
+                className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition"
+              >
+                Submit
+              </button>
           </div>
         </div>
   
@@ -305,8 +339,7 @@ const BranchInventory = ({ branchName }) => {
                     "Beg Inv",
                     "Delivered",
                     "Waste",
-                    "Yesterday Use",  // New column
-                    "Today's Use",   // New column
+                    "Use",
                     "Withdrawal",
                     "Current",
                     "Actions",
@@ -340,8 +373,7 @@ const BranchInventory = ({ branchName }) => {
                           product.begInventory,
                           product.delivered,
                           product.waste,
-                          product.yesterdayUse,  // New field
-                          product.todayUse,     // New field
+                          product.use,
                           product.withdrawal,
                           product.current,
                         ].map((item, i) => (
@@ -352,7 +384,7 @@ const BranchInventory = ({ branchName }) => {
                                 ? "text-green-600 font-medium"
                                 : i === 5
                                 ? "text-red-500"
-                                : i === 6 || i === 7  // Color both use fields blue
+                                : i === 6
                                 ? "text-blue-500"
                                 : ""
                             }`}
@@ -361,15 +393,16 @@ const BranchInventory = ({ branchName }) => {
                           </td>
                         ))}
                         <td className="px-5 py-4 whitespace-nowrap space-x-2">
-                          <button
-                            className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg shadow-md transition duration-150"
-                            onClick={() => {
-                              setEditProduct(product);
-                              setShowEditModal(true);
-                            }}
-                          >
-                            Edit
-                          </button>
+
+                            <button
+                              className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg shadow-md transition duration-150"
+                              onClick={() => {
+                                setEditProduct(product);
+                                setShowEditModal(true);
+                              }}
+                            >
+                              Edit
+                            </button>
                           
                           {role === "admin" && (
                             <button
@@ -387,7 +420,7 @@ const BranchInventory = ({ branchName }) => {
                     ))
                 ) : (
                   <tr>
-                    <td colSpan="11" className="text-center py-6 text-gray-500">  {/* Updated colSpan */}
+                    <td colSpan="10" className="text-center py-6 text-gray-500">
                       No products found
                     </td>
                   </tr>
@@ -464,14 +497,11 @@ const BranchInventory = ({ branchName }) => {
                   "name",
                   "category",
                   ...(role === "admin"
-                    ? ["price", "begInventory", "delivered", "waste", "yesterdayUse", "todayUse", "withdrawal"]
-                    : ["price", "delivered", "waste", "todayUse", "withdrawal"]),
+                    ? ["price", "begInventory", "delivered", "waste", "use", "withdrawal"]
+                    : ["price", "delivered", "waste", "use", "withdrawal"]),
                 ].map((field) => (
                   <div key={field}>
-                    <label className="block text-sm font-medium capitalize">
-                      {field === "yesterdayUse" ? "Yesterday's Use" : 
-                       field === "todayUse" ? "Today's Use" : field}
-                    </label>
+                    <label className="block text-sm font-medium capitalize">{field}</label>
                     <input
                       type={
                         [
@@ -479,8 +509,7 @@ const BranchInventory = ({ branchName }) => {
                           "begInventory",
                           "delivered",
                           "waste",
-                          "yesterdayUse",
-                          "todayUse",
+                          "use",
                           "withdrawal",
                         ].includes(field)
                           ? "number"
@@ -500,7 +529,7 @@ const BranchInventory = ({ branchName }) => {
                       className="w-full border border-gray-300 px-3 py-2 rounded-md"
                       disabled={
                         role === "staff" &&
-                        !["name", "category", "delivered", "waste", "todayUse", "withdrawal"].includes(
+                        !["name", "category", "delivered", "waste", "use", "withdrawal"].includes(
                           field
                         )
                       }
@@ -526,7 +555,7 @@ const BranchInventory = ({ branchName }) => {
           </div>
         )}
   
-        {/* Keep Delete Confirm Modal unchanged */}
+        {/* Delete Confirm Modal */}
         {showDeleteConfirm && (
           <div className="fixed inset-0 flex items-center justify-center bg-black/30 backdrop-blur-sm z-50 p-4">
             <div className="bg-white rounded-lg p-6 w-full max-w-sm text-center">
@@ -552,6 +581,7 @@ const BranchInventory = ({ branchName }) => {
       </div>
     </div>
   );
-};
+  
+  };
 
 export default BranchInventory;
