@@ -5,7 +5,7 @@ const router = express.Router();
 // Region and branch structure matching your frontend
 const regions = {
   "LAGUNA": ["LAGUNA CHKN CHOP", "LAGUNA VARDA BURGER", "LAGUNA THE GOOD JUICE", "LAGUNA THE GOOD NOODLE BAR"],
-  "LIPA BATANGAS": ["LIPA CHKN CHOP", "LIPA VARDA BURGER", "LIPA SILOG", "LIPA NRB"],
+  "LIPA BATANGAS": ["LIPA BATANGAS CHKN CHOP", "LIPA BATANGAS VARDA BURGER", "LIPA BATANGAS SILOG", "LIPA BATANGAS NRB"],
 };
 
 // Map branch names to collection names
@@ -14,10 +14,10 @@ const branchToCollection = {
   "LAGUNA VARDA BURGER": "lagunavardaburger_inventory",
   "LAGUNA THE GOOD JUICE": "lagunathegoodjuice_inventory",
   "LAGUNA THE GOOD NOODLE BAR": "lagunathegoodnoodlebar_inventory",
-  "LIPA CHKN CHOP": "lipachknchop_inventory",
-  "LIPA VARDA BURGER": "lipavardaburger_inventory",
-  "LIPA SILOG": "lipasilog_inventory",
-  "LIPA NRB": "lipanrb_inventory",
+  "LIPA BATANGAS CHKN CHOP": "lipabatangaschknchop_inventory",
+  "LIPA BATANGAS VARDA BURGER": "lipabatangasvardaburger_inventory",
+  "LIPA BATANGAS SILOG": "lipabatangassilog_inventory",
+  "LIPA BATANGAS NRB": "lipabatangasnrb_inventory",
 };
 
 // Helper function to get collections based on region/branch
