@@ -20,7 +20,7 @@ const regions = [
       "LAGUNA CHKN CHOP",
       "LAGUNA VARDA BURGER",
       "LAGUNA THE GOOD JUICE",
-      "LAGUNA THE GOOD NOODLE BAR"
+      "LAGUNA THE GOOD NOODLE BAR",
     ]
   },
   {
@@ -29,7 +29,10 @@ const regions = [
       "LIPA BATANGAS CHKN CHOP",
       "LIPA BATANGAS VARDA BURGER",
       "LIPA BATANGAS SILOG",
-      "LIPA BATANGAS NRB"
+      "LIPA BATANGAS NRB",
+      "LIPA BATANGAS BEVERAGE MAIN C",
+      "LIPA BATANGAS BREAD MAIN C",
+
     ]
   }
 ];
@@ -358,7 +361,7 @@ const Dashboard = () => {
           {/* Slow Moving Items */}
           <div className="bg-white p-5 rounded-xl shadow-md border border-gray-100 hover:shadow-lg transition-shadow duration-200">
             <h2 className="text-xl font-semibold mb-4 text-emerald-600 border-b border-emerald-100 pb-2">
-              {selectedBranch ? `${selectedBranch} Slow Movers` : "Slow Moving Items"}
+              {selectedBranch ? `${selectedBranch} Slow Moving Items` : "Slow Moving Items"}
             </h2>
             <div className="overflow-x-auto">
               <table className="w-full border-collapse">
@@ -393,7 +396,7 @@ const Dashboard = () => {
           {/* Fast Moving Items */}
           <div className="bg-white p-5 rounded-xl shadow-md border border-gray-100 hover:shadow-lg transition-shadow duration-200">
             <h2 className="text-xl font-semibold mb-4 text-amber-500 border-b border-amber-100 pb-2">
-              {selectedBranch ? `${selectedBranch} Fast Movers` : "Fast Moving Items"}
+              {selectedBranch ? `${selectedBranch} Fast Moving Items` : "Fast Moving Items"}
             </h2>
             <div className="overflow-x-auto">
               <table className="w-full border-collapse">
