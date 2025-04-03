@@ -1,14 +1,16 @@
 import { HashRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
-import LagunaCHKNChopInventory from "./pages/inventory/LagunaCHKNChop";
-import LagunaVardaBurgerInventory from "./pages/inventory/LagunaVardaBurger";
-import LagunaTheGoodJuiceInventory from "./pages/inventory/LagunaTheGoodJuice";
-import LagunaTheGoodNoodleBarInventory from "./pages/inventory/LagunaTheGoodNoodleBar";
-import LipaBatangasCHKNChopInventory from "./pages/inventory/LipaBatangasCHKNChop";
-import LipaBatangasVardaBurgerInventory from "./pages/inventory/LipaBatangasVardaBurger";
-import LipaBatangasSilogInventory from "./pages/inventory/LipaBatangasSilog";
-import LipaBatangasNRBInventory from "./pages/inventory/LipaBatangasNRB";
+import LagunaCHKNChopInventory from "./pages/inventory/Laguna/LagunaCHKNChop";
+import LagunaVardaBurgerInventory from "./pages/inventory/Laguna/LagunaVardaBurger";
+import LagunaTheGoodJuiceInventory from "./pages/inventory/Laguna/LagunaTheGoodJuice";
+import LagunaTheGoodNoodleBarInventory from "./pages/inventory/Laguna/LagunaTheGoodNoodleBar";
+import LipaBatangasCHKNChopInventory from "./pages/inventory/LipaBatangas/LipaBatangasCHKNChop";
+import LipaBatangasVardaBurgerInventory from "./pages/inventory/LipaBatangas/LipaBatangasVardaBurger";
+import LipaBatangasSilogInventory from "./pages/inventory/LipaBatangas/LipaBatangasSilog";
+import LipaBatangasNRBInventory from "./pages/inventory/LipaBatangas/LipaBatangasNRB";
+import LipaBatangasBeverageMainCInventory from "./pages/inventory/LipaBatangas/LipaBatangasBeverageMainC";
+import LipaBatangasBreadMainCInventory from "./pages/inventory/LipaBatangas/LipaBatangasBreadMainC";
 import UserManagement from "./pages/UserManagement";
 import History from "./pages/History";
 import ActivityLog from "./pages/ActivityLog";
@@ -34,6 +36,8 @@ function App() {
         <Route path="/inventory/lipabatangas-varda-burger" element={<PrivateRoute element={<LipaBatangasVardaBurgerInventory />}  />} />
         <Route path="/inventory/lipabatangas-silog" element={<PrivateRoute element={<LipaBatangasSilogInventory />}  />} />
         <Route path="/inventory/lipabatangas-nrb" element={<PrivateRoute element={<LipaBatangasNRBInventory />}  />} />
+        <Route path="/inventory/lipabatangas-beverage-main-c" element={<PrivateRoute element={<LipaBatangasBeverageMainCInventory />}  />} />
+        <Route path="/inventory/lipabatangas-bread-main-c" element={<PrivateRoute element={<LipaBatangasBreadMainCInventory />}  />} />
         <Route path="/history" element={<History />} />
         <Route path="/activitylogs" element={<ActivityLog />} />
 

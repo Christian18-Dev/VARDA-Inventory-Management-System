@@ -33,6 +33,8 @@ const Sidebar = () => {
       { label: "VARDA BURGER", path: "/inventory/lipabatangas-varda-burger", roleMatch: "Lipa-VardaBurger" },
       { label: "SILOG", path: "/inventory/lipabatangas-silog", roleMatch: "Lipa-Silog" },
       { label: "NRB", path: "/inventory/lipabatangas-nrb", roleMatch: "Lipa-NRB" },
+      { label: "MAIN C - BEVERAGE", path: "/inventory/lipabatangas-beverage-main-c", roleMatch: "Lipa-Beverage"},
+      { label: "MAIN C - BREAD", path: "/inventory/lipabatangas-bread-main-c", roleMatch: "Lipa-Bread"},
       // Add more Lipa stores here
     ]
   };

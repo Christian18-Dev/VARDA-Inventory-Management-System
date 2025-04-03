@@ -1,4 +1,4 @@
-import BranchInventory from "../../components/BranchInventory";
+import BranchInventory from "../../../components/BranchInventory";
 
 const LagunaVardaBurger = () => {
   return <BranchInventory branchName="LAGUNA VARDA BURGER" />;
