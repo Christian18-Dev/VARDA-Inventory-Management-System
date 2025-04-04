@@ -23,7 +23,9 @@ const regions = [
       "LIPA BATANGAS CHKN CHOP",
       "LIPA BATANGAS VARDA BURGER",
       "LIPA BATANGAS SILOG",
-      "LIPA BATANGAS NRB"
+      "LIPA BATANGAS NRB",
+      "LIPA BATANGAS BEVERAGE MAIN C",
+      "LIPA BATANGAS BREAD MAIN C",
     ]
   },
 ];

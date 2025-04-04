@@ -240,7 +240,7 @@ const Dashboard = () => {
                     className="border-b border-gray-100 pb-2 flex justify-start items-center text-sm text-gray-700 hover:bg-indigo-50/50 transition-colors p-2 rounded-md gap-4"
                   >
                     <span className="font-medium text-gray-800 w-1/4">{activity.username}</span>
-                    <span className="w-1/2 truncate">{activity.action}</span>
+                    <span className="w-1/2 truncate hover:whitespace-normal">{activity.action}</span>
                     <span className="text-gray-500 w-1/4 text-right">
                       {new Date(activity.timestamp).toLocaleString()}
                     </span>
