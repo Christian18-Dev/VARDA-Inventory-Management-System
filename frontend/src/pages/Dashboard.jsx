@@ -32,9 +32,36 @@ const regions = [
       "LIPA BATANGAS NRB",
       "LIPA BATANGAS BEVERAGE MAIN C",
       "LIPA BATANGAS BREAD MAIN C",
-
     ]
-  }
+  },
+  {
+    name: "PUP MAIN BRANCH",
+    branches: [
+      "PUP MAIN BRANCH CHKN CHOP", 
+      "PUP MAIN BRANCH VARDA BURGER",
+    ]
+  },
+  {
+    name: "MAPUA INTRAMUROS",
+    branches: [
+      "MAPUA INTRAMUROS VARDA BURGER",
+      "MAPUA INTRAMUROS THE GOOD JUICE",
+    ]
+  },
+  {
+    name: "MAPUA MAKATI",
+    branches: [
+      "MAPUA MAKATI CHKN CHOP",
+      "MAPUA MAKATI VARDA BURGER",
+    ]
+  },
+  {
+    name: "ST JUDE MANILA",
+    branches: [
+      "ST JUDE MANILA CHKN CHOP",
+      "ST JUDE MANILA VARDA BURGER",
+    ]
+  },
 ];
 
 const allBranches = regions.flatMap(region => region.branches);
@@ -161,8 +188,10 @@ const Dashboard = () => {
     <div className="flex">
       <Sidebar />
       <div className="flex-1 p-6 bg-gray-100 min-h-screen md:ml-64 w-full">
+
         {/* Region and Branch Selection */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+
           {/* Region Selection */}
           <div>
             <label className="block text-lg font-semibold mb-2">Select Region</label>
@@ -234,18 +263,37 @@ const Dashboard = () => {
             </h2>
             <ul className="space-y-3">
               {recentActivity.length > 0 ? (
-                recentActivity.map((activity, index) => (
-                  <li
-                    key={index}
-                    className="border-b border-gray-100 pb-2 flex justify-start items-center text-sm text-gray-700 hover:bg-indigo-50/50 transition-colors p-2 rounded-md gap-4"
-                  >
-                    <span className="font-medium text-gray-800 w-1/4">{activity.username}</span>
-                    <span className="w-1/2 truncate hover:whitespace-normal">{activity.action}</span>
-                    <span className="text-gray-500 w-1/4 text-right">
-                      {new Date(activity.timestamp).toLocaleString()}
-                    </span>
-                  </li>
-                ))
+                recentActivity.map((activity, index) => {
+                  let hoverTimer;
+                  
+                  const handleMouseEnter = (e) => {
+                    const element = e.currentTarget.querySelector('.activity-action');
+                    hoverTimer = setTimeout(() => {
+                      element.classList.remove('truncate');
+                    }, 500); 
+                  };
+                  
+                  const handleMouseLeave = (e) => {
+                    clearTimeout(hoverTimer);
+                    const element = e.currentTarget.querySelector('.activity-action');
+                    element.classList.add('truncate');
+                  };
+
+                  return (
+                    <li
+                      key={index}
+                      className="border-b border-gray-100 pb-2 flex justify-start items-center text-sm text-gray-700 hover:bg-indigo-50/50 transition-colors p-2 rounded-md gap-4"
+                      onMouseEnter={handleMouseEnter}
+                      onMouseLeave={handleMouseLeave}
+                    >
+                      <span className="font-medium text-gray-800 w-1/4">{activity.username}</span>
+                      <span className="activity-action w-1/2 truncate">{activity.action}</span>
+                      <span className="text-gray-500 w-1/4 text-right">
+                        {new Date(activity.timestamp).toLocaleString()}
+                      </span>
+                    </li>
+                  );
+                })
               ) : (
                 <li className="text-gray-500">No recent activity</li>
               )}
