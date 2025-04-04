@@ -28,6 +28,34 @@ const regions = [
       "LIPA BATANGAS BREAD MAIN C",
     ]
   },
+  {
+    name: "PUP MAIN BRANCH",
+    branches: [
+      "PUP MAIN BRANCH CHKN CHOP", 
+      "PUP MAIN BRANCH VARDA BURGER",
+    ]
+  },
+  {
+    name: "MAPUA INTRAMUROS",
+    branches: [
+      "MAPUA INTRAMUROS VARDA BURGER",
+      "MAPUA INTRAMUROS THE GOOD JUICE",
+    ]
+  },
+  {
+    name: "MAPUA MAKATI",
+    branches: [
+      "MAPUA MAKATI CHKN CHOP",
+      "MAPUA MAKATI VARDA BURGER",
+    ]
+  },
+  {
+    name: "ST JUDE MANILA",
+    branches: [
+      "ST JUDE MANILA CHKN CHOP",
+      "ST JUDE MANILA VARDA BURGER",
+    ]
+  }
 ];
 
 const ITEMS_PER_PAGE = 10;

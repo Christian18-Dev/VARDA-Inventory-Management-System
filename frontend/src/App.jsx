@@ -11,6 +11,14 @@ import LipaBatangasSilogInventory from "./pages/inventory/LipaBatangas/LipaBatan
 import LipaBatangasNRBInventory from "./pages/inventory/LipaBatangas/LipaBatangasNRB";
 import LipaBatangasBeverageMainCInventory from "./pages/inventory/LipaBatangas/LipaBatangasBeverageMainC";
 import LipaBatangasBreadMainCInventory from "./pages/inventory/LipaBatangas/LipaBatangasBreadMainC";
+import PUPMainVardaBurgerInventory from "./pages/inventory/PUPMainBranch/PUPMainVardaBurger";
+import PUPMainCHKNChopInventory from "./pages/inventory/PUPMainBranch/PUPMainCHKNChop";
+import MAPUAIntramurosVardaBurgerInventory from "./pages/inventory/MAPUA/MAPUAIntramurosVardaBurger";
+import MAPUAIntramurosTheGoodJuiceInventory from "./pages/inventory/MAPUA/MAPUAIntramurosTheGoodJuice";
+import MAPUAMakatiVardaBurgerInventory from "./pages/inventory/MAPUA/MAPUAMakatiVardaBurger";
+import MAPUAMakatiCHKNChopInventory from "./pages/inventory/MAPUA/MAPUAMakatiCHKNChop";
+import STJudeManilaCHKNChopInventory from "./pages/inventory/STJude/STJudeManilaCHKNChop";
+import STJudeManilaVardaBurgerInventory from "./pages/inventory/STJude/STJudeManilaVardaBurger";
 import UserManagement from "./pages/UserManagement";
 import History from "./pages/History";
 import ActivityLog from "./pages/ActivityLog";
@@ -38,6 +46,14 @@ function App() {
         <Route path="/inventory/lipabatangas-nrb" element={<PrivateRoute element={<LipaBatangasNRBInventory />}  />} />
         <Route path="/inventory/lipabatangas-beverage-main-c" element={<PrivateRoute element={<LipaBatangasBeverageMainCInventory />}  />} />
         <Route path="/inventory/lipabatangas-bread-main-c" element={<PrivateRoute element={<LipaBatangasBreadMainCInventory />}  />} />
+        <Route path="/inventory/pup-main-varda-burger" element={<PrivateRoute element={<PUPMainVardaBurgerInventory />}  />} />
+        <Route path="/inventory/pup-main-chkn-chop" element={<PrivateRoute element={<PUPMainCHKNChopInventory />}  />} />
+        <Route path="/inventory/mapua-intramuros-varda-burger" element={<PrivateRoute element={<MAPUAIntramurosVardaBurgerInventory />}  />} />
+        <Route path="/inventory/mapua-intramuros-the-good-juice" element={<PrivateRoute element={<MAPUAIntramurosTheGoodJuiceInventory />}  />} />
+        <Route path="/inventory/mapua-makati-varda-burger" element={<PrivateRoute element={<MAPUAMakatiVardaBurgerInventory />}  />} />
+        <Route path="/inventory/mapua-makati-chkn-chop" element={<PrivateRoute element={<MAPUAMakatiCHKNChopInventory />}  />} />
+        <Route path="/inventory/st-jude-manila-chkn-chop" element={<PrivateRoute element={<STJudeManilaCHKNChopInventory />}  />} />
+        <Route path="/inventory/st-jude-manila-varda-burger" element={<PrivateRoute element={<STJudeManilaVardaBurgerInventory />}  />} />
         <Route path="/history" element={<History />} />
         <Route path="/activitylogs" element={<ActivityLog />} />
 

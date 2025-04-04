@@ -6,6 +6,11 @@ const router = express.Router();
 const regions = {
   "LAGUNA": ["LAGUNA CHKN CHOP", "LAGUNA VARDA BURGER", "LAGUNA THE GOOD JUICE", "LAGUNA THE GOOD NOODLE BAR"],
   "LIPA BATANGAS": ["LIPA BATANGAS CHKN CHOP", "LIPA BATANGAS VARDA BURGER", "LIPA BATANGAS SILOG", "LIPA BATANGAS NRB", "LIPA BATANGAS BEVERAGE MAIN C", "LIPA BATANGAS BREAD MAIN C"],
+  "PUP MAIN BRANCH": ["PUP MAIN BRANCH CHKN CHOP", "PUP MAIN BRANCH VARDA BURGER"],
+  "MAPUA INTRAMUROS": ["MAPUA INTRAMUROS VARDA BURGER", "MAPUA INTRAMUROS THE GOOD JUICE"],
+  "MAPUA MAKATI": ["MAPUA MAKATI CHKN CHOP", "MAPUA MAKATI VARDA BURGER"],
+  "ST JUDE MANILA": ["ST JUDE MANILA CHKN CHOP", "ST JUDE MANILA VARDA BURGER"],
+
 };
 
 // Map branch names to collection names
@@ -20,6 +25,14 @@ const branchToCollection = {
   "LIPA BATANGAS NRB": "lipabatangasnrb_inventory",
   "LIPA BATANGAS BEVERAGE MAIN C": "lipabatangasbeveragemainc_inventory",
   "LIPA BATANGAS BREAD MAIN C": "lipabatangasbreadmainc_inventory",
+  "PUP MAIN BRANCH CHKN CHOP": "pupmainbranchchknchop_inventory",
+  "PUP MAIN BRANCH VARDA BURGER": "pupmainbranchvardaburger_inventory",
+  "MAPUA INTRAMUROS VARDA BURGER": "mapuaintramurosvardaburger_inventory",
+  "MAPUA INTRAMUROS THE GOOD JUICE": "mapuaintramurosthegoodjuice_inventory",
+  "MAPUA MAKATI CHKN CHOP": "mapuamakatichknchop_inventory",
+  "MAPUA MAKATI VARDA BURGER": "mapuamakativardaburger_inventory",
+  "ST JUDE MANILA CHKN CHOP": "stjudemanilachknchop_inventory",
+  "ST JUDE MANILA VARDA BURGER": "stjudemanilavardaburger_inventory",
 };
 
 // Helper function to get collections based on region/branch

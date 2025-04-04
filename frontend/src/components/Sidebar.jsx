@@ -24,8 +24,8 @@ const Sidebar = () => {
     "Laguna Branch": [
       { label: "CHKN CHOP", path: "/inventory/laguna-chkn-chop", roleMatch: "Laguna-ChknChop" },
       { label: "VARDA BURGER", path: "/inventory/laguna-varda-burger", roleMatch: "Laguna-VardaBurger" },
-      { label: "THE GOOD JUICE", path: "/inventory/laguna-the-good-juice", roleMatch: "laguna-the-good-juice" },
-      { label: "THE GOOD NOODLE BAR", path: "/inventory/laguna-the-good-noodle-bar", roleMatch: "laguna-the-good-noodle-bar" },
+      { label: "THE GOOD JUICE", path: "/inventory/laguna-the-good-juice", roleMatch: "laguna-TheGoodJuice" },
+      { label: "THE GOOD NOODLE BAR", path: "/inventory/laguna-the-good-noodle-bar", roleMatch: "laguna-TheGoodNoodleBar" },
       // Add more Laguna stores here
     ],
     "Lipa Batangas Branch": [
@@ -36,6 +36,22 @@ const Sidebar = () => {
       { label: "MAIN C - BEVERAGE", path: "/inventory/lipabatangas-beverage-main-c", roleMatch: "Lipa-Beverage"},
       { label: "MAIN C - BREAD", path: "/inventory/lipabatangas-bread-main-c", roleMatch: "Lipa-Bread"},
       // Add more Lipa stores here
+    ],
+    "PUP Main Branch": [
+      { label: "CHKN CHOP", path: "/inventory/pup-main-chkn-chop", roleMatch: "PUPMain-ChknChop"},
+      { label: "VARDA BURGER", path: "/inventory/pup-main-varda-burger", roleMatch: "PUPMain-VardaBurger"},
+    ],
+    "MAPUA Intramuros": [
+      { label: "VARDA BURGER", path: "/inventory/mapua-intramuros-varda-burger", roleMatch: "MAPUAIntramuros-VardaBurger"},
+      { label: "THE GOOD JUICE", path: "/inventory/mapua-intramuros-the-good-juice", roleMatch: "MAPUAIntramuros-TheGoodjuice"},
+    ],
+    "MAPUA Makati": [
+      { label: "CHKN CHOP", path: "/inventory/mapua-makati-chkn-chop", roleMatch: "MAPUAMakati-ChknChop"},
+      { label: "VARDA BURGER", path: "/inventory/mapua-makati-varda-burger", roleMatch: "MAPUAMakati-VardaBurger"},
+    ],
+    "ST Jude Manila": [
+      { label: "CHKN CHOP", path: "/inventory/st-jude-manila-chkn-chop", roleMatch: "STJudeManila-ChknChop"},
+      { label: "VARDA BURGER", path: "/inventory/st-jude-manila-varda-burger", roleMatch: "STJudeManila-VardaBurger"},
     ]
   };
 
