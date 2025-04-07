@@ -217,13 +217,13 @@ const Dashboard = () => {
   return (
     <div className="flex">
       <Sidebar />
-      <div className="flex-1 p-6 bg-gray-100 min-h-screen md:ml-64 w-full">
+      <div className="flex-1 p-6 bg-gray-100 min-h-screen md:ml-64 w-full mt-10 md:mt-0">
         {/* Enhanced Dropdown Selectors Section */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
 
          {/* Region Selector */}
           <div className="w-full">
-          <label className="block text-sm font-bold text-indigo-800 mb-2 mt-10 ml-1">Select Region</label>
+          <label className="block text-sm font-bold text-indigo-800 mb-2 ml-1">Select Region</label>
             <motion.div 
               className="flex items-center bg-white hover:bg-indigo-50 border-2 border-indigo-200 hover:border-indigo-400 rounded-lg overflow-hidden relative transition-all duration-200 h-12"
               whileHover={{ scale: 1.005 }}
