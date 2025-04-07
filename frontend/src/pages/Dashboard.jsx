@@ -447,7 +447,7 @@ const Dashboard = () => {
               ? `${staffLocation.branch} Inventory` 
               : selectedBranch 
                 ? `${selectedBranch} Inventory` 
-                : "Inventory Overview"}
+                : "Today's Use Overview"}
           </h2>
           <div className="w-full h-[300px]">
             {inventoryGraphData.labels.length > 0 ? (
