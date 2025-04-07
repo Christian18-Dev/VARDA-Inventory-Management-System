@@ -66,6 +66,19 @@ const regions = [
 
 const allBranches = regions.flatMap(region => region.branches);
 
+// Helper function to get location from role
+const getLocationFromRole = (role) => {
+  if (!role || !role.startsWith("Staff-")) return null;
+  
+  const parts = role.split("-");
+  if (parts.length < 3) return null;
+  
+  const region = parts[1];
+  const branch = `${parts[1]} ${parts[2].replace(/([A-Z])/g, " $1").trim()}`.toUpperCase();
+  
+  return { region, branch };
+};
+
 const Dashboard = () => {
   const [highInventoryItems, setHighInventoryItems] = useState([]);
   const [lowInventoryItems, setLowInventoryItems] = useState([]);
@@ -77,18 +90,38 @@ const Dashboard = () => {
   const [availableBranches, setAvailableBranches] = useState(allBranches);
   const [isLoading, setIsLoading] = useState(false);
 
+  // Get user role from localStorage
+  const userRole = localStorage.getItem("role");
+  const isAdmin = userRole === "Admin";
+  const isStaff = userRole?.startsWith("Staff-");
+  const staffLocation = isStaff ? getLocationFromRole(userRole) : null;
+
+  // Set initial region/branch based on user role
+  useEffect(() => {
+    if (isStaff && staffLocation) {
+      setSelectedRegion(staffLocation.region);
+      setSelectedBranch(staffLocation.branch);
+    }
+  }, [userRole]);
+
   useEffect(() => {
     if (selectedRegion) {
       const region = regions.find(r => r.name === selectedRegion);
       if (region) {
         setAvailableBranches(region.branches);
-        setSelectedBranch(""); // Reset branch when region changes
+        // Don't reset branch if it's already set by staff role
+        if (!isStaff || !staffLocation?.branch) {
+          setSelectedBranch("");
+        }
       }
     } else {
       setAvailableBranches(allBranches);
-      setSelectedBranch("");
+      // Don't reset branch if it's set by staff role
+      if (!isStaff || !staffLocation?.branch) {
+        setSelectedBranch("");
+      }
     }
-  }, [selectedRegion]);
+  }, [selectedRegion, userRole]);
 
   useEffect(() => {
     const fetchRecentActivity = async () => {
@@ -112,10 +145,17 @@ const Dashboard = () => {
       setIsLoading(true);
       try {
         const params = new URLSearchParams();
-        if (selectedBranch) {
-          params.append('branch', selectedBranch);
-        } else if (selectedRegion) {
-          params.append('region', selectedRegion);
+        
+        // For staff users, always filter by their branch
+        if (isStaff && staffLocation?.branch) {
+          params.append('branch', staffLocation.branch);
+        } else {
+          // For admin users, use their selected filters
+          if (selectedBranch) {
+            params.append('branch', selectedBranch);
+          } else if (selectedRegion) {
+            params.append('region', selectedRegion);
+          }
         }
 
         // Fetch high inventory items
@@ -152,11 +192,13 @@ const Dashboard = () => {
           return;
         }
     
-        // Filter data to only include selected region's branches if a region is selected
-        const filteredGraphData = selectedRegion && !selectedBranch
-          ? graphData.filter(item => 
-              regions.find(r => r.name === selectedRegion)?.branches.includes(item.branch))
-          : graphData;
+        // Filter data based on user role
+        const filteredGraphData = isStaff && staffLocation?.branch
+          ? graphData.filter(item => item.branch === staffLocation.branch)
+          : selectedRegion && !selectedBranch
+            ? graphData.filter(item => 
+                regions.find(r => r.name === selectedRegion)?.branches.includes(item.branch))
+            : graphData;
     
         // Group by product and show top products across branches
         const productNames = [...new Set(filteredGraphData.map(item => item.name))].slice(0, 10);
@@ -182,66 +224,78 @@ const Dashboard = () => {
     };
 
     fetchDashboardData();
-  }, [selectedBranch, selectedRegion]);
+  }, [selectedBranch, selectedRegion, userRole]);
+
+  // Render region and branch selectors with role-based access
+  const renderRegionSelection = () => (
+    <div>
+      <label className="block text-lg font-semibold mb-2">Select Region</label>
+      <select
+        value={selectedRegion}
+        onChange={(e) => setSelectedRegion(e.target.value)}
+        className="w-full p-2 border border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+        disabled={isStaff}
+      >
+        <option value="">All Regions</option>
+        {regions.map((region, idx) => (
+          <option key={idx} value={region.name}>
+            {region.name}
+          </option>
+        ))}
+      </select>
+    </div>
+  );
+
+  const renderBranchSelection = () => (
+    <div>
+      <label className="block text-lg font-semibold mb-2">Select Branch</label>
+      <select
+        value={selectedBranch}
+        onChange={(e) => setSelectedBranch(e.target.value)}
+        className="w-full p-2 border border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+        disabled={isStaff}
+      >
+        <option value="">All Branches</option>
+        {availableBranches.map((branch, idx) => (
+          <option key={idx} value={branch}>
+            {branch}
+          </option>
+        ))}
+      </select>
+    </div>
+  );
 
   return (
     <div className="flex">
       <Sidebar />
       <div className="flex-1 p-6 bg-gray-100 min-h-screen md:ml-64 w-full">
-
         {/* Region and Branch Selection */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-
-          {/* Region Selection */}
-          <div>
-            <label className="block text-lg font-semibold mb-2">Select Region</label>
-            <select
-              value={selectedRegion}
-              onChange={(e) => setSelectedRegion(e.target.value)}
-              className="w-full p-2 border border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="">All Regions</option>
-              {regions.map((region, idx) => (
-                <option key={idx} value={region.name}>
-                  {region.name}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Branch Selection */}
-          <div>
-            <label className="block text-lg font-semibold mb-2">Select Branch</label>
-            <select
-              value={selectedBranch}
-              onChange={(e) => setSelectedBranch(e.target.value)}
-              className="w-full p-2 border border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="">All Branches</option>
-              {availableBranches.map((branch, idx) => (
-                <option key={idx} value={branch}>
-                  {branch}
-                </option>
-              ))}
-            </select>
-          </div>
-
+          {renderRegionSelection()}
+          {renderBranchSelection()}
+          
           {/* Summary Card */}
           <div className="bg-white p-4 rounded-lg shadow-md border border-gray-200 flex items-center justify-center">
             <div className="text-center">
               <h3 className="text-lg font-semibold text-gray-700">
-                {selectedBranch 
-                  ? selectedBranch 
-                  : selectedRegion 
-                    ? `${selectedRegion} (All Branches)` 
-                    : "All Locations"}
+                {isStaff && staffLocation?.branch
+                  ? staffLocation.branch
+                  : selectedBranch 
+                    ? selectedBranch 
+                    : selectedRegion 
+                      ? `${selectedRegion} (All Branches)` 
+                      : "All Locations"}
               </h3>
               <p className="text-sm text-gray-500 mt-1">
-                {selectedBranch 
-                  ? "Single Branch View" 
-                  : selectedRegion 
-                    ? "Regional View" 
-                    : "Global View"}
+                {isAdmin ? (
+                  selectedBranch 
+                    ? "Single Branch View" 
+                    : selectedRegion 
+                      ? "Regional View" 
+                      : "Global View"
+                ) : (
+                  "Your Branch View"
+                )}
               </p>
             </div>
           </div>
@@ -370,7 +424,11 @@ const Dashboard = () => {
         {/* Bar Graph Card */}
         <div className="bg-white p-6 mt-6 rounded-xl shadow-md border border-gray-100 hover:shadow-lg transition-shadow duration-200">
           <h2 className="text-xl font-semibold mb-4 text-indigo-700 border-b border-indigo-100 pb-2">
-            {selectedBranch ? `${selectedBranch} Inventory` : "Inventory Overview"}
+            {isStaff && staffLocation?.branch 
+              ? `${staffLocation.branch} Inventory` 
+              : selectedBranch 
+                ? `${selectedBranch} Inventory` 
+                : "Inventory Overview"}
           </h2>
           <div className="w-full h-[300px]">
             {inventoryGraphData.labels.length > 0 ? (
@@ -409,7 +467,11 @@ const Dashboard = () => {
           {/* Slow Moving Items */}
           <div className="bg-white p-5 rounded-xl shadow-md border border-gray-100 hover:shadow-lg transition-shadow duration-200">
             <h2 className="text-xl font-semibold mb-4 text-emerald-600 border-b border-emerald-100 pb-2">
-              {selectedBranch ? `${selectedBranch} Slow Moving Items` : "Slow Moving Items"}
+              {isStaff && staffLocation?.branch
+                ? `${staffLocation.branch} Slow Moving Items`
+                : selectedBranch
+                  ? `${selectedBranch} Slow Moving Items`
+                  : "Slow Moving Items"}
             </h2>
             <div className="overflow-x-auto">
               <table className="w-full border-collapse">
@@ -417,7 +479,7 @@ const Dashboard = () => {
                   <tr className="bg-indigo-50 text-indigo-700">
                     <th className="p-3 text-left font-medium">Item Name</th>
                     <th className="p-3 text-left font-medium">Inventory</th>
-                    {!selectedBranch && <th className="p-3 text-left font-medium">Branch</th>}
+                    {!selectedBranch && !isStaff && <th className="p-3 text-left font-medium">Branch</th>}
                   </tr>
                 </thead>
                 <tbody>
@@ -426,12 +488,12 @@ const Dashboard = () => {
                       <tr key={index} className="border-b border-gray-100 hover:bg-indigo-50/50 transition-colors">
                         <td className="p-3 text-gray-800">{item.name}</td>
                         <td className="p-3 text-gray-800">{item.stock}</td>
-                        {!selectedBranch && <td className="p-3 text-gray-800">{item.branch}</td>}
+                        {!selectedBranch && !isStaff && <td className="p-3 text-gray-800">{item.branch}</td>}
                       </tr>
                     ))
                   ) : (
                     <tr>
-                      <td colSpan={selectedBranch ? 2 : 3} className="p-3 text-center text-gray-500">
+                      <td colSpan={selectedBranch || isStaff ? 2 : 3} className="p-3 text-center text-gray-500">
                         No data available
                       </td>
                     </tr>
@@ -444,7 +506,11 @@ const Dashboard = () => {
           {/* Fast Moving Items */}
           <div className="bg-white p-5 rounded-xl shadow-md border border-gray-100 hover:shadow-lg transition-shadow duration-200">
             <h2 className="text-xl font-semibold mb-4 text-amber-500 border-b border-amber-100 pb-2">
-              {selectedBranch ? `${selectedBranch} Fast Moving Items` : "Fast Moving Items"}
+              {isStaff && staffLocation?.branch
+                ? `${staffLocation.branch} Fast Moving Items`
+                : selectedBranch
+                  ? `${selectedBranch} Fast Moving Items`
+                  : "Fast Moving Items"}
             </h2>
             <div className="overflow-x-auto">
               <table className="w-full border-collapse">
@@ -452,7 +518,7 @@ const Dashboard = () => {
                   <tr className="bg-amber-50 text-amber-700">
                     <th className="p-3 text-left font-medium">Item Name</th>
                     <th className="p-3 text-left font-medium">Inventory</th>
-                    {!selectedBranch && <th className="p-3 text-left font-medium">Branch</th>}
+                    {!selectedBranch && !isStaff && <th className="p-3 text-left font-medium">Branch</th>}
                   </tr>
                 </thead>
                 <tbody>
@@ -461,12 +527,12 @@ const Dashboard = () => {
                       <tr key={index} className="border-b border-gray-100 hover:bg-amber-50/50 transition-colors">
                         <td className="p-3 text-gray-800">{item.name}</td>
                         <td className="p-3 text-gray-800">{item.stock}</td>
-                        {!selectedBranch && <td className="p-3 text-gray-800">{item.branch}</td>}
+                        {!selectedBranch && !isStaff && <td className="p-3 text-gray-800">{item.branch}</td>}
                       </tr>
                     ))
                   ) : (
                     <tr>
-                      <td colSpan={selectedBranch ? 2 : 3} className="p-3 text-center text-gray-500">
+                      <td colSpan={selectedBranch || isStaff ? 2 : 3} className="p-3 text-center text-gray-500">
                         No data available
                       </td>
                     </tr>
