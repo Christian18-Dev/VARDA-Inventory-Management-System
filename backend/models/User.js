@@ -5,7 +5,15 @@ const UserSchema = new mongoose.Schema({
     password: { type: String, required: true },
     role: { 
         type: String, 
-        enum: ["User", "Admin", "Manager", "Staff-Laguna-ChknChop", "Staff-VardaBurger", "Staff-GoodJuice", "Staff-GoodNoodles", "Staff-NRB", "Staff-PUP", "Staff-STJude", "Staff-Intramuros"], 
+        enum: [ "User",
+                "Admin",
+                "Staff-Laguna-ChknChop", "Staff-Laguna-VardaBurger", "Staff-Laguna-TheGoodJuice", "Staff-Laguna-TheGoodNoodleBar",
+                "Staff-Lipa-ChknChop", "Staff-Lipa-VardaBurger", "Staff-Lipa-Silog", "Staff-Lipa-NRB", "Staff-Lipa-Beverage", "Staff-Lipa-Bread",
+                "Staff-PUPMain-ChknChop", "Staff-PUPMain-VardaBurger",
+                "Staff-MAPUAIntramuros-VardaBurger", "Staff-MAPUAIntramuros-TheGoodJuice",
+                "Staff-MAPUAMakati-ChknChop", "Staff-MAPUAMakati-VardaBurger",
+                "Staff-STJudeManila-ChknChop", "Staff-STJudeManila-VardaBurger",
+              ], 
         default: "User" 
     }
 });

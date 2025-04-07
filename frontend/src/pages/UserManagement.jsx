@@ -335,17 +335,45 @@ const UserManagement = () => {
                   required
                 >
                   <option value="">Select Role</option>
+                  {/*MASTER ADMIN*/}
                   <option value="Admin">Admin</option>
-                  <option value="Staff">Staff</option>
-                  <option value="Staff-ChknChop">Staff-ChknChop</option>
+
+                  { /* LAGUNA BRANCH */}
+                  <option value="Manager-Laguna-ChknChop">Manager-Laguna-ChknChop</option>
                   <option value="Staff-Laguna-ChknChop">Staff-Laguna-ChknChop</option>
-                  <option value="Staff-VardaBurger">Staff-VardaBurger</option>
-                  <option value="Staff-GoodJuice">Staff-GoodJuice</option>
-                  <option value="Staff-GoodNoodles">Staff-GoodNoodles</option>
-                  <option value="Staff-NRB">Staff-NRB</option>
-                  <option value="Staff-PUP">Staff-PUP</option>
-                  <option value="Staff-STJude">Staff-STJude</option>
-                  <option value="Staff-Intramuros">Staff-Intramuros</option>
+                  <option value="Staff-Laguna-VardaBurger">Staff-Laguna-VardaBurger</option>
+                  <option value="Staff-Laguna-TheGoodJuice">Staff-Laguna-TheGoodJuice</option>
+                  <option value="Staff-Laguna-TheGoodNoodleBar">Staff-Laguna-TheGoodNoodleBar</option>
+
+                  {/* lIPA BATANGAS BRANCH */}
+                  <option value="Manager-Lipa-ChknChop">Manager-Lipa-ChknChop</option>
+                  <option value="Staff-Lipa-ChknChop">Staff-Lipa-ChknChop</option>
+                  <option value="Staff-Lipa-VardaBurger">Staff-Lipa-VardaBurger</option>
+                  <option value="Staff-Lipa-Silog">Staff-Lipa-Silog</option>
+                  <option value="Staff-Lipa-NRB">Staff-Lipa-NRB</option>
+                  <option value="Staff-Lipa-Beverage">Staff-Lipa-Beverage</option>
+                  <option value="Staff-Lipa-Bread">Staff-Lipa-Bread</option>
+
+                  {/* PUP MAIN BRANCH */}
+                  <option value="Manager-PUPMain-ChknChop">Manager-PUPMain-ChknChop</option>
+                  <option value="Staff-PUPMain-ChknChop">Staff-PUPMain-ChknChop</option>
+                  <option value="Staff-PUPMain-VardaBurger">Staff-PUPMain-VardaBurger</option> 
+
+                  {/* MAPUA INTRAMUROS BRANCH */}
+                  <option value="Manager-MAPUAIntramuros-VardaBurger">Manager-MAPUAIntramuros-VardaBurger</option>
+                  <option value="Staff-MAPUAIntramuros-VardaBurger">Staff-MAPUAIntramuros-VardaBurger</option>
+                  <option value="Staff-MapuaIntramuros-TheGoodJuice">Staff-MAPUAIntramuros-TheGoodJuice</option>
+
+                  {/* MAPUA MAKATI BRANCH */}
+                  <option value="Manager-MAPUAMakati-ChknChop">Manager-MAPUAMakati-ChknChop</option>
+                  <option value="Staff-MAPUAMakati-ChknChop">Staff-MAPUAMakati-ChknChop</option>
+                  <option value="Staff-MAPUAMakati-VardaBurger">Staff-MAPUAMakati-VardaBurger</option>
+
+                  {/* ST JUDE MANILA BRANCH */} 
+                  <option value="Manager-STJudeManila-ChknChop">Manager-STJudeManila-ChknChop</option>
+                  <option value="Staff-STJudeManila-ChknChop">Staff-STJudeManila-ChknChop</option>
+                  <option value="Staff-STJudeManila-VardaBurger">Staff-STJudeManila-VardaBurger</option>
+                  
                 </select>
                 <div className="flex justify-end">
                   <button

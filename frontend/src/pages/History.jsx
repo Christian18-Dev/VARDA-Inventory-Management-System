@@ -6,6 +6,19 @@ import { saveAs } from "file-saver";
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import PDFDocument from "../components/PDFDocument";
 
+// Helper function to get location from role
+const getLocationFromRole = (role) => {
+  if (!role || !role.startsWith("Staff-")) return null;
+  
+  const parts = role.split("-");
+  if (parts.length < 3) return null;
+  
+  const region = parts[1];
+  const branch = `${parts[1]} ${parts[2].replace(/([A-Z])/g, " $1").trim()}`.toUpperCase();
+  
+  return { region, branch };
+};
+
 // Region and branch structure
 const regions = [
   {
@@ -61,6 +74,12 @@ const regions = [
 const ITEMS_PER_PAGE = 10;
 
 const History = () => {
+  // Get user role from localStorage
+  const userRole = localStorage.getItem("role");
+  const isAdmin = userRole === "Admin";
+  const isStaff = userRole?.startsWith("Staff-");
+  const staffLocation = isStaff ? getLocationFromRole(userRole) : null;
+
   const [selectedRegion, setSelectedRegion] = useState("");
   const [selectedBranch, setSelectedBranch] = useState("");
   const [availableBranches, setAvailableBranches] = useState([]);
@@ -71,18 +90,32 @@ const History = () => {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
 
+  // Set initial region/branch based on user role
+  useEffect(() => {
+    if (isStaff && staffLocation) {
+      setSelectedRegion(staffLocation.region);
+      setSelectedBranch(staffLocation.branch);
+    }
+  }, [userRole]);
+
   useEffect(() => {
     if (selectedRegion) {
       const region = regions.find(r => r.name === selectedRegion);
       if (region) {
         setAvailableBranches(region.branches);
-        setSelectedBranch("");
+        // Don't reset branch if it's already set by staff role
+        if (!isStaff || !staffLocation?.branch) {
+          setSelectedBranch("");
+        }
       }
     } else {
       setAvailableBranches([]);
-      setSelectedBranch("");
+      // Don't reset branch if it's set by staff role
+      if (!isStaff || !staffLocation?.branch) {
+        setSelectedBranch("");
+      }
     }
-  }, [selectedRegion]);
+  }, [selectedRegion, userRole]);
 
   useEffect(() => {
     if (selectedBranch) {
@@ -219,6 +252,45 @@ const History = () => {
     }
   };
 
+  // Render region and branch selectors with role-based access
+  const renderRegionSelection = () => (
+    <div>
+      <label className="block text-lg font-semibold mb-2">Select Region</label>
+      <select
+        value={selectedRegion}
+        onChange={(e) => setSelectedRegion(e.target.value)}
+        className="w-full p-2 border border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+        disabled={isStaff}
+      >
+        <option value="">-- Select Region --</option>
+        {regions.map((region, idx) => (
+          <option key={idx} value={region.name}>
+            {region.name}
+          </option>
+        ))}
+      </select>
+    </div>
+  );
+
+  const renderBranchSelection = () => (
+    <div>
+      <label className="block text-lg font-semibold mb-2">Select Branch</label>
+      <select
+        value={selectedBranch}
+        onChange={(e) => setSelectedBranch(e.target.value)}
+        className="w-full p-2 border border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+        disabled={isStaff || !selectedRegion}
+      >
+        <option value="">-- Select Branch --</option>
+        {availableBranches.map((branch, idx) => (
+          <option key={idx} value={branch}>
+            {branch}
+          </option>
+        ))}
+      </select>
+    </div>
+  );
+
   return (
     <div className="flex bg-gray-100 min-h-screen">
       {/* Sidebar */}
@@ -231,40 +303,8 @@ const History = () => {
 
           {/* Filter Controls */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-            {/* Region Selection */}
-            <div>
-              <label className="block text-lg font-semibold mb-2">Select Region</label>
-              <select
-                value={selectedRegion}
-                onChange={(e) => setSelectedRegion(e.target.value)}
-                className="w-full p-2 border border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="">-- Select Region --</option>
-                {regions.map((region, idx) => (
-                  <option key={idx} value={region.name}>
-                    {region.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {/* Branch Selection */}
-            <div>
-              <label className="block text-lg font-semibold mb-2">Select Branch</label>
-              <select
-                value={selectedBranch}
-                onChange={(e) => setSelectedBranch(e.target.value)}
-                className="w-full p-2 border border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                disabled={!selectedRegion}
-              >
-                <option value="">-- Select Branch --</option>
-                {availableBranches.map((branch, idx) => (
-                  <option key={idx} value={branch}>
-                    {branch}
-                  </option>
-                ))}
-              </select>
-            </div>
+            {renderRegionSelection()}
+            {renderBranchSelection()}
 
             {/* Date Range Filter */}
             <div>
@@ -284,6 +324,19 @@ const History = () => {
                 />
               </div>
             </div>
+          </div>
+
+          {/* Summary Card */}
+          <div className="mb-6 bg-blue-50 p-4 rounded-lg border border-blue-200">
+            <h3 className="text-lg font-semibold text-blue-800">
+              {isStaff && staffLocation?.branch
+                ? `Viewing history for: ${staffLocation.branch}`
+                : selectedBranch
+                  ? `Viewing history for: ${selectedBranch}`
+                  : selectedRegion
+                    ? `Select a branch in ${selectedRegion} to view history`
+                    : "Select a region and branch to view history"}
+            </h3>
           </div>
 
           {/* History Records */}
