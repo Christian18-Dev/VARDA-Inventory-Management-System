@@ -10,6 +10,7 @@ import {
   CategoryScale,
   LinearScale,
 } from "chart.js";
+import { motion } from "framer-motion";
 
 ChartJS.register(ArcElement, Tooltip, Legend, BarElement, CategoryScale, LinearScale);
 
@@ -66,7 +67,6 @@ const regions = [
 
 const allBranches = regions.flatMap(region => region.branches);
 
-// Helper function to get location from role
 const getLocationFromRole = (role) => {
   if (!role || !role.startsWith("Staff-")) return null;
   
@@ -90,13 +90,11 @@ const Dashboard = () => {
   const [availableBranches, setAvailableBranches] = useState(allBranches);
   const [isLoading, setIsLoading] = useState(false);
 
-  // Get user role from localStorage
   const userRole = localStorage.getItem("role");
   const isAdmin = userRole === "Admin";
   const isStaff = userRole?.startsWith("Staff-");
   const staffLocation = isStaff ? getLocationFromRole(userRole) : null;
 
-  // Set initial region/branch based on user role
   useEffect(() => {
     if (isStaff && staffLocation) {
       setSelectedRegion(staffLocation.region);
@@ -109,14 +107,12 @@ const Dashboard = () => {
       const region = regions.find(r => r.name === selectedRegion);
       if (region) {
         setAvailableBranches(region.branches);
-        // Don't reset branch if it's already set by staff role
         if (!isStaff || !staffLocation?.branch) {
           setSelectedBranch("");
         }
       }
     } else {
       setAvailableBranches(allBranches);
-      // Don't reset branch if it's set by staff role
       if (!isStaff || !staffLocation?.branch) {
         setSelectedBranch("");
       }
@@ -146,11 +142,9 @@ const Dashboard = () => {
       try {
         const params = new URLSearchParams();
         
-        // For staff users, always filter by their branch
         if (isStaff && staffLocation?.branch) {
           params.append('branch', staffLocation.branch);
         } else {
-          // For admin users, use their selected filters
           if (selectedBranch) {
             params.append('branch', selectedBranch);
           } else if (selectedRegion) {
@@ -158,21 +152,18 @@ const Dashboard = () => {
           }
         }
 
-        // Fetch high inventory items
         const highResponse = await fetch(
           `${import.meta.env.VITE_API_BASE_URL}/api/dashboard/highest-inventory-items?${params}`
         );
         const highData = await highResponse.json();
         setHighInventoryItems(highData);
 
-        // Fetch low inventory items
         const lowResponse = await fetch(
           `${import.meta.env.VITE_API_BASE_URL}/api/dashboard/lowest-inventory-items?${params}`
         );
         const lowData = await lowResponse.json();
         setLowInventoryItems(lowData);
 
-        // Fetch category data
         const categoryResponse = await fetch(
           `${import.meta.env.VITE_API_BASE_URL}/api/dashboard/category-distribution?${params}`
         );
@@ -181,7 +172,6 @@ const Dashboard = () => {
         const values = categoryData.map((category) => category.count);
         setCategoryData({ labels, values });
 
-        // Fetch inventory graph data
         const graphResponse = await fetch(
           `${import.meta.env.VITE_API_BASE_URL}/api/dashboard/inventory-data?${params}&limit=50`
         );
@@ -192,7 +182,6 @@ const Dashboard = () => {
           return;
         }
     
-        // Filter data based on user role
         const filteredGraphData = isStaff && staffLocation?.branch
           ? graphData.filter(item => item.branch === staffLocation.branch)
           : selectedRegion && !selectedBranch
@@ -200,7 +189,6 @@ const Dashboard = () => {
                 regions.find(r => r.name === selectedRegion)?.branches.includes(item.branch))
             : graphData;
     
-        // Group by product and show top products across branches
         const productNames = [...new Set(filteredGraphData.map(item => item.name))].slice(0, 10);
         const branches = [...new Set(filteredGraphData.map(item => item.branch))];
     
@@ -214,7 +202,7 @@ const Dashboard = () => {
     
         setInventoryGraphData({ 
           labels: productNames, 
-          datasets: datasets.slice(0, 10) // Limit to 10 branches
+          datasets: datasets.slice(0, 10)
         });
       } catch (error) {
         console.error("Error fetching dashboard data:", error);
@@ -226,58 +214,89 @@ const Dashboard = () => {
     fetchDashboardData();
   }, [selectedBranch, selectedRegion, userRole]);
 
-  // Render region and branch selectors with role-based access
-  const renderRegionSelection = () => (
-    <div>
-      <label className="block text-lg font-semibold mb-2">Select Region</label>
-      <select
-        value={selectedRegion}
-        onChange={(e) => setSelectedRegion(e.target.value)}
-        className="w-full p-2 border border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-        disabled={isStaff}
-      >
-        <option value="">All Regions</option>
-        {regions.map((region, idx) => (
-          <option key={idx} value={region.name}>
-            {region.name}
-          </option>
-        ))}
-      </select>
-    </div>
-  );
-
-  const renderBranchSelection = () => (
-    <div>
-      <label className="block text-lg font-semibold mb-2">Select Branch</label>
-      <select
-        value={selectedBranch}
-        onChange={(e) => setSelectedBranch(e.target.value)}
-        className="w-full p-2 border border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-        disabled={isStaff}
-      >
-        <option value="">All Branches</option>
-        {availableBranches.map((branch, idx) => (
-          <option key={idx} value={branch}>
-            {branch}
-          </option>
-        ))}
-      </select>
-    </div>
-  );
-
   return (
     <div className="flex">
       <Sidebar />
       <div className="flex-1 p-6 bg-gray-100 min-h-screen md:ml-64 w-full">
-        {/* Region and Branch Selection */}
+        {/* Enhanced Dropdown Selectors Section */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-          {renderRegionSelection()}
-          {renderBranchSelection()}
-          
+
+         {/* Region Selector */}
+          <div className="w-full">
+          <label className="block text-sm font-bold text-indigo-800 mb-2 mt-10 ml-1">Select Region</label>
+            <motion.div 
+              className="flex items-center bg-white hover:bg-indigo-50 border-2 border-indigo-200 hover:border-indigo-400 rounded-lg overflow-hidden relative transition-all duration-200 h-12"
+              whileHover={{ scale: 1.005 }}
+              whileTap={{ scale: 0.995 }}
+            >
+              <div className="pl-3.5 pr-3 text-indigo-600 flex-shrink-0 h-full flex items-center border-r border-indigo-100">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
+                </svg>
+              </div>
+              
+              <select
+                value={selectedRegion}
+                onChange={(e) => setSelectedRegion(e.target.value)}
+                className="bg-transparent border-none outline-none text-gray-800 pl-3 py-3 pr-10 w-full appearance-none cursor-pointer font-medium text-sm focus:ring-0 focus:border-none"
+                disabled={isStaff}
+              >
+                <option value="">All Regions</option>
+                {regions.map((region, idx) => (
+                  <option key={idx} value={region.name} className="text-sm">
+                    {region.name}
+                  </option>
+                ))}
+              </select>
+              
+              <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none text-indigo-400">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </div>
+            </motion.div>
+          </div>
+
+          {/* Branch Selector */}
+          <div className="w-full">
+            <label className="block text-sm font-bold text-indigo-800 mb-2 ml-1">Select Branch</label>
+            <motion.div 
+              className="flex items-center bg-white hover:bg-indigo-50 border-2 border-indigo-200 hover:border-indigo-400 rounded-lg overflow-hidden relative transition-all duration-200 h-12"
+              whileHover={{ scale: 1.005 }}
+              whileTap={{ scale: 0.995 }}
+            >
+              <div className="pl-3.5 pr-3 text-indigo-600 flex-shrink-0 h-full flex items-center border-r border-indigo-100">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                  <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
+                </svg>
+              </div>
+              
+              <select
+                value={selectedBranch}
+                onChange={(e) => setSelectedBranch(e.target.value)}
+                className="bg-transparent border-none outline-none text-gray-800 pl-3 py-3 pr-10 w-full appearance-none cursor-pointer font-medium text-sm focus:ring-0 focus:border-none"
+                disabled={isStaff}
+              >
+                <option value="">All Branches</option>
+                {availableBranches.map((branch, idx) => (
+                  <option key={idx} value={branch} className="text-sm">
+                    {branch}
+                  </option>
+                ))}
+              </select>
+              
+              <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none text-indigo-400">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </div>
+            </motion.div>
+          </div>
+
           {/* Summary Card */}
-          <div className="bg-white p-4 rounded-lg shadow-md border border-gray-200 flex items-center justify-center">
+          <div className="bg-indigo-600 p-4 rounded-lg shadow-md flex items-center justify-center hover:shadow-lg transition-shadow">
             <div className="text-center">
-              <h3 className="text-lg font-semibold text-gray-700">
+              <h3 className="text-lg font-semibold text-white">
                 {isStaff && staffLocation?.branch
                   ? staffLocation.branch
                   : selectedBranch 
@@ -286,7 +305,7 @@ const Dashboard = () => {
                       ? `${selectedRegion} (All Branches)` 
                       : "All Locations"}
               </h3>
-              <p className="text-sm text-gray-500 mt-1">
+              <p className="text-sm text-indigo-100 mt-1">
                 {isAdmin ? (
                   selectedBranch 
                     ? "Single Branch View" 
@@ -303,7 +322,7 @@ const Dashboard = () => {
 
         {isLoading && (
           <div className="fixed inset-0 flex items-center justify-center z-50 w-full h-full">
-            <div className="w-12 h-12 border-4 border-blue-500 border-solid border-t-transparent rounded-full animate-spin"></div>
+            <div className="w-12 h-12 border-4 border-indigo-500 border-solid border-t-transparent rounded-full animate-spin"></div>
           </div>
         )}
   

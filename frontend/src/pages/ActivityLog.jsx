@@ -118,22 +118,46 @@ const ActivityLog = () => {
               </thead>
               <tbody className="divide-y divide-gray-200">
                 {currentLogs.length > 0 ? (
-                  currentLogs.map((log) => (
-                    <tr key={log._id} className="hover:bg-gray-50 transition-colors duration-200">
-                      <td className="px-3 py-2 md:px-6 md:py-4 text-xs md:text-sm text-gray-700">
-                        {log.username}
-                      </td>
-                      <td className="px-3 py-2 md:px-6 md:py-4 text-xs md:text-sm text-gray-700">
-                        {log.role}
-                      </td>
-                      <td className="px-3 py-2 md:px-6 md:py-4 text-xs md:text-sm text-gray-700 max-w-[150px] md:max-w-[200px] truncate hover:whitespace-normal">
-                        {log.action}
-                      </td>
-                      <td className="px-3 py-2 md:px-6 md:py-4 text-xs md:text-sm text-gray-700">
-                        {new Date(log.timestamp).toLocaleString()}
-                      </td>
-                    </tr>
-                  ))
+                  currentLogs.map((log) => {
+                    let hoverTimer;
+                    
+                    const handleMouseEnter = (e) => {
+                      const element = e.currentTarget.querySelector('.action-text');
+                      hoverTimer = setTimeout(() => {
+                        element.classList.remove('truncate');
+                        element.classList.add('whitespace-normal');
+                      }, 500); 
+                    };
+                    
+                    const handleMouseLeave = (e) => {
+                      clearTimeout(hoverTimer);
+                      const element = e.currentTarget.querySelector('.action-text');
+                      element.classList.add('truncate');
+                      element.classList.remove('whitespace-normal');
+                    };
+
+                    return (
+                      <tr 
+                        key={log._id} 
+                        className="hover:bg-gray-50 transition-colors duration-200"
+                        onMouseEnter={handleMouseEnter}
+                        onMouseLeave={handleMouseLeave}
+                      >
+                        <td className="px-3 py-2 md:px-6 md:py-4 text-xs md:text-sm text-gray-700">
+                          {log.username}
+                        </td>
+                        <td className="px-3 py-2 md:px-6 md:py-4 text-xs md:text-sm text-gray-700">
+                          {log.role}
+                        </td>
+                        <td className="px-3 py-2 md:px-6 md:py-4 text-xs md:text-sm text-gray-700 max-w-[150px] md:max-w-[200px]">
+                          <span className="action-text truncate block">{log.action}</span>
+                        </td>
+                        <td className="px-3 py-2 md:px-6 md:py-4 text-xs md:text-sm text-gray-700">
+                          {new Date(log.timestamp).toLocaleString()}
+                        </td>
+                      </tr>
+                    );
+                  })
                 ) : (
                   <tr>
                     <td colSpan="4" className="text-center p-6 text-gray-500">
