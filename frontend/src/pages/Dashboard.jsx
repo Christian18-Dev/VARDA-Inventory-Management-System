@@ -299,10 +299,10 @@ const Dashboard = () => {
   return (
     <div className="flex">
       <Sidebar />
-      <div className="flex-1 p-6 bg-gray-100 min-h-screen md:ml-64 w-full mt-10 md:mt-0">
+      <div className="flex-1 p-6 bg-red-50 min-h-screen md:ml-64 w-full mt-10 md:mt-0">
         {/* Error Message */}
         {error && (
-          <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6 rounded">
+          <div className="bg-red-200 border-l-4 border-red-800 text-red-900 p-4 mb-6 rounded">
             <p>Error: {error}</p>
           </div>
         )}
@@ -311,13 +311,13 @@ const Dashboard = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
           {/* Region Selector */}
           <div className="w-full">
-            <label className="block text-sm font-bold text-indigo-800 mb-2 ml-1">Select Region</label>
+            <label className="block text-sm font-bold text-yellow-600 mb-2 ml-1">Select Region</label>
             <motion.div 
-              className="flex items-center bg-white hover:bg-indigo-50 border-2 border-indigo-200 hover:border-indigo-400 rounded-lg overflow-hidden relative transition-all duration-200 h-12"
+              className="flex items-center bg-white hover:bg-red-100 border-2 border-red-200 hover:border-red-400 rounded-lg overflow-hidden relative transition-all duration-200 h-12"
               whileHover={{ scale: 1.005 }}
               whileTap={{ scale: 0.995 }}
             >
-              <div className="pl-3.5 pr-3 text-indigo-600 flex-shrink-0 h-full flex items-center border-r border-indigo-100">
+              <div className="pl-3.5 pr-3 text-red-600 flex-shrink-0 h-full flex items-center border-r border-red-100">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                   <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
                 </svg>
@@ -337,7 +337,7 @@ const Dashboard = () => {
                 ))}
               </select>
               
-              <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none text-indigo-400">
+              <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none text-red-400">
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                 </svg>
@@ -347,13 +347,13 @@ const Dashboard = () => {
 
           {/* Branch Selector */}
           <div className="w-full">
-            <label className="block text-sm font-bold text-indigo-800 mb-2 ml-1">Select Branch</label>
+            <label className="block text-sm font-bold text-yellow-600 mb-2 ml-1">Select Branch</label>
             <motion.div 
-              className="flex items-center bg-white hover:bg-indigo-50 border-2 border-indigo-200 hover:border-indigo-400 rounded-lg overflow-hidden relative transition-all duration-200 h-12"
+              className="flex items-center bg-white hover:bg-red-100 border-2 border-red-200 hover:border-red-400 rounded-lg overflow-hidden relative transition-all duration-200 h-12"
               whileHover={{ scale: 1.005 }}
               whileTap={{ scale: 0.995 }}
             >
-              <div className="pl-3.5 pr-3 text-indigo-600 flex-shrink-0 h-full flex items-center border-r border-indigo-100">
+              <div className="pl-3.5 pr-3 text-red-600 flex-shrink-0 h-full flex items-center border-r border-red-100">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                   <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
                 </svg>
@@ -373,7 +373,7 @@ const Dashboard = () => {
                 ))}
               </select>
               
-              <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none text-indigo-400">
+              <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none text-red-400">
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                 </svg>
@@ -382,9 +382,9 @@ const Dashboard = () => {
           </div>
 
           {/* Summary Card */}
-          <div className="bg-indigo-600 p-4 rounded-lg shadow-md flex items-center justify-center hover:shadow-lg transition-shadow">
+          <div className="bg-red-800 p-4 rounded-lg shadow-md flex items-center justify-center hover:shadow-lg transition-shadow border border-yellow-400">
             <div className="text-center">
-              <h3 className="text-lg font-semibold text-white">
+              <h3 className="text-lg font-semibold text-yellow-300">
                 {isStaff && staffLocation?.branch
                   ? staffLocation.branch
                   : selectedBranch 
@@ -393,7 +393,7 @@ const Dashboard = () => {
                       ? `${selectedRegion} (All Branches)` 
                       : "All Locations"}
               </h3>
-              <p className="text-sm text-indigo-100 mt-1">
+              <p className="text-sm text-yellow-300/80 mt-1">
                 {isAdmin ? (
                   selectedBranch 
                     ? "Single Branch View" 
@@ -410,7 +410,7 @@ const Dashboard = () => {
 
         {isLoading && (
           <div className="fixed inset-0 flex items-center justify-center z-50 w-full h-full">
-            <div className="w-12 h-12 border-4 border-indigo-500 border-solid border-t-transparent rounded-full animate-spin"></div>
+            <div className="w-12 h-12 border-4 border-red-800 border-solid border-t-transparent rounded-full animate-spin"></div>
           </div>
         )}
   
@@ -418,8 +418,8 @@ const Dashboard = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
          {/* Recent Activity Card */}
-          <div className="bg-white p-6 rounded-xl shadow-md border border-gray-100 lg:col-span-2 hover:shadow-lg transition-shadow duration-200">
-            <h2 className="text-xl font-semibold mb-4 text-indigo-700 border-b border-indigo-100 pb-2">
+          <div className="bg-white p-6 rounded-xl shadow-md border border-red-100 lg:col-span-2 hover:shadow-lg transition-shadow duration-200">
+            <h2 className="text-xl font-semibold mb-4 text-red-800 border-b border-red-100 pb-2">
               Recent Activity
             </h2>
             <ul className="space-y-3">
@@ -443,7 +443,7 @@ const Dashboard = () => {
                   return (
                     <li
                       key={index}
-                      className="border-b border-gray-100 pb-2 flex justify-start items-center text-sm text-gray-700 hover:bg-indigo-50/50 transition-colors p-2 rounded-md gap-4"
+                      className="border-b border-red-100 pb-2 flex justify-start items-center text-sm text-gray-700 hover:bg-red-50/50 transition-colors p-2 rounded-md gap-4"
                       onMouseEnter={handleMouseEnter}
                       onMouseLeave={handleMouseLeave}
                     >
@@ -462,8 +462,8 @@ const Dashboard = () => {
           </div>
           
           {/* Pie Chart Card */}
-          <div className="bg-white p-6 rounded-xl shadow-md border border-gray-100 hover:shadow-lg transition-shadow duration-200">
-            <h2 className="text-lg font-semibold mb-3 text-indigo-700">
+          <div className="bg-white p-6 rounded-xl shadow-md border border-red-100 hover:shadow-lg transition-shadow duration-200">
+            <h2 className="text-lg font-semibold mb-3 text-red-800">
               Categories
             </h2>
             <div className="h-[250px] md:h-[300px] relative">
@@ -474,21 +474,21 @@ const Dashboard = () => {
                     datasets: [{
                       data: categoryData.values,
                       backgroundColor: [
-                        "rgba(79, 70, 229, 0.9)",   // indigo
-                        "rgba(16, 185, 129, 0.9)",  // emerald
-                        "rgba(245, 158, 11, 0.9)",  // amber
-                        "rgba(239, 68, 68, 0.9)",   // red
-                        "rgba(139, 92, 246, 0.9)"   // violet
+                        "rgba(185, 28, 28, 0.9)",   // red-700
+                        "rgba(202, 138, 4, 0.9)",    // amber-600
+                        "rgba(234, 179, 8, 0.9)",     // yellow-500
+                        "rgba(220, 38, 38, 0.9)",     // red-600
+                        "rgba(153, 27, 27, 0.9)"      // red-800
                       ],
                       hoverBackgroundColor: [
-                        "rgba(79, 70, 229, 1)",
-                        "rgba(16, 185, 129, 1)",
-                        "rgba(245, 158, 11, 1)",
-                        "rgba(239, 68, 68, 1)",
-                        "rgba(139, 92, 246, 1)"
+                        "rgba(185, 28, 28, 1)",
+                        "rgba(202, 138, 4, 1)",
+                        "rgba(234, 179, 8, 1)",
+                        "rgba(220, 38, 38, 1)",
+                        "rgba(153, 27, 27, 1)"
                       ],
                       borderWidth: 5,
-                      borderColor: '#f9fafb', // lighter background border
+                      borderColor: '#fef2f2', // lighter background border
                       hoverOffset: 10, // pops out on hover
                     }],
                   }}
@@ -516,8 +516,8 @@ const Dashboard = () => {
         </div>
   
         {/* Bar Graph Card */}
-        <div className="bg-white p-6 mt-6 rounded-xl shadow-md border border-gray-100 hover:shadow-lg transition-shadow duration-200">
-          <h2 className="text-xl font-semibold mb-4 text-indigo-700 border-b border-indigo-100 pb-2">
+        <div className="bg-white p-6 mt-6 rounded-xl shadow-md border border-red-100 hover:shadow-lg transition-shadow duration-200">
+          <h2 className="text-xl font-semibold mb-4 text-red-800 border-b border-red-100 pb-2">
             {isStaff && staffLocation?.branch 
               ? `${staffLocation.branch} Inventory` 
               : selectedBranch 
@@ -541,8 +541,8 @@ const Dashboard = () => {
         {/* Tables Section */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
           {/* Slow Moving Items */}
-          <div className="bg-white p-5 rounded-xl shadow-md border border-gray-100 hover:shadow-lg transition-shadow duration-200">
-            <h2 className="text-xl font-semibold mb-4 text-emerald-600 border-b border-emerald-100 pb-2">
+          <div className="bg-white p-5 rounded-xl shadow-md border border-red-100 hover:shadow-lg transition-shadow duration-200">
+            <h2 className="text-xl font-semibold mb-4 text-yellow-600 border-b border-yellow-100 pb-2">
               {isStaff && staffLocation?.branch
                 ? `${staffLocation.branch} Slow Moving Items`
                 : selectedBranch
@@ -552,7 +552,7 @@ const Dashboard = () => {
             <div className="overflow-x-auto">
               <table className="w-full border-collapse">
                 <thead>
-                  <tr className="bg-indigo-50 text-indigo-700">
+                  <tr className="bg-red-50 text-red-800">
                     <th className="p-3 text-left font-medium">Item Name</th>
                     <th className="p-3 text-left font-medium">Inventory</th>
                     {!selectedBranch && !isStaff && <th className="p-3 text-left font-medium">Branch</th>}
@@ -561,7 +561,7 @@ const Dashboard = () => {
                 <tbody>
                   {highInventoryItems.length > 0 ? (
                     highInventoryItems.map((item, index) => (
-                      <tr key={index} className="border-b border-gray-100 hover:bg-indigo-50/50 transition-colors">
+                      <tr key={index} className="border-b border-red-100 hover:bg-red-50/50 transition-colors">
                         <td className="p-3 text-gray-800">{item.name}</td>
                         <td className="p-3 text-gray-800">{item.stock}</td>
                         {!selectedBranch && !isStaff && <td className="p-3 text-gray-800 truncate max-w-xs">{item.branch}</td>}
@@ -580,8 +580,8 @@ const Dashboard = () => {
           </div>
   
           {/* Fast Moving Items */}
-          <div className="bg-white p-5 rounded-xl shadow-md border border-gray-100 hover:shadow-lg transition-shadow duration-200">
-            <h2 className="text-xl font-semibold mb-4 text-amber-500 border-b border-amber-100 pb-2">
+          <div className="bg-white p-5 rounded-xl shadow-md border border-red-100 hover:shadow-lg transition-shadow duration-200">
+            <h2 className="text-xl font-semibold mb-4 text-yellow-500 border-b border-yellow-100 pb-2">
               {isStaff && staffLocation?.branch
                 ? `${staffLocation.branch} Fast Moving Items`
                 : selectedBranch
@@ -591,7 +591,7 @@ const Dashboard = () => {
             <div className="overflow-x-auto">
               <table className="w-full border-collapse">
                 <thead>
-                  <tr className="bg-amber-50 text-amber-700">
+                  <tr className="bg-yellow-50 text-yellow-700">
                     <th className="p-3 text-left font-medium">Item Name</th>
                     <th className="p-3 text-left font-medium">Inventory</th>
                     {!selectedBranch && !isStaff && <th className="p-3 text-left font-medium">Branch</th>}
@@ -600,7 +600,7 @@ const Dashboard = () => {
                 <tbody>
                   {lowInventoryItems.length > 0 ? (
                     lowInventoryItems.map((item, index) => (
-                      <tr key={index} className="border-b border-gray-100 hover:bg-amber-50/50 transition-colors">
+                      <tr key={index} className="border-b border-red-100 hover:bg-yellow-50/50 transition-colors">
                         <td className="p-3 text-gray-800">{item.name}</td>
                         <td className="p-3 text-gray-800">{item.stock}</td>
                         {!selectedBranch && !isStaff && <td className="p-3 text-gray-800 truncate max-w-xs">{item.branch}</td>}

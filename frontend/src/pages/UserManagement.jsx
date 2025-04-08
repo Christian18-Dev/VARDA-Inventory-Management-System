@@ -175,7 +175,7 @@ const UserManagement = () => {
   );
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <div className="flex min-h-screen bg-red-50">
       {/* Sidebar */}
       <div className="w-64">
         <Sidebar />
@@ -189,14 +189,14 @@ const UserManagement = () => {
         {/* Page Content */}
         <div className="flex-1 p-4 md:p-8 mt-16">
           <div className="flex flex-col md:flex-row justify-between items-center mb-6">
-            <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-4 md:mb-0">
+            <h2 className="text-2xl md:text-3xl font-bold text-yellow-500 mb-4 md:mb-0">
               User Management
             </h2>
 
             {userRole === "Admin" && (
               <button
                 onClick={openAddUserModal}
-                className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-4 py-2 rounded-lg shadow-md transition-all duration-300 transform hover:scale-105"
+                className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-4 py-2 rounded-lg shadow-md transition-all duration-300 transform hover:scale-105"
               >
                 Add New User
               </button>
@@ -206,7 +206,7 @@ const UserManagement = () => {
           {/* Table Container */}
           <div className="overflow-x-auto bg-white rounded-xl shadow-lg">
             <table className="min-w-full">
-              <thead className="bg-gradient-to-r from-blue-600 to-blue-700">
+              <thead className="bg-gradient-to-r from-red-600 to-red-700">
                 <tr>
                   <th className="px-4 py-3 text-left text-xs md:text-sm font-semibold text-white uppercase tracking-wider">
                     Username
@@ -259,7 +259,7 @@ const UserManagement = () => {
                 <div className="flex justify-end mt-4">
                   <button
                     onClick={() => setShowDeleteModal(false)}
-                    className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-md mr-2 transition-all duration-300 transform hover:scale-105"
+                    className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-md mr-2 transition-all duration-300 transform hover:scale-105"
                   >
                     Cancel
                   </button>
@@ -378,13 +378,13 @@ const UserManagement = () => {
                 <div className="flex justify-end">
                   <button
                     onClick={() => setShowModal(false)}
-                    className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-md mr-2 transition-all duration-300 transform hover:scale-105"
+                    className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-md mr-2 transition-all duration-300 transform hover:scale-105"
                   >
                     Cancel
                   </button>
                   <button
                     onClick={handleSaveUser}
-                    className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md transition-all duration-300 transform hover:scale-105"
+                    className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md transition-all duration-300 transform hover:scale-105"
                   >
                     Save
                   </button>
