@@ -290,14 +290,14 @@ const History = () => {
   // Date range picker component
   const DateRangePicker = () => (
     <div className="w-full">
-      <label className="block text-sm font-bold text-indigo-800 mb-2 ml-1">Filter by Date Range</label>
+      <label className="block text-sm font-bold text-yellow-600 mb-2 ml-1">Filter by Date Range</label>
       <div className="flex gap-2">
         <motion.div 
-          className="flex items-center bg-white hover:bg-indigo-50 border-2 border-indigo-200 hover:border-indigo-400 rounded-lg overflow-hidden relative transition-all duration-200 h-12 flex-1"
+          className="flex items-center bg-white hover:bg-red-50 border-2 border-red-200 hover:border-red-400 rounded-lg overflow-hidden relative transition-all duration-200 h-12 flex-1"
           whileHover={{ scale: 1.005 }}
           whileTap={{ scale: 0.995 }}
         >
-          <div className="pl-3.5 pr-3 text-indigo-600 flex-shrink-0 h-full flex items-center border-r border-indigo-100">
+          <div className="pl-3.5 pr-3 text-red-600 flex-shrink-0 h-full flex items-center border-r border-red-100">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
               <path fillRule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clipRule="evenodd" />
             </svg>
@@ -311,11 +311,11 @@ const History = () => {
         </motion.div>
         
         <motion.div 
-          className="flex items-center bg-white hover:bg-indigo-50 border-2 border-indigo-200 hover:border-indigo-400 rounded-lg overflow-hidden relative transition-all duration-200 h-12 flex-1"
+          className="flex items-center bg-white hover:bg-red-50 border-2 border-red-200 hover:border-red-400 rounded-lg overflow-hidden relative transition-all duration-200 h-12 flex-1"
           whileHover={{ scale: 1.005 }}
           whileTap={{ scale: 0.995 }}
         >
-          <div className="pl-3.5 pr-3 text-indigo-600 flex-shrink-0 h-full flex items-center border-r border-indigo-100">
+          <div className="pl-3.5 pr-3 text-red-600 flex-shrink-0 h-full flex items-center border-r border-red-100">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
               <path fillRule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clipRule="evenodd" />
             </svg>
@@ -332,26 +332,26 @@ const History = () => {
   );
 
   return (
-    <div className="flex bg-gray-100 min-h-screen">
+    <div className="flex bg-red-50 min-h-screen">
       {/* Sidebar */}
       <Sidebar />
 
       {/* Main Content */}
       <div className="flex-1 p-6 md:ml-64 w-full">
-        <div className="bg-white p-6 shadow-md rounded-lg">
-          <h2 className="text-2xl font-bold mb-5 text-indigo-800">📜 Inventory History</h2>
+        <div className="bg-white p-6 shadow-md rounded-lg border border-red-100">
+          <h2 className="text-2xl font-bold mb-5 text-yellow-600">📜 Inventory History</h2>
 
           {/* Filter Controls */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
             {/* Region Selector */}
             <div className="w-full">
-              <label className="block text-sm font-bold text-indigo-800 mb-2 ml-1">Select Region</label>
+              <label className="block text-sm font-bold text-yellow-600 mb-2 ml-1">Select Region</label>
               <motion.div 
-                className="flex items-center bg-white hover:bg-indigo-50 border-2 border-indigo-200 hover:border-indigo-400 rounded-lg overflow-hidden relative transition-all duration-200 h-12"
+                className="flex items-center bg-white hover:bg-red-50 border-2 border-red-200 hover:border-red-400 rounded-lg overflow-hidden relative transition-all duration-200 h-12"
                 whileHover={{ scale: 1.005 }}
                 whileTap={{ scale: 0.995 }}
               >
-                <div className="pl-3.5 pr-3 text-indigo-600 flex-shrink-0 h-full flex items-center border-r border-indigo-100">
+                <div className="pl-3.5 pr-3 text-red-600 flex-shrink-0 h-full flex items-center border-r border-red-100">
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                     <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
                   </svg>
@@ -371,7 +371,7 @@ const History = () => {
                   ))}
                 </select>
                 
-                <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none text-indigo-400">
+                <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none text-red-400">
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                   </svg>
@@ -381,13 +381,13 @@ const History = () => {
 
             {/* Branch Selector */}
             <div className="w-full">
-              <label className="block text-sm font-bold text-indigo-800 mb-2 ml-1">Select Branch</label>
+              <label className="block text-sm font-bold text-yellow-600 mb-2 ml-1">Select Branch</label>
               <motion.div 
-                className="flex items-center bg-white hover:bg-indigo-50 border-2 border-indigo-200 hover:border-indigo-400 rounded-lg overflow-hidden relative transition-all duration-200 h-12"
+                className="flex items-center bg-white hover:bg-red-50 border-2 border-red-200 hover:border-red-400 rounded-lg overflow-hidden relative transition-all duration-200 h-12"
                 whileHover={{ scale: 1.005 }}
                 whileTap={{ scale: 0.995 }}
               >
-                <div className="pl-3.5 pr-3 text-indigo-600 flex-shrink-0 h-full flex items-center border-r border-indigo-100">
+                <div className="pl-3.5 pr-3 text-red-600 flex-shrink-0 h-full flex items-center border-r border-red-100">
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                     <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
                   </svg>
@@ -407,7 +407,7 @@ const History = () => {
                   ))}
                 </select>
                 
-                <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none text-indigo-400">
+                <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none text-red-400">
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                   </svg>
@@ -420,8 +420,8 @@ const History = () => {
           </div>
 
           {/* Summary Card */}
-          <div className="mb-6 bg-indigo-50 p-4 rounded-lg border border-indigo-200 shadow-sm">
-            <h3 className="text-lg font-semibold text-indigo-800">
+          <div className="mb-6 bg-red-100 p-4 rounded-lg border border-red-200 shadow-sm">
+            <h3 className="text-lg font-semibold text-red-800">
               {isStaff && staffLocation?.branch
                 ? `Viewing history for: ${staffLocation.branch}`
                 : selectedBranch
@@ -437,18 +437,18 @@ const History = () => {
             currentItems.map((record, idx) => (
               <motion.div 
                 key={idx} 
-                className="mb-5 border border-indigo-100 rounded-lg bg-white shadow-sm overflow-hidden"
+                className="mb-5 border border-red-100 rounded-lg bg-white shadow-sm overflow-hidden"
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3 }}
               >
                 <motion.div
                   onClick={() => toggleTable(idx)}
-                  className="p-4 cursor-pointer bg-indigo-50 flex justify-between items-center font-bold rounded-t-lg"
-                  whileHover={{ backgroundColor: "#e0e7ff" }}
+                  className="p-4 cursor-pointer bg-red-100 flex justify-between items-center font-bold rounded-t-lg"
+                  whileHover={{ backgroundColor: "#fee2e2" }}
                 >
-                  <span className="text-indigo-800">📅 Reset Date: {new Date(record.date).toLocaleString()}</span>
-                  <span className="text-indigo-600">{openTables[idx] ? "▲ Collapse" : "▼ Expand"}</span>
+                  <span className="text-red-800">📅 Reset Date: {new Date(record.date).toLocaleString()}</span>
+                  <span className="text-red-600">{openTables[idx] ? "▲ Collapse" : "▼ Expand"}</span>
                 </motion.div>
 
                 {openTables[idx] && (
@@ -463,13 +463,13 @@ const History = () => {
                       <PDFDownloadLink
                         document={<PDFDocument data={record.products} branch={selectedBranch} />}
                         fileName={`Inventory-${selectedBranch.replace(/\s+/g, "_")}-${new Date(record.date).toISOString().split("T")[0]}.pdf`}
-                        className="flex items-center gap-2 px-4 py-2 bg-red-500 text-white font-bold rounded-lg shadow hover:bg-red-600 transition-colors"
+                        className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white font-bold rounded-lg shadow hover:bg-red-700 transition-colors"
                       >
                         <FaFilePdf /> PDF
                       </PDFDownloadLink>
                       <motion.button 
                         onClick={() => exportToExcel(record)} 
-                        className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white font-bold rounded-lg shadow hover:bg-green-700 transition-colors"
+                        className="flex items-center gap-2 px-4 py-2 bg-yellow-500 text-red-900 font-bold rounded-lg shadow hover:bg-yellow-600 transition-colors"
                         whileHover={{ scale: 1.03 }}
                         whileTap={{ scale: 0.97 }}
                       >
@@ -479,32 +479,32 @@ const History = () => {
 
                     {/* Table */}
                     <div className="overflow-x-auto">
-                      <table className="w-full min-w-[600px] border border-indigo-100 bg-white shadow-sm rounded-lg overflow-hidden">
-                        <thead className="bg-indigo-100 text-indigo-800 text-md">
+                      <table className="w-full min-w-[600px] border border-red-100 bg-white shadow-sm rounded-lg overflow-hidden">
+                        <thead className="bg-red-100 text-red-800 text-md">
                           <tr>
-                            <th className="px-4 py-3 border border-indigo-200">Name</th>
-                            <th className="px-4 py-3 border border-indigo-200">Category</th>
-                            <th className="px-4 py-3 border border-indigo-200">Price</th>
-                            <th className="px-4 py-3 border border-indigo-200">Beg Inventory</th>
-                            <th className="px-4 py-3 border border-indigo-200">Delivered</th>
-                            <th className="px-4 py-3 border border-indigo-200">Waste</th>
-                            <th className="px-4 py-3 border border-indigo-200">Use</th>
-                            <th className="px-4 py-3 border border-indigo-200">Withdrawal</th>
-                            <th className="px-4 py-3 border border-indigo-200">Current</th>
+                            <th className="px-4 py-3 border border-red-200">Name</th>
+                            <th className="px-4 py-3 border border-red-200">Category</th>
+                            <th className="px-4 py-3 border border-red-200">Price</th>
+                            <th className="px-4 py-3 border border-red-200">Beg Inventory</th>
+                            <th className="px-4 py-3 border border-red-200">Delivered</th>
+                            <th className="px-4 py-3 border border-red-200">Waste</th>
+                            <th className="px-4 py-3 border border-red-200">Use</th>
+                            <th className="px-4 py-3 border border-red-200">Withdrawal</th>
+                            <th className="px-4 py-3 border border-red-200">Current</th>
                           </tr>
                         </thead>
                         <tbody>
                           {record.products.map((item, i) => (
-                            <tr key={i} className="hover:bg-indigo-50 even:bg-indigo-50/30">
-                              <td className="px-4 py-3 border border-indigo-100">{item.name}</td>
-                              <td className="px-4 py-3 border border-indigo-100">{item.category}</td>
-                              <td className="px-4 py-3 border border-indigo-100">{item.price}</td>
-                              <td className="px-4 py-3 border border-indigo-100">{item.begInventory}</td>
-                              <td className="px-4 py-3 border border-indigo-100">{item.delivered}</td>
-                              <td className="px-4 py-3 border border-indigo-100">{item.waste}</td>
-                              <td className="px-4 py-3 border border-indigo-100">{item.use}</td>
-                              <td className="px-4 py-3 border border-indigo-100">{item.withdrawal}</td>
-                              <td className="px-4 py-3 border border-indigo-100">{item.current}</td>
+                            <tr key={i} className="hover:bg-red-50 even:bg-red-50/30">
+                              <td className="px-4 py-3 border border-red-100">{item.name}</td>
+                              <td className="px-4 py-3 border border-red-100">{item.category}</td>
+                              <td className="px-4 py-3 border border-red-100">{item.price}</td>
+                              <td className="px-4 py-3 border border-red-100">{item.begInventory}</td>
+                              <td className="px-4 py-3 border border-red-100">{item.delivered}</td>
+                              <td className="px-4 py-3 border border-red-100">{item.waste}</td>
+                              <td className="px-4 py-3 border border-red-100">{item.use}</td>
+                              <td className="px-4 py-3 border border-red-100">{item.withdrawal}</td>
+                              <td className="px-4 py-3 border border-red-100">{item.current}</td>
                             </tr>
                           ))}
                         </tbody>
@@ -528,17 +528,17 @@ const History = () => {
                 <motion.button
                   onClick={handlePreviousPage}
                   disabled={currentPage === 1}
-                  className="px-4 py-2 bg-indigo-100 text-indigo-800 rounded-lg disabled:opacity-50"
+                  className="px-4 py-2 bg-red-100 text-red-800 rounded-lg disabled:opacity-50"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >
                   Previous
                 </motion.button>
-                <span className="px-4 py-2 bg-indigo-600 text-white rounded-lg">{currentPage}</span>
+                <span className="px-4 py-2 bg-red-600 text-white rounded-lg">{currentPage}</span>
                 <motion.button
                   onClick={handleNextPage}
                   disabled={currentPage === totalPages}
-                  className="px-4 py-2 bg-indigo-100 text-indigo-800 rounded-lg disabled:opacity-50"
+                  className="px-4 py-2 bg-red-100 text-red-800 rounded-lg disabled:opacity-50"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >

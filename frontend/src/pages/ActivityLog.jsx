@@ -65,7 +65,7 @@ const ActivityLog = () => {
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   return (
-    <div className="flex min-h-screen bg-gray-50 relative">
+    <div className="flex min-h-screen bg-red-50 relative">
       {/* Sidebar - Fixed position that overlaps content */}
       <div className={`w-64`}>
         <Sidebar />
@@ -86,7 +86,7 @@ const ActivityLog = () => {
         <div className="p-4 md:p-8 mt-4 w-full max-w-[1800px] mx-auto">
           {/* Header and Clear Button */}
           <div className="flex flex-col md:flex-row justify-between items-center mb-6">
-            <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-4 md:mb-0">
+            <h2 className="text-2xl md:text-3xl font-bold text-yellow-500 mb-4 md:mb-0">
               Activity Log
             </h2>
             <button
@@ -100,7 +100,7 @@ const ActivityLog = () => {
           {/* Table Container */}
           <div className="w-full overflow-x-auto bg-white rounded-xl shadow-lg">
             <table className="min-w-full">
-              <thead className="bg-gradient-to-r from-blue-600 to-blue-700">
+              <thead className="bg-gradient-to-r from-red-600 to-red-700">
                 <tr>
                   <th className="px-3 py-2 md:px-6 md:py-4 text-left text-xs md:text-sm font-semibold text-white uppercase tracking-wider">
                     Username

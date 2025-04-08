@@ -304,16 +304,16 @@ const BranchInventory = ({ branchName }) => {
   if (!role) return null;
 
   return (
-    <div className="flex flex-col md:flex-row min-h-screen bg-gray-100">
+    <div className="flex flex-col md:flex-row min-h-screen bg-red-50">
       <Sidebar />
       <div className="flex-1 pt-16 p-4 md:ml-64">
         <Navbar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
         <div className="flex flex-col md:flex-row justify-between items-center mt-6 mb-4">
-          <h1 className="text-2xl font-bold mb-4 md:mb-0">{branchName}</h1>
+          <h1 className="text-2xl font-bold text-yellow-500 mb-4 md:mb-0">{branchName}</h1>
           <div className="space-x-2">
               <button
                 onClick={() => setShowAddModal(true)}
-                className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition"
+                className="bg-yellow-500 text-white px-4 py-2 rounded-md hover:bg-yellow-600 transition"
               >
                 Add Item
               </button>    
@@ -331,7 +331,7 @@ const BranchInventory = ({ branchName }) => {
           <div className="overflow-x-auto">
             <table className="min-w-full text-sm text-center border-collapse">
               <thead>
-                <tr className="bg-gray-300 border-b">
+                <tr className="bg-red-600 border-b">
                   {[
                     "Name",
                     "Category",
@@ -346,7 +346,7 @@ const BranchInventory = ({ branchName }) => {
                   ].map((head, idx) => (
                     <th
                       key={idx}
-                      className="px-5 py-4 text-black font-semibold uppercase tracking-wider text-xs md:text-sm"
+                      className="px-5 py-4 text-yellow-500 font-semibold uppercase tracking-wider text-xs md:text-sm"
                     >
                       {head}
                     </th>
@@ -385,7 +385,7 @@ const BranchInventory = ({ branchName }) => {
                                 : i === 5
                                 ? "text-red-500"
                                 : i === 6
-                                ? "text-blue-500"
+                                ? "text-yellow-500"
                                 : ""
                             }`}
                           >
@@ -395,7 +395,7 @@ const BranchInventory = ({ branchName }) => {
                         <td className="px-5 py-4 whitespace-nowrap space-x-2">
 
                             <button
-                              className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg shadow-md transition duration-150"
+                              className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg shadow-md transition duration-150"
                               onClick={() => {
                                 setEditProduct(product);
                                 setShowEditModal(true);
@@ -406,7 +406,7 @@ const BranchInventory = ({ branchName }) => {
                           
                           {role === "admin" && (
                             <button
-                              className="bg-rose-500 hover:bg-rose-600 text-white px-4 py-2 rounded-lg shadow-md transition duration-150"
+                              className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg shadow-md transition duration-150"
                               onClick={() => {
                                 setProductToDelete(product);
                                 setShowDeleteConfirm(true);
@@ -478,7 +478,7 @@ const BranchInventory = ({ branchName }) => {
                 </button>
                 <button
                   onClick={handleAddProduct}
-                  className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+                  className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600"
                 >
                   Add
                 </button>
@@ -564,13 +564,13 @@ const BranchInventory = ({ branchName }) => {
               <div className="flex justify-center space-x-4">
                 <button
                   onClick={() => setShowDeleteConfirm(false)}
-                  className="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400"
+                  className="bg-yellow-300 px-4 py-2 rounded hover:bg-yellow-400"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleDeleteProduct}
-                  className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+                  className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
                 >
                   Delete
                 </button>

@@ -27,11 +27,11 @@ const Navbar = ({ searchQuery, setSearchQuery }) => {
   };
 
   return (
-    <nav className="bg-indigo-600 text-white p-3 flex items-center justify-between fixed top-0 left-0 right-0 z-40 md:left-[calc(16rem+1rem)] md:right-4 md:top-2 md:w-[calc(100%-(16rem+2rem))] md:rounded-xl shadow-md">
+    <nav className="bg-red-600 text-white p-3 flex items-center justify-between fixed top-0 left-0 right-0 z-40 md:left-[calc(16rem+1rem)] md:right-4 md:top-2 md:w-[calc(100%-(16rem+2rem))] md:rounded-xl shadow-md">
       {/* Animated Search Bar */}
       <div className="flex items-center pl-16 md:pl-0">
         <motion.div
-          className={`flex items-center ${isSearchExpanded ? 'bg-indigo-700' : 'bg-indigo-700/80'} rounded-xl overflow-hidden`}
+          className={`flex items-center ${isSearchExpanded ? 'bg-red-700' : 'bg-red-700/80'} rounded-xl overflow-hidden`}
           animate={{
             width: isSearchExpanded ? '280px' : '48px',
           }}
@@ -39,7 +39,7 @@ const Navbar = ({ searchQuery, setSearchQuery }) => {
         >
           <button 
             onClick={handleSearchClick}
-            className="p-3 text-indigo-100 hover:text-white flex-shrink-0"
+            className="p-3 text-red-100 hover:text-white flex-shrink-0"
           >
             <FaSearch />
           </button>
@@ -60,13 +60,13 @@ const Navbar = ({ searchQuery, setSearchQuery }) => {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   onBlur={handleSearchBlur}
-                  className="bg-transparent border-none outline-none text-white placeholder-indigo-200 py-2 pr-2 w-full min-w-[180px]"
+                  className="bg-transparent border-none outline-none text-white placeholder-red-200 py-2 pr-2 w-full min-w-[180px]"
                 />
                 
                 {searchQuery && (
                   <motion.button
                     onClick={clearSearch}
-                    className="p-2 text-indigo-200 hover:text-white"
+                    className="p-2 text-red-200 hover:text-white"
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.9 }}
                   >
@@ -82,11 +82,11 @@ const Navbar = ({ searchQuery, setSearchQuery }) => {
       {/* Notification Bell */}
       <div className="ml-4">
         <motion.button 
-          className="p-2 rounded-full bg-indigo-700 hover:bg-indigo-800"
+          className="p-2 rounded-full bg-red-700 hover:bg-red-800"
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
         >
-          <FaBell className="text-lg text-indigo-100 hover:text-white" />
+          <FaBell className="text-lg text-red-100 hover:text-white" />
         </motion.button>
       </div> 
     </nav> 
