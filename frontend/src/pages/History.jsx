@@ -5,29 +5,16 @@ import ExcelJS from "exceljs";
 import { saveAs } from "file-saver";
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import PDFDocument from "../components/PDFDocument";
+import { motion } from "framer-motion";
 
-// Helper function to get location from role
-const getLocationFromRole = (role) => {
-  if (!role || !role.startsWith("Staff-")) return null;
-  
-  const parts = role.split("-");
-  if (parts.length < 3) return null;
-  
-  const region = parts[1];
-  const branch = `${parts[1]} ${parts[2].replace(/([A-Z])/g, " $1").trim()}`.toUpperCase();
-  
-  return { region, branch };
-};
-
-// Region and branch structure
 const regions = [
   {
     name: "LAGUNA",
     branches: [
       "LAGUNA CHKN CHOP",
-      "LAGUNA VARDA BURGER",
+      "LAGUNA VARDA BURGER", 
       "LAGUNA THE GOOD JUICE",
-      "LAGUNA THE GOOD NOODLE BAR"
+      "LAGUNA THE GOOD NOODLE BAR",
     ]
   },
   {
@@ -44,7 +31,7 @@ const regions = [
   {
     name: "PUP MAIN BRANCH",
     branches: [
-      "PUP MAIN BRANCH CHKN CHOP", 
+      "PUP MAIN BRANCH CHKN CHOP",
       "PUP MAIN BRANCH VARDA BURGER",
     ]
   },
@@ -68,8 +55,56 @@ const regions = [
       "ST JUDE MANILA CHKN CHOP",
       "ST JUDE MANILA VARDA BURGER",
     ]
-  }
+  },
 ];
+
+const allBranches = regions.flatMap(region => region.branches);
+
+const getLocationFromRole = (role) => {
+  if (!role || !role.startsWith("Staff-")) return null;
+  
+  const parts = role.split("-");
+  if (parts.length < 3) return null;
+  
+  // Map role region names to display region names
+  const regionMap = {
+    "Laguna": "LAGUNA",
+    "Lipa": "LIPA BATANGAS",
+    "PUPMain": "PUP MAIN BRANCH",
+    "MAPUAIntramuros": "MAPUA INTRAMUROS",
+    "MAPUAMakati": "MAPUA MAKATI",
+    "STJudeManila": "ST JUDE MANILA"
+  };
+  
+  const roleRegion = parts[1];
+  const displayRegion = regionMap[roleRegion] || roleRegion.toUpperCase();
+  
+  // Map role branch types to display branch types
+  const branchTypeMap = {
+    "ChknChop": "CHKN CHOP",
+    "VardaBurger": "VARDA BURGER",
+    "TheGoodJuice": "THE GOOD JUICE",
+    "TheGoodNoodleBar": "THE GOOD NOODLE BAR",
+    "Silog": "SILOG",
+    "NRB": "NRB",
+    "Beverage": "BEVERAGE MAIN C",
+    "Bread": "BREAD MAIN C"
+  };
+  
+  const roleBranchType = parts.slice(2).join(""); // Join remaining parts
+  const displayBranchType = branchTypeMap[roleBranchType] || 
+                          roleBranchType.replace(/([A-Z])/g, " $1").trim().toUpperCase();
+  
+  const branch = `${displayRegion} ${displayBranchType}`;
+  
+  // Verify the branch exists in allBranches
+  const matchedBranch = allBranches.find(b => b === branch);
+  
+  return matchedBranch ? { 
+    region: displayRegion, 
+    branch: matchedBranch 
+  } : null;
+};
 
 const ITEMS_PER_PAGE = 10;
 
@@ -252,42 +287,47 @@ const History = () => {
     }
   };
 
-  // Render region and branch selectors with role-based access
-  const renderRegionSelection = () => (
-    <div>
-      <label className="block text-lg font-semibold mb-2">Select Region</label>
-      <select
-        value={selectedRegion}
-        onChange={(e) => setSelectedRegion(e.target.value)}
-        className="w-full p-2 border border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-        disabled={isStaff}
-      >
-        <option value="">-- Select Region --</option>
-        {regions.map((region, idx) => (
-          <option key={idx} value={region.name}>
-            {region.name}
-          </option>
-        ))}
-      </select>
-    </div>
-  );
-
-  const renderBranchSelection = () => (
-    <div>
-      <label className="block text-lg font-semibold mb-2">Select Branch</label>
-      <select
-        value={selectedBranch}
-        onChange={(e) => setSelectedBranch(e.target.value)}
-        className="w-full p-2 border border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-        disabled={isStaff || !selectedRegion}
-      >
-        <option value="">-- Select Branch --</option>
-        {availableBranches.map((branch, idx) => (
-          <option key={idx} value={branch}>
-            {branch}
-          </option>
-        ))}
-      </select>
+  // Date range picker component
+  const DateRangePicker = () => (
+    <div className="w-full">
+      <label className="block text-sm font-bold text-indigo-800 mb-2 ml-1">Filter by Date Range</label>
+      <div className="flex gap-2">
+        <motion.div 
+          className="flex items-center bg-white hover:bg-indigo-50 border-2 border-indigo-200 hover:border-indigo-400 rounded-lg overflow-hidden relative transition-all duration-200 h-12 flex-1"
+          whileHover={{ scale: 1.005 }}
+          whileTap={{ scale: 0.995 }}
+        >
+          <div className="pl-3.5 pr-3 text-indigo-600 flex-shrink-0 h-full flex items-center border-r border-indigo-100">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clipRule="evenodd" />
+            </svg>
+          </div>
+          <input
+            type="date"
+            value={startDate}
+            onChange={(e) => setStartDate(e.target.value)}
+            className="bg-transparent border-none outline-none text-gray-800 pl-3 py-3 pr-3 w-full appearance-none cursor-pointer font-medium text-sm focus:ring-0 focus:border-none"
+          />
+        </motion.div>
+        
+        <motion.div 
+          className="flex items-center bg-white hover:bg-indigo-50 border-2 border-indigo-200 hover:border-indigo-400 rounded-lg overflow-hidden relative transition-all duration-200 h-12 flex-1"
+          whileHover={{ scale: 1.005 }}
+          whileTap={{ scale: 0.995 }}
+        >
+          <div className="pl-3.5 pr-3 text-indigo-600 flex-shrink-0 h-full flex items-center border-r border-indigo-100">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clipRule="evenodd" />
+            </svg>
+          </div>
+          <input
+            type="date"
+            value={endDate}
+            onChange={(e) => setEndDate(e.target.value)}
+            className="bg-transparent border-none outline-none text-gray-800 pl-3 py-3 pr-3 w-full appearance-none cursor-pointer font-medium text-sm focus:ring-0 focus:border-none"
+          />
+        </motion.div>
+      </div>
     </div>
   );
 
@@ -299,36 +339,89 @@ const History = () => {
       {/* Main Content */}
       <div className="flex-1 p-6 md:ml-64 w-full">
         <div className="bg-white p-6 shadow-md rounded-lg">
-          <h2 className="text-2xl font-bold mb-5">📜 Inventory History</h2>
+          <h2 className="text-2xl font-bold mb-5 text-indigo-800">📜 Inventory History</h2>
 
           {/* Filter Controls */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-            {renderRegionSelection()}
-            {renderBranchSelection()}
-
-            {/* Date Range Filter */}
-            <div>
-              <label className="block text-lg font-semibold mb-2">Filter by Date Range</label>
-              <div className="flex gap-2">
-                <input
-                  type="date"
-                  value={startDate}
-                  onChange={(e) => setStartDate(e.target.value)}
-                  className="w-1/2 p-2 border border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-                <input
-                  type="date"
-                  value={endDate}
-                  onChange={(e) => setEndDate(e.target.value)}
-                  className="w-1/2 p-2 border border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
+            {/* Region Selector */}
+            <div className="w-full">
+              <label className="block text-sm font-bold text-indigo-800 mb-2 ml-1">Select Region</label>
+              <motion.div 
+                className="flex items-center bg-white hover:bg-indigo-50 border-2 border-indigo-200 hover:border-indigo-400 rounded-lg overflow-hidden relative transition-all duration-200 h-12"
+                whileHover={{ scale: 1.005 }}
+                whileTap={{ scale: 0.995 }}
+              >
+                <div className="pl-3.5 pr-3 text-indigo-600 flex-shrink-0 h-full flex items-center border-r border-indigo-100">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                
+                <select
+                  value={selectedRegion}
+                  onChange={(e) => setSelectedRegion(e.target.value)}
+                  className="bg-transparent border-none outline-none text-gray-800 pl-3 py-3 pr-10 w-full appearance-none cursor-pointer font-medium text-sm focus:ring-0 focus:border-none"
+                  disabled={isStaff}
+                >
+                  <option value="">All Regions</option>
+                  {regions.map((region, idx) => (
+                    <option key={idx} value={region.name} className="text-sm">
+                      {region.name}
+                    </option>
+                  ))}
+                </select>
+                
+                <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none text-indigo-400">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
+              </motion.div>
             </div>
+
+            {/* Branch Selector */}
+            <div className="w-full">
+              <label className="block text-sm font-bold text-indigo-800 mb-2 ml-1">Select Branch</label>
+              <motion.div 
+                className="flex items-center bg-white hover:bg-indigo-50 border-2 border-indigo-200 hover:border-indigo-400 rounded-lg overflow-hidden relative transition-all duration-200 h-12"
+                whileHover={{ scale: 1.005 }}
+                whileTap={{ scale: 0.995 }}
+              >
+                <div className="pl-3.5 pr-3 text-indigo-600 flex-shrink-0 h-full flex items-center border-r border-indigo-100">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
+                  </svg>
+                </div>
+                
+                <select
+                  value={selectedBranch}
+                  onChange={(e) => setSelectedBranch(e.target.value)}
+                  className="bg-transparent border-none outline-none text-gray-800 pl-3 py-3 pr-10 w-full appearance-none cursor-pointer font-medium text-sm focus:ring-0 focus:border-none"
+                  disabled={isStaff || !selectedRegion}
+                >
+                  <option value="">All Branches</option>
+                  {availableBranches.map((branch, idx) => (
+                    <option key={idx} value={branch} className="text-sm">
+                      {branch}
+                    </option>
+                  ))}
+                </select>
+                
+                <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none text-indigo-400">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
+              </motion.div>
+            </div>
+
+            {/* Date Range Picker */}
+            <DateRangePicker />
           </div>
 
           {/* Summary Card */}
-          <div className="mb-6 bg-blue-50 p-4 rounded-lg border border-blue-200">
-            <h3 className="text-lg font-semibold text-blue-800">
+          <div className="mb-6 bg-indigo-50 p-4 rounded-lg border border-indigo-200 shadow-sm">
+            <h3 className="text-lg font-semibold text-indigo-800">
               {isStaff && staffLocation?.branch
                 ? `Viewing history for: ${staffLocation.branch}`
                 : selectedBranch
@@ -342,97 +435,115 @@ const History = () => {
           {/* History Records */}
           {selectedBranch && currentItems.length > 0 ? (
             currentItems.map((record, idx) => (
-              <div key={idx} className="mb-5 border border-gray-300 rounded-lg bg-white shadow-md">
-                <div
+              <motion.div 
+                key={idx} 
+                className="mb-5 border border-indigo-100 rounded-lg bg-white shadow-sm overflow-hidden"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                <motion.div
                   onClick={() => toggleTable(idx)}
-                  className="p-4 cursor-pointer bg-gray-200 flex justify-between items-center font-bold rounded-t-lg"
+                  className="p-4 cursor-pointer bg-indigo-50 flex justify-between items-center font-bold rounded-t-lg"
+                  whileHover={{ backgroundColor: "#e0e7ff" }}
                 >
-                  <span>📅 Reset Date: {new Date(record.date).toLocaleString()}</span>
-                  <span>{openTables[idx] ? "▲ Collapse" : "▼ Expand"}</span>
-                </div>
+                  <span className="text-indigo-800">📅 Reset Date: {new Date(record.date).toLocaleString()}</span>
+                  <span className="text-indigo-600">{openTables[idx] ? "▲ Collapse" : "▼ Expand"}</span>
+                </motion.div>
 
                 {openTables[idx] && (
-                  <div className="p-4">
+                  <motion.div 
+                    className="p-4"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.2 }}
+                  >
                     {/* Action Buttons */}
                     <div className="flex flex-wrap gap-4 mb-4">
                       <PDFDownloadLink
                         document={<PDFDocument data={record.products} branch={selectedBranch} />}
                         fileName={`Inventory-${selectedBranch.replace(/\s+/g, "_")}-${new Date(record.date).toISOString().split("T")[0]}.pdf`}
-                        className="flex items-center gap-2 px-4 py-2 bg-red-500 text-white font-bold rounded-lg shadow"
+                        className="flex items-center gap-2 px-4 py-2 bg-red-500 text-white font-bold rounded-lg shadow hover:bg-red-600 transition-colors"
                       >
                         <FaFilePdf /> PDF
                       </PDFDownloadLink>
-                      <button 
+                      <motion.button 
                         onClick={() => exportToExcel(record)} 
-                        className="flex items-center gap-2 px-3 py-2 bg-green-500 text-white font-bold rounded"
+                        className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white font-bold rounded-lg shadow hover:bg-green-700 transition-colors"
+                        whileHover={{ scale: 1.03 }}
+                        whileTap={{ scale: 0.97 }}
                       >
                         <FaFileExcel /> Excel
-                      </button>
+                      </motion.button>
                     </div>
 
                     {/* Table */}
                     <div className="overflow-x-auto">
-                      <table className="w-full min-w-[600px] border border-gray-300 bg-white shadow-md rounded-lg">
-                        <thead className="bg-gray-300 text-gray-700 text-md">
+                      <table className="w-full min-w-[600px] border border-indigo-100 bg-white shadow-sm rounded-lg overflow-hidden">
+                        <thead className="bg-indigo-100 text-indigo-800 text-md">
                           <tr>
-                            <th className="px-4 py-3 border">Name</th>
-                            <th className="px-4 py-3 border">Category</th>
-                            <th className="px-4 py-3 border">Price</th>
-                            <th className="px-4 py-3 border">Beg Inventory</th>
-                            <th className="px-4 py-3 border">Delivered</th>
-                            <th className="px-4 py-3 border">Waste</th>
-                            <th className="px-4 py-3 border">Use</th>
-                            <th className="px-4 py-3 border">Withdrawal</th>
-                            <th className="px-4 py-3 border">Current</th>
+                            <th className="px-4 py-3 border border-indigo-200">Name</th>
+                            <th className="px-4 py-3 border border-indigo-200">Category</th>
+                            <th className="px-4 py-3 border border-indigo-200">Price</th>
+                            <th className="px-4 py-3 border border-indigo-200">Beg Inventory</th>
+                            <th className="px-4 py-3 border border-indigo-200">Delivered</th>
+                            <th className="px-4 py-3 border border-indigo-200">Waste</th>
+                            <th className="px-4 py-3 border border-indigo-200">Use</th>
+                            <th className="px-4 py-3 border border-indigo-200">Withdrawal</th>
+                            <th className="px-4 py-3 border border-indigo-200">Current</th>
                           </tr>
                         </thead>
                         <tbody>
                           {record.products.map((item, i) => (
-                            <tr key={i} className="hover:bg-gray-100">
-                              <td className="px-4 py-3 border">{item.name}</td>
-                              <td className="px-4 py-3 border">{item.category}</td>
-                              <td className="px-4 py-3 border">{item.price}</td>
-                              <td className="px-4 py-3 border">{item.begInventory}</td>
-                              <td className="px-4 py-3 border">{item.delivered}</td>
-                              <td className="px-4 py-3 border">{item.waste}</td>
-                              <td className="px-4 py-3 border">{item.use}</td>
-                              <td className="px-4 py-3 border">{item.withdrawal}</td>
-                              <td className="px-4 py-3 border">{item.current}</td>
+                            <tr key={i} className="hover:bg-indigo-50 even:bg-indigo-50/30">
+                              <td className="px-4 py-3 border border-indigo-100">{item.name}</td>
+                              <td className="px-4 py-3 border border-indigo-100">{item.category}</td>
+                              <td className="px-4 py-3 border border-indigo-100">{item.price}</td>
+                              <td className="px-4 py-3 border border-indigo-100">{item.begInventory}</td>
+                              <td className="px-4 py-3 border border-indigo-100">{item.delivered}</td>
+                              <td className="px-4 py-3 border border-indigo-100">{item.waste}</td>
+                              <td className="px-4 py-3 border border-indigo-100">{item.use}</td>
+                              <td className="px-4 py-3 border border-indigo-100">{item.withdrawal}</td>
+                              <td className="px-4 py-3 border border-indigo-100">{item.current}</td>
                             </tr>
                           ))}
                         </tbody>
                       </table>
                     </div>
-                  </div>
+                  </motion.div>
                 )}
-              </div>
+              </motion.div>
             ))
           ) : (
-            selectedBranch && <p className="text-gray-500 text-center">No history data available for this branch yet.</p>
+            selectedBranch && <p className="text-gray-500 text-center py-6">No history data available for this branch yet.</p>
           )}
 
           {/* Pagination */}
           {filteredData.length > ITEMS_PER_PAGE && (
             <div className="flex justify-between items-center mt-6">
-              <div className="text-gray-700">
+              <div className="text-gray-700 text-sm">
                 Showing {indexOfFirstItem + 1} to {Math.min(indexOfLastItem, filteredData.length)} of {filteredData.length} logs
               </div>
               <div className="flex gap-2">
-                <button
+                <motion.button
                   onClick={handlePreviousPage}
                   disabled={currentPage === 1}
-                  className="px-4 py-2 bg-gray-200 rounded-lg disabled:opacity-50"
+                  className="px-4 py-2 bg-indigo-100 text-indigo-800 rounded-lg disabled:opacity-50"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
                 >
                   Previous
-                </button>
-                <span className="px-4 py-2 bg-gray-200 rounded-lg">{currentPage}</span>
-                <button
+                </motion.button>
+                <span className="px-4 py-2 bg-indigo-600 text-white rounded-lg">{currentPage}</span>
+                <motion.button
                   onClick={handleNextPage}
                   disabled={currentPage === totalPages}
-                  className="px-4 py-2 bg-gray-200 rounded-lg disabled:opacity-50"
+                  className="px-4 py-2 bg-indigo-100 text-indigo-800 rounded-lg disabled:opacity-50"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
                 >
                   Next
-                </button>
+                </motion.button>
               </div>
             </div>
           )}

@@ -19,7 +19,7 @@ const regions = [
     name: "LAGUNA",
     branches: [
       "LAGUNA CHKN CHOP",
-      "LAGUNA VARDA BURGER",
+      "LAGUNA VARDA BURGER", 
       "LAGUNA THE GOOD JUICE",
       "LAGUNA THE GOOD NOODLE BAR",
     ]
@@ -38,7 +38,7 @@ const regions = [
   {
     name: "PUP MAIN BRANCH",
     branches: [
-      "PUP MAIN BRANCH CHKN CHOP", 
+      "PUP MAIN BRANCH CHKN CHOP",
       "PUP MAIN BRANCH VARDA BURGER",
     ]
   },
@@ -73,10 +73,44 @@ const getLocationFromRole = (role) => {
   const parts = role.split("-");
   if (parts.length < 3) return null;
   
-  const region = parts[1];
-  const branch = `${parts[1]} ${parts[2].replace(/([A-Z])/g, " $1").trim()}`.toUpperCase();
+  // Map role region names to display region names
+  const regionMap = {
+    "Laguna": "LAGUNA",
+    "Lipa": "LIPA BATANGAS",
+    "PUPMain": "PUP MAIN BRANCH",
+    "MAPUAIntramuros": "MAPUA INTRAMUROS",
+    "MAPUAMakati": "MAPUA MAKATI",
+    "STJudeManila": "ST JUDE MANILA"
+  };
   
-  return { region, branch };
+  const roleRegion = parts[1];
+  const displayRegion = regionMap[roleRegion] || roleRegion.toUpperCase();
+  
+  // Map role branch types to display branch types
+  const branchTypeMap = {
+    "ChknChop": "CHKN CHOP",
+    "VardaBurger": "VARDA BURGER",
+    "TheGoodJuice": "THE GOOD JUICE",
+    "TheGoodNoodleBar": "THE GOOD NOODLE BAR",
+    "Silog": "SILOG",
+    "NRB": "NRB",
+    "Beverage": "BEVERAGE MAIN C",
+    "Bread": "BREAD MAIN C"
+  };
+  
+  const roleBranchType = parts.slice(2).join(""); // Join remaining parts
+  const displayBranchType = branchTypeMap[roleBranchType] || 
+                          roleBranchType.replace(/([A-Z])/g, " $1").trim().toUpperCase();
+  
+  const branch = `${displayRegion} ${displayBranchType}`;
+  
+  // Verify the branch exists in allBranches
+  const matchedBranch = allBranches.find(b => b === branch);
+  
+  return matchedBranch ? { 
+    region: displayRegion, 
+    branch: matchedBranch 
+  } : null;
 };
 
 const Dashboard = () => {
@@ -89,6 +123,7 @@ const Dashboard = () => {
   const [selectedBranch, setSelectedBranch] = useState("");
   const [availableBranches, setAvailableBranches] = useState(allBranches);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   const userRole = localStorage.getItem("role");
   const isAdmin = userRole === "Admin";
@@ -119,16 +154,26 @@ const Dashboard = () => {
     }
   }, [selectedRegion, userRole]);
 
+  const fetchWithErrorHandling = async (url, options = {}) => {
+    try {
+      const response = await fetch(url, options);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return await response.json();
+    } catch (error) {
+      console.error(`Fetch error for ${url}:`, error);
+      setError(error.message);
+      return null;
+    }
+  };
+
   useEffect(() => {
     const fetchRecentActivity = async () => {
-      try {
-        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/activitylogs`);
-        if (!response.ok) throw new Error("Failed to fetch activity logs");
-        const data = await response.json();
-        setRecentActivity(data.slice(0, 7));
-      } catch (error) {
-        console.error("Error fetching recent activity:", error);
-      }
+      const data = await fetchWithErrorHandling(
+        `${import.meta.env.VITE_API_BASE_URL}/api/activitylogs`
+      );
+      if (data) setRecentActivity(data.slice(0, 7));
     };
   
     fetchRecentActivity();
@@ -139,6 +184,8 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchDashboardData = async () => {
       setIsLoading(true);
+      setError(null);
+      
       try {
         const params = new URLSearchParams();
         
@@ -152,60 +199,80 @@ const Dashboard = () => {
           }
         }
 
-        const highResponse = await fetch(
-          `${import.meta.env.VITE_API_BASE_URL}/api/dashboard/highest-inventory-items?${params}`
-        );
-        const highData = await highResponse.json();
-        setHighInventoryItems(highData);
-
-        const lowResponse = await fetch(
-          `${import.meta.env.VITE_API_BASE_URL}/api/dashboard/lowest-inventory-items?${params}`
-        );
-        const lowData = await lowResponse.json();
-        setLowInventoryItems(lowData);
-
-        const categoryResponse = await fetch(
-          `${import.meta.env.VITE_API_BASE_URL}/api/dashboard/category-distribution?${params}`
-        );
-        const categoryData = await categoryResponse.json();
-        const labels = categoryData.map((category) => category.name);
-        const values = categoryData.map((category) => category.count);
-        setCategoryData({ labels, values });
-
-        const graphResponse = await fetch(
-          `${import.meta.env.VITE_API_BASE_URL}/api/dashboard/inventory-data?${params}&limit=50`
-        );
-        const graphData = await graphResponse.json();
-    
-        if (!graphData.every(item => item.branch)) {
-          console.error("Missing branch field in API response");
-          return;
-        }
-    
-        const filteredGraphData = isStaff && staffLocation?.branch
-          ? graphData.filter(item => item.branch === staffLocation.branch)
-          : selectedRegion && !selectedBranch
-            ? graphData.filter(item => 
-                regions.find(r => r.name === selectedRegion)?.branches.includes(item.branch))
-            : graphData;
-    
-        const productNames = [...new Set(filteredGraphData.map(item => item.name))].slice(0, 10);
-        const branches = [...new Set(filteredGraphData.map(item => item.branch))];
-    
-        const datasets = branches.map(branch => ({
-          label: branch,
-          data: productNames.map(
-            product => filteredGraphData.find(item => item.name === product && item.branch === branch)?.stock || 0
+        // Fetch all data in parallel
+        const [highData, lowData, categoryData, graphData] = await Promise.all([
+          fetchWithErrorHandling(
+            `${import.meta.env.VITE_API_BASE_URL}/api/dashboard/highest-inventory-items?${params}`
           ),
-          backgroundColor: `#${Math.floor(Math.random() * 16777215).toString(16)}`,
-        }));
-    
-        setInventoryGraphData({ 
-          labels: productNames, 
-          datasets: datasets.slice(0, 10)
-        });
+          fetchWithErrorHandling(
+            `${import.meta.env.VITE_API_BASE_URL}/api/dashboard/lowest-inventory-items?${params}`
+          ),
+          fetchWithErrorHandling(
+            `${import.meta.env.VITE_API_BASE_URL}/api/dashboard/category-distribution?${params}`
+          ),
+          fetchWithErrorHandling(
+            `${import.meta.env.VITE_API_BASE_URL}/api/dashboard/inventory-data?${params}&limit=50`
+          )
+        ]);
+
+        // Process high inventory items
+        if (highData && Array.isArray(highData)) {
+          setHighInventoryItems(highData);
+        } else {
+          setHighInventoryItems([]);
+        }
+
+        // Process low inventory items
+        if (lowData && Array.isArray(lowData)) {
+          setLowInventoryItems(lowData);
+        } else {
+          setLowInventoryItems([]);
+        }
+
+        // Process category data
+        if (categoryData && Array.isArray(categoryData)) {
+          const labels = categoryData.map((category) => category._id || category.name);
+          const values = categoryData.map((category) => category.count || category.value);
+          setCategoryData({ labels, values });
+        } else {
+          setCategoryData({ labels: [], values: [] });
+        }
+
+        // Process graph data
+        if (graphData && Array.isArray(graphData)) {
+          const filteredGraphData = isStaff && staffLocation?.branch
+            ? graphData.filter(item => item.branch === staffLocation.branch)
+            : selectedRegion && !selectedBranch
+              ? graphData.filter(item => 
+                  regions.find(r => r.name === selectedRegion)?.branches.includes(item.branch))
+              : graphData;
+          
+          const productNames = [...new Set(filteredGraphData.map(item => item.name))].slice(0, 10);
+          const branches = [...new Set(filteredGraphData.map(item => item.branch))].slice(0, 5); // Limit to 5 branches for better visibility
+          
+          const colorPalette = [
+            '#4f46e5', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6',
+            '#ec4899', '#14b8a6', '#f97316', '#64748b', '#a855f7'
+          ];
+          
+          const datasets = branches.map((branch, index) => ({
+            label: branch,
+            data: productNames.map(
+              product => filteredGraphData.find(item => item.name === product && item.branch === branch)?.stock || 0
+            ),
+            backgroundColor: colorPalette[index % colorPalette.length],
+          }));
+          
+          setInventoryGraphData({ 
+            labels: productNames, 
+            datasets
+          });
+        } else {
+          setInventoryGraphData({ labels: [], datasets: [] });
+        }
       } catch (error) {
-        console.error("Error fetching dashboard data:", error);
+        console.error("Error in dashboard data processing:", error);
+        setError("Failed to process dashboard data");
       } finally {
         setIsLoading(false);
       }
@@ -214,16 +281,37 @@ const Dashboard = () => {
     fetchDashboardData();
   }, [selectedBranch, selectedRegion, userRole]);
 
+  // Default chart options
+  const chartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        position: 'top',
+        labels: {
+          boxWidth: 12,
+          padding: 20
+        }
+      }
+    }
+  };
+
   return (
     <div className="flex">
       <Sidebar />
       <div className="flex-1 p-6 bg-gray-100 min-h-screen md:ml-64 w-full mt-10 md:mt-0">
+        {/* Error Message */}
+        {error && (
+          <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6 rounded">
+            <p>Error: {error}</p>
+          </div>
+        )}
+
         {/* Enhanced Dropdown Selectors Section */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-
-         {/* Region Selector */}
+          {/* Region Selector */}
           <div className="w-full">
-          <label className="block text-sm font-bold text-indigo-800 mb-2 ml-1">Select Region</label>
+            <label className="block text-sm font-bold text-indigo-800 mb-2 ml-1">Select Region</label>
             <motion.div 
               className="flex items-center bg-white hover:bg-indigo-50 border-2 border-indigo-200 hover:border-indigo-400 rounded-lg overflow-hidden relative transition-all duration-200 h-12"
               whileHover={{ scale: 1.005 }}
@@ -328,8 +416,8 @@ const Dashboard = () => {
   
         {/* Top Section */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          
-          {/* Recent Activity Card */}
+
+         {/* Recent Activity Card */}
           <div className="bg-white p-6 rounded-xl shadow-md border border-gray-100 lg:col-span-2 hover:shadow-lg transition-shadow duration-200">
             <h2 className="text-xl font-semibold mb-4 text-indigo-700 border-b border-indigo-100 pb-2">
               Recent Activity
@@ -378,63 +466,50 @@ const Dashboard = () => {
             <h2 className="text-lg font-semibold mb-3 text-indigo-700">
               Categories
             </h2>
-            <div className="flex-grow flex items-center justify-center relative">
+            <div className="h-[250px] md:h-[300px] relative">
               {categoryData.labels.length > 0 ? (
-                <div className="w-full h-[250px] md:h-[300px] relative">
-                  {/* 3D Shadow Effect */}
-                  <div className="absolute inset-0 transform translate-y-2 opacity-20 blur-sm">
-                    <Pie
-                      data={{
-                        labels: categoryData.labels,
-                        datasets: [{
-                          data: categoryData.values,
-                          backgroundColor: ["#4f46e5", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6"].map(c => `${c}80`),
-                          borderWidth: 0
-                        }],
-                      }}
-                      options={{
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: { legend: { display: false } },
-                        cutout: '60%'
-                      }}
-                    />
-                  </div>
-                  
-                  {/* Main 3D Pie Chart */}
-                  <div className="absolute inset-0">
-                    <Pie
-                      data={{
-                        labels: categoryData.labels,
-                        datasets: [{
-                          data: categoryData.values,
-                          backgroundColor: ["#4f46e5", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6"],
-                          borderWidth: 2,
-                          borderColor: '#fff',
-                          weight: 0.5
-                        }],
-                      }}
-                      options={{
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: { 
-                          legend: { display: false },
-                          tooltip: {
-                            callbacks: {
-                              label: (context) => `${context.label}: ${context.raw}`
-                            }
-                          }
-                        },
-                        rotation: -15,
-                        borderRadius: 6,
-                        spacing: 2,
-                        radius: '90%'
-                      }}
-                    />
-                  </div>
-                </div>
+                <Pie
+                  data={{
+                    labels: categoryData.labels,
+                    datasets: [{
+                      data: categoryData.values,
+                      backgroundColor: [
+                        "rgba(79, 70, 229, 0.9)",   // indigo
+                        "rgba(16, 185, 129, 0.9)",  // emerald
+                        "rgba(245, 158, 11, 0.9)",  // amber
+                        "rgba(239, 68, 68, 0.9)",   // red
+                        "rgba(139, 92, 246, 0.9)"   // violet
+                      ],
+                      hoverBackgroundColor: [
+                        "rgba(79, 70, 229, 1)",
+                        "rgba(16, 185, 129, 1)",
+                        "rgba(245, 158, 11, 1)",
+                        "rgba(239, 68, 68, 1)",
+                        "rgba(139, 92, 246, 1)"
+                      ],
+                      borderWidth: 5,
+                      borderColor: '#f9fafb', // lighter background border
+                      hoverOffset: 10, // pops out on hover
+                    }],
+                  }}
+                  options={{
+                    ...chartOptions,
+                    plugins: {
+                      ...chartOptions.plugins,
+                      legend: {
+                        display: false,
+                      },
+                      tooltip: {
+                        enabled: true,
+                      },
+                    },
+                    cutout: '0%', // full pie (not donut)
+                  }}
+                />
               ) : (
-                <p className="text-gray-500 text-center">Loading...</p>
+                <div className="h-full flex items-center justify-center">
+                  <p className="text-gray-500">{isLoading ? "Loading..." : "No category data available"}</p>
+                </div>
               )}
             </div>
           </div>
@@ -447,42 +522,24 @@ const Dashboard = () => {
               ? `${staffLocation.branch} Inventory` 
               : selectedBranch 
                 ? `${selectedBranch} Inventory` 
-                : "Today's Use Overview"}
+                : "Inventory Overview"}
           </h2>
-          <div className="w-full h-[300px]">
+          <div className="h-[300px]">
             {inventoryGraphData.labels.length > 0 ? (
               <Bar
-                data={{
-                  labels: inventoryGraphData.labels,
-                  datasets: inventoryGraphData.datasets,
-                }}
-                options={{
-                  responsive: true,
-                  maintainAspectRatio: false,
-                  plugins: {
-                    legend: { 
-                      display: true, 
-                      position: "top",
-                      labels: {
-                        boxWidth: 12,
-                        padding: 20
-                      }
-                    },
-                  },
-                  scales: {
-                    y: { beginAtZero: true },
-                  },
-                }}
+                data={inventoryGraphData}
+                options={chartOptions}
               />
             ) : (
-              <p className="text-gray-500 text-center">Loading...</p>
+              <div className="h-full flex items-center justify-center">
+                <p className="text-gray-500">{isLoading ? "Loading..." : "No inventory data available"}</p>
+              </div>
             )}
           </div>
         </div>
   
         {/* Tables Section */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-          
           {/* Slow Moving Items */}
           <div className="bg-white p-5 rounded-xl shadow-md border border-gray-100 hover:shadow-lg transition-shadow duration-200">
             <h2 className="text-xl font-semibold mb-4 text-emerald-600 border-b border-emerald-100 pb-2">
@@ -507,13 +564,13 @@ const Dashboard = () => {
                       <tr key={index} className="border-b border-gray-100 hover:bg-indigo-50/50 transition-colors">
                         <td className="p-3 text-gray-800">{item.name}</td>
                         <td className="p-3 text-gray-800">{item.stock}</td>
-                        {!selectedBranch && !isStaff && <td className="p-3 text-gray-800">{item.branch}</td>}
+                        {!selectedBranch && !isStaff && <td className="p-3 text-gray-800 truncate max-w-xs">{item.branch}</td>}
                       </tr>
                     ))
                   ) : (
                     <tr>
                       <td colSpan={selectedBranch || isStaff ? 2 : 3} className="p-3 text-center text-gray-500">
-                        No data available
+                        {isLoading ? "Loading..." : "No slow moving items found"}
                       </td>
                     </tr>
                   )}
@@ -546,13 +603,13 @@ const Dashboard = () => {
                       <tr key={index} className="border-b border-gray-100 hover:bg-amber-50/50 transition-colors">
                         <td className="p-3 text-gray-800">{item.name}</td>
                         <td className="p-3 text-gray-800">{item.stock}</td>
-                        {!selectedBranch && !isStaff && <td className="p-3 text-gray-800">{item.branch}</td>}
+                        {!selectedBranch && !isStaff && <td className="p-3 text-gray-800 truncate max-w-xs">{item.branch}</td>}
                       </tr>
                     ))
                   ) : (
                     <tr>
                       <td colSpan={selectedBranch || isStaff ? 2 : 3} className="p-3 text-center text-gray-500">
-                        No data available
+                        {isLoading ? "Loading..." : "No fast moving items found"}
                       </td>
                     </tr>
                   )}
