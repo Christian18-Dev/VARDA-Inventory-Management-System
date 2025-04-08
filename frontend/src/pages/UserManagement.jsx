@@ -362,7 +362,7 @@ const UserManagement = () => {
                   {/* MAPUA INTRAMUROS BRANCH */}
                   <option value="Manager-MAPUAIntramuros-VardaBurger">Manager-MAPUAIntramuros-VardaBurger</option>
                   <option value="Staff-MAPUAIntramuros-VardaBurger">Staff-MAPUAIntramuros-VardaBurger</option>
-                  <option value="Staff-MapuaIntramuros-TheGoodJuice">Staff-MAPUAIntramuros-TheGoodJuice</option>
+                  <option value="Staff-MAPUAIntramuros-TheGoodJuice">Staff-MAPUAIntramuros-TheGoodJuice</option>
 
                   {/* MAPUA MAKATI BRANCH */}
                   <option value="Manager-MAPUAMakati-ChknChop">Manager-MAPUAMakati-ChknChop</option>

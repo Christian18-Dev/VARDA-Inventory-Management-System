@@ -43,7 +43,7 @@
       ],
       "MAPUA Intramuros": [
         { label: "VARDA BURGER", path: "/inventory/mapua-intramuros-varda-burger", roleMatch: "MAPUAIntramuros-VardaBurger"},
-        { label: "THE GOOD JUICE", path: "/inventory/mapua-intramuros-the-good-juice", roleMatch: "MAPUAIntramuros-TheGoodjuice"},
+        { label: "THE GOOD JUICE", path: "/inventory/mapua-intramuros-the-good-juice", roleMatch: "MAPUAIntramuros-TheGoodJuice"},
       ],
       "MAPUA Makati": [
         { label: "CHKN CHOP", path: "/inventory/mapua-makati-chkn-chop", roleMatch: "MAPUAMakati-ChknChop"},
@@ -120,7 +120,7 @@
     return (
       <>
         {/* Desktop Sidebar */}
-        <div className="hidden md:flex flex-col w-64 h-full bg-gradient-to-b from-indigo-900 to-indigo-950 text-white p-5 fixed top-0 left-0 overflow-y-auto shadow-lg z-40">
+        <div className="hidden md:flex flex-col w-64 h-full bg-gradient-to-b from-blue-700 to-blue-500 text-white p-5 fixed top-0 left-0 overflow-y-auto shadow-lg z-40">
           <div className="flex items-center gap-3 mb-6">
             <img src={logo} alt="Logo" className="w-10" />
             <span className="text-xl font-bold text-white">VARDA ENTERPRISE</span>
@@ -132,7 +132,7 @@
             {Object.keys(accessibleBranches).length > 0 && (
               <>
                 <button
-                  className="flex justify-between items-center w-full px-4 py-2 rounded-md hover:bg-indigo-700 transition"
+                  className="flex justify-between items-center w-full px-4 py-2 rounded-md hover:bg-blue-400 transition"
                   onClick={toggleInventoryDropdown}
                 >
                   <span>Inventory</span>
@@ -144,7 +144,7 @@
                     {Object.keys(accessibleBranches).map((branch) => (
                       <div key={branch} className="flex flex-col">
                         <button
-                          className="flex justify-between items-center w-full px-3 py-1 rounded-md hover:bg-indigo-800/50 transition"
+                          className="flex justify-between items-center w-full px-3 py-1 rounded-md hover:bg-blue-400/50 transition"
                           onClick={() => toggleBranchDropdown(branch)}
                         >
                           <span>{branch}</span>
@@ -159,8 +159,8 @@
                                 to={store.path}
                                 className={`text-sm px-3 py-1 rounded-md transition ${
                                   location.pathname === store.path
-                                    ? "bg-indigo-600 text-white"
-                                    : "hover:bg-indigo-800/30 text-gray-200"
+                                    ? "bg-blue-400 text-white"
+                                    : "hover:bg-blue-400/30 text-gray-200"
                                 }`}
                               >
                                 {store.label}
@@ -188,7 +188,7 @@
 
           <button
             onClick={() => setIsLogoutModalOpen(true)}
-            className="mt-auto flex items-center justify-center gap-2 bg-rose-600 hover:bg-rose-700 text-white py-2 px-4 rounded-md transition"
+            className="mt-auto flex items-center justify-center gap-2 bg-red-500 hover:bg-red-700 text-white py-2 px-4 rounded-md transition"
           >
             <LogOut size={18} />
             Logout
@@ -198,7 +198,7 @@
         {/* Mobile Menu Button */}
         {!isOpen && (
           <button
-            className="md:hidden fixed top-2 left-2 bg-indigo-900 text-white p-3 rounded-md z-60 shadow-lg hover:bg-indigo-800 transition"
+            className="md:hidden fixed top-2 left-2 bg-blue-400 text-white p-3 rounded-md z-60 shadow-lg hover:bg-blue-400 transition"
             onClick={() => setIsOpen(true)}
             aria-label="Open menu"
           >
@@ -208,13 +208,13 @@
 
         {/* Mobile Sidebar */}
         <div
-          className={`fixed top-0 left-0 h-full w-64 bg-gradient-to-b from-indigo-900 to-indigo-950 text-white p-5 transition-transform duration-300 ease-in-out ${
+          className={`fixed top-0 left-0 h-full w-64 bg-gradient-to-b from-blue-900 to-blue-950 text-white p-5 transition-transform duration-300 ease-in-out ${
             isOpen ? "translate-x-0" : "-translate-x-full"
           } md:hidden z-50 shadow-lg flex flex-col`}
         >
           {/* Close Button */}
           <button
-            className="absolute top-4 right-4 text-white p-2 rounded-md hover:bg-indigo-800 transition"
+            className="absolute top-4 right-4 text-white p-2 rounded-md hover:bg-blue-800 transition"
             onClick={() => setIsOpen(false)}
             aria-label="Close menu"
           >
@@ -237,7 +237,7 @@
             {Object.keys(accessibleBranches).length > 0 && (
               <>
                 <button
-                  className="flex justify-between items-center w-full px-4 py-2 rounded-md hover:bg-indigo-700 transition"
+                  className="flex justify-between items-center w-full px-4 py-2 rounded-md hover:bg-blue-400 transition"
                   onClick={toggleInventoryDropdown}
                 >
                   <span>Inventory</span>
@@ -249,7 +249,8 @@
                     {Object.keys(accessibleBranches).map((branch) => (
                       <div key={branch} className="flex flex-col">
                         <button
-                          className="flex justify-between items-center w-full px-3 py-1 rounded-md hover:bg-indigo-800/50 transition"
+                          className="flex justify-between items-center w-full px-3 py-1 rounded-md hover:bg-blue-400
+                          /50 transition"
                           onClick={() => toggleBranchDropdown(branch)}
                         >
                           <span>{branch}</span>
@@ -265,8 +266,8 @@
                                 onClick={() => setIsOpen(false)}
                                 className={`text-sm px-3 py-1 rounded-md transition ${
                                   location.pathname === store.path
-                                    ? "bg-indigo-600 text-white"
-                                    : "hover:bg-indigo-800/30 text-gray-200"
+                                    ? "bg-blue-400 text-white"
+                                    : "hover:bg-blue-800/30 text-gray-200"
                                 }`}
                               >
                                 {store.label}
@@ -355,8 +356,8 @@
       onClick={onClick}
       className={`block px-4 py-2 rounded-md transition ${
         currentPath === to 
-          ? "bg-indigo-600 text-white shadow-md" 
-          : "hover:bg-indigo-800/50 text-gray-200"
+          ? "bg-blue-400 text-white shadow-md" 
+          : "hover:bg-blue-400 text-gray-200"
       }`}
     >
       {label}
