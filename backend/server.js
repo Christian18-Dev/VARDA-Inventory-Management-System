@@ -4,7 +4,6 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const { MongoClient } = require("mongodb");
 
-// ✅ Import Routes
 const AuthRoutes = require("./routes/AuthRoutes");
 const InventoryRoutes = require("./routes/InventoryRoutes");
 const DashboardRoutes = require("./routes/DashboardRoutes");
@@ -14,19 +13,22 @@ const activityRoutes = require("./routes/ActivityRoutes");
 const app = express();
 const PORT = process.env.PORT || 10000;
 const mongoURI = process.env.MONGO_URI;
+const isProd = process.env.NODE_ENV === "production";
 
+// ✅ Logging info
+console.log(`🔧 Environment: ${isProd ? "🚀 Production" : "🛠 Development"}`);
 console.log(`🔧 Using PORT: ${PORT}`);
 console.log(`🔧 Using MongoDB URI: ${mongoURI ? "✅ Loaded" : "❌ Not Found"}`);
 
-// ✅ Improved CORS Configuration
+// ✅ CORS Configuration (TIGHTENED)
 const allowedOrigins = [
   "https://christian18-dev.github.io",
-  "http://localhost:3001", // Allow local testing
+  "https://vardafoodgroup.com",
+  "http://localhost:3001", // local testing
 ];
 
-app.use(cors({ origin: '*' })); // Allow from all origins
-
 app.use(express.json());
+
 app.use(
   cors({
     origin: (origin, callback) => {
@@ -56,33 +58,33 @@ async function connectDB() {
     startServer();
   } catch (err) {
     console.error("❌ MongoDB Connection Error:", err);
-    process.exit(1); // Stop server if DB fails
+    process.exit(1);
   }
 }
 
 // ✅ Routes Setup
+app.use("/api/auth", AuthRoutes);
 app.use("/api/inventory", InventoryRoutes);
 app.use("/api/dashboard", DashboardRoutes);
-app.use("/api/auth", AuthRoutes);
 app.use("/api/history", HistoryRoutes);
 app.use("/api/activitylogs", activityRoutes);
-app.use("/api/auth", require("./routes/AuthRoutes"));
-app.use('/api/dashboard', require('./routes/DashboardRoutes'));
-app.use('/api/activitylogs', require('./routes/ActivityRoutes'));
 
-// ✅ Debug: Ensure Login Route Works
+// ✅ Debug login route (optional logging in dev)
 app.post("/api/auth/login", (req, res, next) => {
-  console.log("🔹 Login API Hit:", req.body);
+  if (!isProd) {
+    console.log("🔹 Login Request Body:", req.body);
+  }
   next();
 });
 
-// ✅ Health Check Route
+// ✅ Health Check
 app.get("/", (req, res) => res.send("✅ API is running"));
 
-// ✅ Start Express Server
+// ✅ Start Server
 function startServer() {
-  app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+  app.listen(PORT, () => {
+    console.log(`🚀 Server running on port ${PORT}`);
+  });
 }
 
-// 🔥 Connect to Database & Start Server
 connectDB();
