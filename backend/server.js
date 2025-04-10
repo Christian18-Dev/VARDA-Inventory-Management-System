@@ -23,9 +23,7 @@ console.log(`🔧 Using MongoDB URI: ${mongoURI ? "✅ Loaded" : "❌ Not Found"
 // ✅ CORS Configuration 
 const allowedOrigins = [
   "https://christian18-dev.github.io",
-  "https://vardafoodgroup.com",
-  "https://www.vardafoodgroup.com", 
-  "http://localhost:3001"
+  "http://localhost:3001",
 ];
 
 
