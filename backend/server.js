@@ -20,12 +20,14 @@ console.log(`🔧 Environment: ${isProd ? "🚀 Production" : "🛠 Development"
 console.log(`🔧 Using PORT: ${PORT}`);
 console.log(`🔧 Using MongoDB URI: ${mongoURI ? "✅ Loaded" : "❌ Not Found"}`);
 
-// ✅ CORS Configuration (TIGHTENED)
+// ✅ CORS Configuration 
 const allowedOrigins = [
   "https://christian18-dev.github.io",
   "https://vardafoodgroup.com",
-  "http://localhost:3001", // local testing
+  "https://www.vardafoodgroup.com", 
+  "http://localhost:3001"
 ];
+
 
 app.use(express.json());
 
