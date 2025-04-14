@@ -184,18 +184,18 @@ const History = () => {
       return;
     }
   
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    
+    // Set time to beginning and end of day for proper range comparison
+    start.setHours(0, 0, 0, 0);
+    end.setHours(23, 59, 59, 999);
+
     const filtered = historyData.filter((record) => {
       const recordDate = new Date(record.date);
-      const start = new Date(startDate);
-      const end = new Date(endDate);
-      
-      start.setHours(0, 0, 0, 0);
-      end.setHours(23, 59, 59, 999);
-      recordDate.setHours(0, 0, 0, 0);
-      
       return recordDate >= start && recordDate <= end;
     });
-  
+
     setFilteredData(filtered);
     setCurrentPage(1);
   };
@@ -287,49 +287,51 @@ const History = () => {
     }
   };
 
-  // Date range picker component
-  const DateRangePicker = () => (
-    <div className="w-full">
-      <label className="block text-sm font-bold text-yellow-600 mb-2 ml-1">Filter by Date Range</label>
-      <div className="flex gap-2">
-        <motion.div 
-          className="flex items-center bg-white hover:bg-red-50 border-2 border-red-200 hover:border-red-400 rounded-lg overflow-hidden relative transition-all duration-200 h-12 flex-1"
-          whileHover={{ scale: 1.005 }}
-          whileTap={{ scale: 0.995 }}
-        >
-          <div className="pl-3.5 pr-3 text-red-600 flex-shrink-0 h-full flex items-center border-r border-red-100">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-              <path fillRule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clipRule="evenodd" />
-            </svg>
-          </div>
-          <input
-            type="date"
-            value={startDate}
-            onChange={(e) => setStartDate(e.target.value)}
-            className="bg-transparent border-none outline-none text-gray-800 pl-3 py-3 pr-3 w-full appearance-none cursor-pointer font-medium text-sm focus:ring-0 focus:border-none"
-          />
-        </motion.div>
-        
-        <motion.div 
-          className="flex items-center bg-white hover:bg-red-50 border-2 border-red-200 hover:border-red-400 rounded-lg overflow-hidden relative transition-all duration-200 h-12 flex-1"
-          whileHover={{ scale: 1.005 }}
-          whileTap={{ scale: 0.995 }}
-        >
-          <div className="pl-3.5 pr-3 text-red-600 flex-shrink-0 h-full flex items-center border-r border-red-100">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-              <path fillRule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clipRule="evenodd" />
-            </svg>
-          </div>
-          <input
-            type="date"
-            value={endDate}
-            onChange={(e) => setEndDate(e.target.value)}
-            className="bg-transparent border-none outline-none text-gray-800 pl-3 py-3 pr-3 w-full appearance-none cursor-pointer font-medium text-sm focus:ring-0 focus:border-none"
-          />
-        </motion.div>
-      </div>
+  // Replace your existing DateRangePicker component with this one:
+const DateRangePicker = () => (
+  <div className="w-full">
+    <label className="block text-sm font-bold text-yellow-600 mb-2 ml-1">Filter by Date Range</label>
+    <div className="flex gap-2">
+      <motion.div 
+        className="flex items-center bg-white hover:bg-red-50 border-2 border-red-200 hover:border-red-400 rounded-lg overflow-hidden relative transition-all duration-200 h-12 flex-1"
+        whileHover={{ scale: 1.005 }}
+        whileTap={{ scale: 0.995 }}
+      >
+        <div className="pl-3.5 pr-3 text-red-600 flex-shrink-0 h-full flex items-center border-r border-red-100">
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+            <path fillRule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clipRule="evenodd" />
+          </svg>
+        </div>
+        <input
+          type="date"
+          value={startDate}
+          onChange={(e) => setStartDate(e.target.value)}
+          className="bg-transparent border-none outline-none text-gray-800 pl-3 py-3 pr-3 w-full appearance-none cursor-pointer font-medium text-sm focus:ring-0 focus:border-none"
+          onClick={(e) => e.target.showPicker()} // This line triggers the native date picker
+        />
+      </motion.div>
+      
+      <motion.div 
+        className="flex items-center bg-white hover:bg-red-50 border-2 border-red-200 hover:border-red-400 rounded-lg overflow-hidden relative transition-all duration-200 h-12 flex-1"
+        whileHover={{ scale: 1.005 }}
+        whileTap={{ scale: 0.995 }}
+      >
+        <div className="pl-3.5 pr-3 text-red-600 flex-shrink-0 h-full flex items-center border-r border-red-100">
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+            <path fillRule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clipRule="evenodd" />
+          </svg>
+        </div>
+        <input
+          type="date"
+          value={endDate}
+          onChange={(e) => setEndDate(e.target.value)}
+          className="bg-transparent border-none outline-none text-gray-800 pl-3 py-3 pr-3 w-full appearance-none cursor-pointer font-medium text-sm focus:ring-0 focus:border-none"
+          onClick={(e) => e.target.showPicker()} // This line triggers the native date picker
+        />
+      </motion.div>
     </div>
-  );
+  </div>
+);
 
   return (
     <div className="flex bg-red-50 min-h-screen">
