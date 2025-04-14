@@ -28,6 +28,7 @@ const BranchInventory = ({ branchName }) => {
   const [editProduct, setEditProduct] = useState(null);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showSubmitConfirm, setShowSubmitConfirm] = useState(false);
   const [productToDelete, setProductToDelete] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -83,9 +84,11 @@ const BranchInventory = ({ branchName }) => {
   };
 
   const handleResetInventory = async () => {
-    const confirmed = window.confirm("Are you sure you want to submit the inventory?");
-    if (!confirmed) return;
+    setShowSubmitConfirm(true);
+  };
   
+  const confirmResetInventory = async () => {
+    setShowSubmitConfirm(false);
     try {
       // 1. Save current inventory to history
       const baseUrl = import.meta.env.VITE_API_BASE_URL.replace(/\/$/, "");
@@ -96,8 +99,7 @@ const BranchInventory = ({ branchName }) => {
           branch: branchName, 
           products: products.map(p => ({
             ...p,
-            // Include all current values in history
-            use: p.use // This preserves the current usage before reset
+            use: p.use
           }))
         }),
       });
@@ -106,14 +108,14 @@ const BranchInventory = ({ branchName }) => {
         throw new Error("Failed to save history before reset");
       }
   
-      // 2. Prepare updates - reset all operational fields and carry forward current as begInventory
+      // 2. Prepare updates
       const updates = products.map(product => ({
         _id: product._id,
-        begInventory: product.current, // Carry forward current as new beginning inventory
-        delivered: 0,                 // Reset delivered
-        waste: 0,                     // Reset waste
-        use: 0,                       // Reset use to 0
-        withdrawal: 0,                // Reset withdrawal
+        begInventory: product.current,
+        delivered: 0,
+        waste: 0,
+        use: 0,
+        withdrawal: 0,
       }));
   
       // 3. Update the inventory with reset values
@@ -127,7 +129,7 @@ const BranchInventory = ({ branchName }) => {
             return {
               ...p,
               ...update,
-              current: p.current // Maintain the same current value (it will recalculate on next render)
+              current: p.current
             };
           })
         );
@@ -138,13 +140,13 @@ const BranchInventory = ({ branchName }) => {
           timestamp: new Date().toISOString(),
         });
   
-        alert("Inventory submitted successfully!");
+        console.log("Inventory submitted successfully!");
       } else {
-        alert("Failed to submit inventory.");
+        console.log("No changes made during inventory submission.");
       }
     } catch (error) {
-      console.error("❌ Error during inventory submission:", error);
-      alert("Something went wrong during inventory submission.");
+      console.error("Error during inventory submission:", error);
+      console.log("Something went wrong during inventory submission.");
     }
   };
 
@@ -325,7 +327,47 @@ const BranchInventory = ({ branchName }) => {
               </button>
           </div>
         </div>
-  
+
+        {/* Submit Confirm Modal */}
+        {showSubmitConfirm && (
+          <div className="fixed inset-0 flex items-center justify-center bg-black/30 backdrop-blur-sm z-50 p-4">
+            <div className="bg-white rounded-lg p-6 w-full max-w-sm text-center">
+              <h2 className="text-lg font-semibold mb-4">Confirm Submission</h2>
+              <div className="mb-4 text-left">
+                <p className="text-gray-600 mb-2">Are you sure you want to submit the inventory?</p>
+                <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4">
+                  <div className="flex">
+                    <div className="flex-shrink-0">
+                      <svg className="h-5 w-5 text-yellow-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                    <div className="ml-3">
+                      <p className="text-sm text-yellow-700">
+                        <strong>Reminder:</strong> Make sure to only submit the Inventory if its Final for the Day.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="flex justify-center space-x-4">
+                <button
+                  onClick={() => setShowSubmitConfirm(false)}
+                  className="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={confirmResetInventory}
+                  className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
+                >
+                  Submit
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+          
         {/* Responsive Table Container */}
         <div className="bg-white shadow-lg rounded-xl overflow-hidden">
           <div className="overflow-x-auto">
