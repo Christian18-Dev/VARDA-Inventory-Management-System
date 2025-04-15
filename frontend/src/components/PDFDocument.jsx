@@ -8,7 +8,7 @@ const styles = StyleSheet.create({
   title: { fontSize: 18, fontWeight: "bold", marginBottom: 10, textAlign: "center" },
   table: { display: "table", width: "auto", borderStyle: "solid", borderWidth: 1, marginTop: 10 },
   row: { flexDirection: "row" },
-  header: { backgroundColor: "#4F81BD", fontWeight: "bold", color: "#FFFFFF" },
+  header: { backgroundColor: "#DC2626", fontWeight: "bold", color: "#FFFFFF" },
   cell: { borderWidth: 1, padding: 6, flex: 1, textAlign: "center" },
   alternateRow: { backgroundColor: "#f9f9f9" },
 });

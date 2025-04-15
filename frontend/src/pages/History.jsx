@@ -223,7 +223,7 @@ const History = () => {
     const headerRow = worksheet.addRow(headers);
     headerRow.eachCell((cell) => {
       cell.font = { bold: true, color: { argb: "FFFFFFFF" } };
-      cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FF4F81BD" } };
+      cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "DC2626" } };
       cell.alignment = { horizontal: "center" };
       cell.border = { top: { style: "thin" }, bottom: { style: "thin" }, left: { style: "thin" }, right: { style: "thin" } };
     });
