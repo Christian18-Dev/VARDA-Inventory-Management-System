@@ -287,51 +287,50 @@ const History = () => {
     }
   };
 
-  // Replace your existing DateRangePicker component with this one:
-const DateRangePicker = () => (
-  <div className="w-full">
-    <label className="block text-sm font-bold text-yellow-600 mb-2 ml-1">Filter by Date Range</label>
-    <div className="flex gap-2">
-      <motion.div 
-        className="flex items-center bg-white hover:bg-red-50 border-2 border-red-200 hover:border-red-400 rounded-lg overflow-hidden relative transition-all duration-200 h-12 flex-1"
-        whileHover={{ scale: 1.005 }}
-        whileTap={{ scale: 0.995 }}
-      >
-        <div className="pl-3.5 pr-3 text-red-600 flex-shrink-0 h-full flex items-center border-r border-red-100">
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-            <path fillRule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clipRule="evenodd" />
-          </svg>
-        </div>
-        <input
-          type="date"
-          value={startDate}
-          onChange={(e) => setStartDate(e.target.value)}
-          className="bg-transparent border-none outline-none text-gray-800 pl-3 py-3 pr-3 w-full appearance-none cursor-pointer font-medium text-sm focus:ring-0 focus:border-none"
-          onClick={(e) => e.target.showPicker()} // This line triggers the native date picker
-        />
-      </motion.div>
-      
-      <motion.div 
-        className="flex items-center bg-white hover:bg-red-50 border-2 border-red-200 hover:border-red-400 rounded-lg overflow-hidden relative transition-all duration-200 h-12 flex-1"
-        whileHover={{ scale: 1.005 }}
-        whileTap={{ scale: 0.995 }}
-      >
-        <div className="pl-3.5 pr-3 text-red-600 flex-shrink-0 h-full flex items-center border-r border-red-100">
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-            <path fillRule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clipRule="evenodd" />
-          </svg>
-        </div>
-        <input
-          type="date"
-          value={endDate}
-          onChange={(e) => setEndDate(e.target.value)}
-          className="bg-transparent border-none outline-none text-gray-800 pl-3 py-3 pr-3 w-full appearance-none cursor-pointer font-medium text-sm focus:ring-0 focus:border-none"
-          onClick={(e) => e.target.showPicker()} // This line triggers the native date picker
-        />
-      </motion.div>
+  const DateRangePicker = () => (
+    <div className="w-full">
+      <label className="block text-sm font-bold text-yellow-600 mb-2 ml-1">Filter by Date Range</label>
+      <div className="flex flex-col sm:flex-row gap-2">
+        <motion.div 
+          className="flex items-center bg-white hover:bg-red-50 border-2 border-red-200 hover:border-red-400 rounded-lg overflow-hidden relative transition-all duration-200 h-12 flex-1"
+          whileHover={{ scale: 1.005 }}
+          whileTap={{ scale: 0.995 }}
+        >
+          <div className="pl-3.5 pr-3 text-red-600 flex-shrink-0 h-full flex items-center border-r border-red-100">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clipRule="evenodd" />
+            </svg>
+          </div>
+          <input
+            type="date"
+            value={startDate}
+            onChange={(e) => setStartDate(e.target.value)}
+            className="bg-transparent border-none outline-none text-gray-800 pl-3 py-3 pr-3 w-full appearance-none cursor-pointer font-medium text-sm focus:ring-0 focus:border-none"
+            onClick={(e) => e.target.showPicker()}
+          />
+        </motion.div>
+        
+        <motion.div 
+          className="flex items-center bg-white hover:bg-red-50 border-2 border-red-200 hover:border-red-400 rounded-lg overflow-hidden relative transition-all duration-200 h-12 flex-1"
+          whileHover={{ scale: 1.005 }}
+          whileTap={{ scale: 0.995 }}
+        >
+          <div className="pl-3.5 pr-3 text-red-600 flex-shrink-0 h-full flex items-center border-r border-red-100">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clipRule="evenodd" />
+            </svg>
+          </div>
+          <input
+            type="date"
+            value={endDate}
+            onChange={(e) => setEndDate(e.target.value)}
+            className="bg-transparent border-none outline-none text-gray-800 pl-3 py-3 pr-3 w-full appearance-none cursor-pointer font-medium text-sm focus:ring-0 focus:border-none"
+            onClick={(e) => e.target.showPicker()}
+          />
+        </motion.div>
+      </div>
     </div>
-  </div>
-);
+  );
 
   return (
     <div className="flex bg-red-50 min-h-screen">
@@ -339,12 +338,12 @@ const DateRangePicker = () => (
       <Sidebar />
 
       {/* Main Content */}
-      <div className="flex-1 p-6 md:ml-64 w-full">
-        <div className="bg-white p-6 shadow-md rounded-lg border border-red-100">
-          <h2 className="text-2xl font-bold mb-5 text-yellow-600">📜 Inventory History</h2>
+      <div className="flex-1 p-4 md:p-6 md:ml-64 w-full">
+        <div className="bg-white p-4 md:p-6 shadow-md rounded-lg border border-red-100">
+          <h2 className="text-xl md:text-2xl font-bold mb-5 text-yellow-600">📜 Inventory History</h2>
 
           {/* Filter Controls */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mb-6">
             {/* Region Selector */}
             <div className="w-full">
               <label className="block text-sm font-bold text-yellow-600 mb-2 ml-1">Select Region</label>
@@ -418,12 +417,14 @@ const DateRangePicker = () => (
             </div>
 
             {/* Date Range Picker */}
-            <DateRangePicker />
+            <div className="md:col-span-2 lg:col-span-1">
+              <DateRangePicker />
+            </div>
           </div>
 
           {/* Summary Card */}
-          <div className="mb-6 bg-red-100 p-4 rounded-lg border border-red-200 shadow-sm">
-            <h3 className="text-lg font-semibold text-red-800">
+          <div className="mb-6 bg-red-100 p-3 md:p-4 rounded-lg border border-red-200 shadow-sm">
+            <h3 className="text-base md:text-lg font-semibold text-red-800">
               {isStaff && staffLocation?.branch
                 ? `Viewing history for: ${staffLocation.branch}`
                 : selectedBranch
@@ -446,32 +447,32 @@ const DateRangePicker = () => (
               >
                 <motion.div
                   onClick={() => toggleTable(idx)}
-                  className="p-4 cursor-pointer bg-red-100 flex justify-between items-center font-bold rounded-t-lg"
+                  className="p-3 md:p-4 cursor-pointer bg-red-100 flex justify-between items-center font-bold rounded-t-lg"
                   whileHover={{ backgroundColor: "#fee2e2" }}
                 >
-                  <span className="text-red-800">📅 Reset Date: {new Date(record.date).toLocaleString()}</span>
-                  <span className="text-red-600">{openTables[idx] ? "▲ Collapse" : "▼ Expand"}</span>
+                  <span className="text-sm md:text-base text-red-800">📅 Reset Date: {new Date(record.date).toLocaleString()}</span>
+                  <span className="text-sm md:text-base text-red-600">{openTables[idx] ? "▲ Collapse" : "▼ Expand"}</span>
                 </motion.div>
 
                 {openTables[idx] && (
                   <motion.div 
-                    className="p-4"
+                    className="p-3 md:p-4"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ duration: 0.2 }}
                   >
                     {/* Action Buttons */}
-                    <div className="flex flex-wrap gap-4 mb-4">
+                    <div className="flex flex-wrap gap-2 md:gap-4 mb-4">
                       <PDFDownloadLink
                         document={<PDFDocument data={record.products} branch={selectedBranch} />}
                         fileName={`Inventory-${selectedBranch.replace(/\s+/g, "_")}-${new Date(record.date).toISOString().split("T")[0]}.pdf`}
-                        className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white font-bold rounded-lg shadow hover:bg-red-700 transition-colors"
+                        className="flex items-center gap-2 px-3 py-2 text-sm md:text-base md:px-4 md:py-2 bg-red-600 text-white font-bold rounded-lg shadow hover:bg-red-700 transition-colors"
                       >
                         <FaFilePdf /> PDF
                       </PDFDownloadLink>
                       <motion.button 
                         onClick={() => exportToExcel(record)} 
-                        className="flex items-center gap-2 px-4 py-2 bg-yellow-500 text-red-900 font-bold rounded-lg shadow hover:bg-yellow-600 transition-colors"
+                        className="flex items-center gap-2 px-3 py-2 text-sm md:text-base md:px-4 md:py-2 bg-yellow-500 text-red-900 font-bold rounded-lg shadow hover:bg-yellow-600 transition-colors"
                         whileHover={{ scale: 1.03 }}
                         whileTap={{ scale: 0.97 }}
                       >
@@ -482,31 +483,31 @@ const DateRangePicker = () => (
                     {/* Table */}
                     <div className="overflow-x-auto">
                       <table className="w-full min-w-[600px] border border-red-100 bg-white shadow-sm rounded-lg overflow-hidden">
-                        <thead className="bg-red-100 text-red-800 text-md">
+                        <thead className="bg-red-100 text-red-800 text-sm md:text-md">
                           <tr>
-                            <th className="px-4 py-3 border border-red-200">Name</th>
-                            <th className="px-4 py-3 border border-red-200">Category</th>
-                            <th className="px-4 py-3 border border-red-200">Price</th>
-                            <th className="px-4 py-3 border border-red-200">Beg Inventory</th>
-                            <th className="px-4 py-3 border border-red-200">Delivered</th>
-                            <th className="px-4 py-3 border border-red-200">Waste</th>
-                            <th className="px-4 py-3 border border-red-200">Use</th>
-                            <th className="px-4 py-3 border border-red-200">Withdrawal</th>
-                            <th className="px-4 py-3 border border-red-200">Current</th>
+                            <th className="px-2 py-2 md:px-4 md:py-3 border border-red-200">Name</th>
+                            <th className="px-2 py-2 md:px-4 md:py-3 border border-red-200">Category</th>
+                            <th className="px-2 py-2 md:px-4 md:py-3 border border-red-200">Price</th>
+                            <th className="px-2 py-2 md:px-4 md:py-3 border border-red-200">Beg Inv</th>
+                            <th className="px-2 py-2 md:px-4 md:py-3 border border-red-200">Delivered</th>
+                            <th className="px-2 py-2 md:px-4 md:py-3 border border-red-200">Waste</th>
+                            <th className="px-2 py-2 md:px-4 md:py-3 border border-red-200">Use</th>
+                            <th className="px-2 py-2 md:px-4 md:py-3 border border-red-200">Withdrawal</th>
+                            <th className="px-2 py-2 md:px-4 md:py-3 border border-red-200">Current</th>
                           </tr>
                         </thead>
                         <tbody>
                           {record.products.map((item, i) => (
                             <tr key={i} className="hover:bg-red-50 even:bg-red-50/30">
-                              <td className="px-4 py-3 border border-red-100">{item.name}</td>
-                              <td className="px-4 py-3 border border-red-100">{item.category}</td>
-                              <td className="px-4 py-3 border border-red-100">{item.price}</td>
-                              <td className="px-4 py-3 border border-red-100">{item.begInventory}</td>
-                              <td className="px-4 py-3 border border-red-100">{item.delivered}</td>
-                              <td className="px-4 py-3 border border-red-100">{item.waste}</td>
-                              <td className="px-4 py-3 border border-red-100">{item.use}</td>
-                              <td className="px-4 py-3 border border-red-100">{item.withdrawal}</td>
-                              <td className="px-4 py-3 border border-red-100">{item.current}</td>
+                              <td className="px-2 py-2 md:px-4 md:py-3 border border-red-100 text-sm md:text-base">{item.name}</td>
+                              <td className="px-2 py-2 md:px-4 md:py-3 border border-red-100 text-sm md:text-base">{item.category}</td>
+                              <td className="px-2 py-2 md:px-4 md:py-3 border border-red-100 text-sm md:text-base">{item.price}</td>
+                              <td className="px-2 py-2 md:px-4 md:py-3 border border-red-100 text-sm md:text-base">{item.begInventory}</td>
+                              <td className="px-2 py-2 md:px-4 md:py-3 border border-red-100 text-sm md:text-base">{item.delivered}</td>
+                              <td className="px-2 py-2 md:px-4 md:py-3 border border-red-100 text-sm md:text-base">{item.waste}</td>
+                              <td className="px-2 py-2 md:px-4 md:py-3 border border-red-100 text-sm md:text-base">{item.use}</td>
+                              <td className="px-2 py-2 md:px-4 md:py-3 border border-red-100 text-sm md:text-base">{item.withdrawal}</td>
+                              <td className="px-2 py-2 md:px-4 md:py-3 border border-red-100 text-sm md:text-base">{item.current}</td>
                             </tr>
                           ))}
                         </tbody>
@@ -522,7 +523,7 @@ const DateRangePicker = () => (
 
           {/* Pagination */}
           {filteredData.length > ITEMS_PER_PAGE && (
-            <div className="flex justify-between items-center mt-6">
+            <div className="flex flex-col sm:flex-row justify-between items-center mt-6 gap-4">
               <div className="text-gray-700 text-sm">
                 Showing {indexOfFirstItem + 1} to {Math.min(indexOfLastItem, filteredData.length)} of {filteredData.length} logs
               </div>
@@ -530,17 +531,17 @@ const DateRangePicker = () => (
                 <motion.button
                   onClick={handlePreviousPage}
                   disabled={currentPage === 1}
-                  className="px-4 py-2 bg-red-100 text-red-800 rounded-lg disabled:opacity-50"
+                  className="px-3 py-1 md:px-4 md:py-2 bg-red-100 text-red-800 rounded-lg disabled:opacity-50 text-sm md:text-base"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >
                   Previous
                 </motion.button>
-                <span className="px-4 py-2 bg-red-600 text-white rounded-lg">{currentPage}</span>
+                <span className="px-3 py-1 md:px-4 md:py-2 bg-red-600 text-white rounded-lg text-sm md:text-base">{currentPage}</span>
                 <motion.button
                   onClick={handleNextPage}
                   disabled={currentPage === totalPages}
-                  className="px-4 py-2 bg-red-100 text-red-800 rounded-lg disabled:opacity-50"
+                  className="px-3 py-1 md:px-4 md:py-2 bg-red-100 text-red-800 rounded-lg disabled:opacity-50 text-sm md:text-base"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >
