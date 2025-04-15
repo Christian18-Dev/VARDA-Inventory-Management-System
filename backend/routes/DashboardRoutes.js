@@ -68,7 +68,7 @@ router.get("/highest-inventory-items", async (req, res) => {
       if (items.length === 0) continue;
 
       const sortedItems = items
-        .filter(item => typeof item.current === "number")
+        .filter(item => typeof item.current === "number" && item.current > 0) // Only include items with stock > 0
         .sort((a, b) => b.current - a.current)
         .slice(0, branch ? 10 : 5)
         .map(item => ({
@@ -107,7 +107,7 @@ router.get("/lowest-inventory-items", async (req, res) => {
       if (items.length === 0) continue;
 
       const sortedItems = items
-        .filter(item => typeof item.current === "number" && item.current > 0)
+        .filter(item => typeof item.current === "number") // Remove this filter: && item.current > 0
         .sort((a, b) => a.current - b.current)
         .slice(0, branch ? 10 : 5)
         .map(item => ({
