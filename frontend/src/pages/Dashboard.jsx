@@ -413,6 +413,108 @@ const Dashboard = () => {
             <div className="w-12 h-12 border-4 border-red-800 border-solid border-t-transparent rounded-full animate-spin"></div>
           </div>
         )}
+
+        {/* Tables Section */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          {/* Slow Moving Items */}
+          <div className="bg-white p-6 rounded-2xl shadow-sm border border-red-100 hover:shadow-md transition duration-200">
+            <h2 className="text-lg font-semibold text-red-800 mb-4 border-b border-red-100 pb-2">
+              {isStaff && staffLocation?.branch
+                ? `${staffLocation.branch} Slow Moving Items`
+                : selectedBranch
+                  ? `${selectedBranch} Slow Moving Items`
+                  : "Slow Moving Items"}
+            </h2>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm text-gray-800 font-medium">
+                <thead>
+                  <tr className="bg-red-50 text-left text-red-800 uppercase text-xs tracking-wider">
+                    <th className="p-3 text-center">Item Name</th>
+                    <th className="p-3 text-center">Inventory</th>
+                    {!selectedBranch && !isStaff && (
+                      <th className="p-3 text-center">Branch</th>
+                    )}
+                  </tr>
+                </thead>
+                <tbody>
+                  {highInventoryItems.length > 0 ? (
+                    highInventoryItems.map((item, index) => (
+                      <tr
+                        key={index}
+                        className="border-b border-red-100 hover:bg-red-50 transition-colors"
+                      >
+                        <td className="p-3 text-center">{item.name}</td>
+                        <td className="p-3 text-center">{item.stock}</td>
+                        {!selectedBranch && !isStaff && (
+                          <td className="p-3 text-center truncate max-w-xs">{item.branch}</td>
+                        )}
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td
+                        colSpan={selectedBranch || isStaff ? 2 : 3}
+                        className="p-4 text-center text-gray-500 font-normal"
+                      >
+                        {isLoading ? "Loading..." : "No slow moving items found"}
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* Fast Moving Items */}
+          <div className="bg-white p-6 rounded-2xl shadow-sm border border-red-100 hover:shadow-md transition duration-200">
+            <h2 className="text-lg font-semibold text-red-800 mb-4 border-b border-red-100 pb-2">
+              {isStaff && staffLocation?.branch
+                ? `${staffLocation.branch} Fast Moving Items`
+                : selectedBranch
+                  ? `${selectedBranch} Fast Moving Items`
+                  : "Fast Moving Items"}
+            </h2>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm text-gray-800 font-medium">
+                <thead>
+                  <tr className="bg-red-50 text-left text-red-800 uppercase text-xs tracking-wider">
+                    <th className="p-3 text-center">Item Name</th>
+                    <th className="p-3 text-center">Inventory</th>
+                    {!selectedBranch && !isStaff && (
+                      <th className="p-3 text-center">Branch</th>
+                    )}
+                  </tr>
+                </thead>
+                <tbody>
+                  {lowInventoryItems.length > 0 ? (
+                    lowInventoryItems.map((item, index) => (
+                      <tr
+                        key={index}
+                        className="border-b border-red-100 hover:bg-red-50 transition-colors"
+                      >
+                        <td className="p-3 text-center">{item.name}</td>
+                        <td className="p-3 text-center">{item.stock}</td>
+                        {!selectedBranch && !isStaff && (
+                          <td className="p-3 text-center truncate max-w-xs">{item.branch}</td>
+                        )}
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td
+                        colSpan={selectedBranch || isStaff ? 2 : 3}
+                        className="p-4 text-center text-gray-500 font-normal"
+                      >
+                        {isLoading ? "Loading..." : "No fast moving items found"}
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
   
         {/* Top Section */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -535,87 +637,6 @@ const Dashboard = () => {
                 <p className="text-gray-500">{isLoading ? "Loading..." : "No inventory data available"}</p>
               </div>
             )}
-          </div>
-        </div>
-  
-        {/* Tables Section */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-          {/* Slow Moving Items */}
-          <div className="bg-white p-5 rounded-xl shadow-md border border-red-100 hover:shadow-lg transition-shadow duration-200">
-            <h2 className="text-xl font-semibold mb-4 text-yellow-600 border-b border-yellow-100 pb-2">
-              {isStaff && staffLocation?.branch
-                ? `${staffLocation.branch} Slow Moving Items`
-                : selectedBranch
-                  ? `${selectedBranch} Slow Moving Items`
-                  : "Slow Moving Items"}
-            </h2>
-            <div className="overflow-x-auto">
-              <table className="w-full border-collapse">
-                <thead>
-                  <tr className="bg-red-50 text-red-800">
-                    <th className="p-3 text-left font-medium">Item Name</th>
-                    <th className="p-3 text-left font-medium">Inventory</th>
-                    {!selectedBranch && !isStaff && <th className="p-3 text-left font-medium">Branch</th>}
-                  </tr>
-                </thead>
-                <tbody>
-                  {highInventoryItems.length > 0 ? (
-                    highInventoryItems.map((item, index) => (
-                      <tr key={index} className="border-b border-red-100 hover:bg-red-50/50 transition-colors">
-                        <td className="p-3 text-gray-800">{item.name}</td>
-                        <td className="p-3 text-gray-800">{item.stock}</td>
-                        {!selectedBranch && !isStaff && <td className="p-3 text-gray-800 truncate max-w-xs">{item.branch}</td>}
-                      </tr>
-                    ))
-                  ) : (
-                    <tr>
-                      <td colSpan={selectedBranch || isStaff ? 2 : 3} className="p-3 text-center text-gray-500">
-                        {isLoading ? "Loading..." : "No slow moving items found"}
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </div>
-  
-          {/* Fast Moving Items */}
-          <div className="bg-white p-5 rounded-xl shadow-md border border-red-100 hover:shadow-lg transition-shadow duration-200">
-            <h2 className="text-xl font-semibold mb-4 text-yellow-500 border-b border-yellow-100 pb-2">
-              {isStaff && staffLocation?.branch
-                ? `${staffLocation.branch} Fast Moving Items`
-                : selectedBranch
-                  ? `${selectedBranch} Fast Moving Items`
-                  : "Fast Moving Items"}
-            </h2>
-            <div className="overflow-x-auto">
-              <table className="w-full border-collapse">
-                <thead>
-                  <tr className="bg-yellow-50 text-yellow-700">
-                    <th className="p-3 text-left font-medium">Item Name</th>
-                    <th className="p-3 text-left font-medium">Inventory</th>
-                    {!selectedBranch && !isStaff && <th className="p-3 text-left font-medium">Branch</th>}
-                  </tr>
-                </thead>
-                <tbody>
-                  {lowInventoryItems.length > 0 ? (
-                    lowInventoryItems.map((item, index) => (
-                      <tr key={index} className="border-b border-red-100 hover:bg-yellow-50/50 transition-colors">
-                        <td className="p-3 text-gray-800">{item.name}</td>
-                        <td className="p-3 text-gray-800">{item.stock}</td>
-                        {!selectedBranch && !isStaff && <td className="p-3 text-gray-800 truncate max-w-xs">{item.branch}</td>}
-                      </tr>
-                    ))
-                  ) : (
-                    <tr>
-                      <td colSpan={selectedBranch || isStaff ? 2 : 3} className="p-3 text-center text-gray-500">
-                        {isLoading ? "Loading..." : "No fast moving items found"}
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
           </div>
         </div>
       </div>
