@@ -79,7 +79,7 @@ const Navbar = ({ searchQuery, setSearchQuery }) => {
         </motion.div>
       </div>
 
-      {/* Notification Bell */}
+      { /* {/* Notification Bell 
       <div className="ml-4">
         <motion.button 
           className="p-2 rounded-full bg-red-700 hover:bg-red-800"
@@ -88,7 +88,7 @@ const Navbar = ({ searchQuery, setSearchQuery }) => {
         >
           <FaBell className="text-lg text-red-100 hover:text-white" />
         </motion.button>
-      </div> 
+      </div> */}
     </nav> 
   );
 };

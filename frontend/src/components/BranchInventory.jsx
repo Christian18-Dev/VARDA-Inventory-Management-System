@@ -529,73 +529,73 @@ const BranchInventory = ({ branchName }) => {
           </div>
         )}
   
-        {/* Edit Modal */}
-        {showEditModal && editProduct && (
-          <div className="fixed inset-0 flex items-center justify-center bg-black/30 backdrop-blur-sm z-50 p-4">
-            <div className="bg-white rounded-lg p-6 w-full max-w-lg">
-              <h2 className="text-xl font-semibold mb-4">Edit Product</h2>
-              <div className="grid grid-cols-1 gap-4">
-                {[
-                  "name",
-                  "category",
-                  ...(role === "admin"
-                    ? ["price", "begInventory", "delivered", "waste", "use", "withdrawal"]
-                    : ["price", "delivered", "waste", "use", "withdrawal"]),
-                ].map((field) => (
-                  <div key={field}>
-                    <label className="block text-sm font-medium capitalize">{field}</label>
-                    <input
-                      type={
-                        [
-                          "price",
-                          "begInventory",
-                          "delivered",
-                          "waste",
-                          "use",
-                          "withdrawal",
-                        ].includes(field)
-                          ? "number"
-                          : "text"
-                      }
-                      value={editProduct[field] === 0 ? "" : editProduct[field]}
-                      onChange={(e) => {
-                        const value = e.target.value;
-                        if (["name", "category"].includes(field)) {
-                          setEditProduct({ ...editProduct, [field]: value });
-                        } else {
-                          if (/^\d*\.?\d*$/.test(value)) {
-                            setEditProduct({ ...editProduct, [field]: value });
-                          }
-                        }
-                      }}
-                      className="w-full border border-gray-300 px-3 py-2 rounded-md"
-                      disabled={
-                        role === "staff" &&
-                        !["name", "category", "delivered", "waste", "use", "withdrawal"].includes(
-                          field
-                        )
-                      }
-                    />
-                  </div>
-                ))}
-              </div>
-              <div className="flex justify-end space-x-2 mt-4">
-                <button
-                  onClick={() => setShowEditModal(false)}
-                  className="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleUpdateProduct}
-                  className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600"
-                >
-                  Update
-                </button>
-              </div>
-            </div>
+       {/* Responsive Edit Modal */}
+{showEditModal && editProduct && (
+  <div className="fixed inset-0 flex items-center justify-center bg-black/30 backdrop-blur-sm z-50 p-2 sm:p-4">
+    <div className="bg-white rounded-lg p-4 sm:p-6 w-full max-w-[95vw] sm:max-w-lg mx-auto overflow-y-auto" 
+         style={{ maxHeight: "90vh" }}>
+      <div className="flex justify-between items-center mb-3 sm:mb-4">
+        <h2 className="text-lg sm:text-xl font-semibold">Edit Product</h2>
+        <button 
+          onClick={() => setShowEditModal(false)}
+          className="sm:hidden text-gray-500 hover:text-gray-700 text-lg"
+        >
+          ✕
+        </button>
+      </div>
+      
+      <div className="grid grid-cols-1 gap-2 sm:gap-4">
+        {[
+          "name",
+          "category",
+          ...(role === "admin"
+            ? ["price", "begInventory", "delivered", "waste", "use", "withdrawal"]
+            : ["price", "delivered", "waste", "use", "withdrawal"]),
+        ].map((field) => (
+          <div key={field}>
+            <label className="block text-xs sm:text-sm font-medium text-gray-600 capitalize">
+              {field}
+            </label>
+            <input
+              type={["price", "begInventory", "delivered", "waste", "use", "withdrawal"].includes(field)
+                ? "number"
+                : "text"}
+              value={editProduct[field] === 0 ? "" : editProduct[field]}
+              onChange={(e) => {
+                const value = e.target.value;
+                if (["name", "category"].includes(field)) {
+                  setEditProduct({ ...editProduct, [field]: value });
+                } else if (/^\d*\.?\d*$/.test(value)) {
+                  setEditProduct({ ...editProduct, [field]: value });
+                }
+              }}
+              className="w-full border border-gray-200 sm:border-gray-300 px-2 py-1.5 sm:px-3 sm:py-2 rounded text-xs sm:text-base"
+              disabled={
+                role === "staff" &&
+                !["name", "category", "delivered", "waste", "use", "withdrawal"].includes(field)
+              }
+            />
           </div>
-        )}
+        ))}
+      </div>
+      
+      <div className="flex justify-end space-x-2 mt-4">
+        <button
+          onClick={() => setShowEditModal(false)}
+          className="bg-gray-200 sm:bg-gray-300 px-3 py-1.5 sm:px-4 sm:py-2 rounded text-xs sm:text-base hover:bg-gray-300 sm:hover:bg-gray-400"
+        >
+          Cancel
+        </button>
+        <button
+          onClick={handleUpdateProduct}
+          className="bg-yellow-500 text-white px-3 py-1.5 sm:px-4 sm:py-2 rounded text-xs sm:text-base hover:bg-yellow-600"
+        >
+          Update
+        </button>
+      </div>
+    </div>
+  </div>
+)}
   
         {/* Delete Confirm Modal */}
         {showDeleteConfirm && (
