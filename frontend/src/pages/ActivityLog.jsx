@@ -8,6 +8,7 @@ const ActivityLog = () => {
   const [logsPerPage] = useState(15);
   const [searchQuery, setSearchQuery] = useState("");
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [showClearModal, setShowClearModal] = useState(false);
 
   // Filter logs based on search query
   const filteredLogs = logs.filter(log => 
@@ -38,7 +39,11 @@ const ActivityLog = () => {
     }
   };
 
-  const clearLogs = async () => {
+  const handleClearClick = () => {
+    setShowClearModal(true);
+  };
+
+  const confirmClearLogs = async () => {
     try {
       const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/activitylogs/clear`, {
         method: "DELETE",
@@ -53,6 +58,8 @@ const ActivityLog = () => {
       }
     } catch (error) {
       console.error("Error clearing logs:", error);
+    } finally {
+      setShowClearModal(false);
     }
   };
 
@@ -90,7 +97,7 @@ const ActivityLog = () => {
               Activity Log
             </h2>
             <button
-              onClick={clearLogs}
+              onClick={handleClearClick}
               className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-4 py-2 rounded-lg shadow-md transition-all duration-300 transform hover:scale-105"
             >
               Clear Logs
@@ -198,6 +205,32 @@ const ActivityLog = () => {
           )}
         </div>
       </div>
+
+      {/* Clear Logs Confirmation Modal */}
+      {showClearModal && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black/30 backdrop-blur-sm z-50 p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+            <h3 className="text-xl font-bold text-gray-800 mb-4">Confirm Clear Logs</h3>
+            <p className="text-gray-600 mb-6">
+              Are you sure you want to clear all activity logs? This action cannot be undone.
+            </p>
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => setShowClearModal(false)}
+                className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmClearLogs}
+                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+              >
+                Confirm
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
