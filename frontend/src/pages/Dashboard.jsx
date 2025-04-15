@@ -429,7 +429,7 @@ const Dashboard = () => {
               <table className="w-full text-sm text-gray-800 font-medium">
                 <thead>
                   <tr className="bg-red-50 text-left text-red-800 uppercase text-xs tracking-wider">
-                    <th className="p-3 text-center">Item Name</th>
+                    <th className="p-3 text-center">Item</th>
                     <th className="p-3 text-center">Inventory</th>
                     {!selectedBranch && !isStaff && (
                       <th className="p-3 text-center">Branch</th>
@@ -478,7 +478,7 @@ const Dashboard = () => {
               <table className="w-full text-sm text-gray-800 font-medium">
                 <thead>
                   <tr className="bg-red-50 text-left text-red-800 uppercase text-xs tracking-wider">
-                    <th className="p-3 text-center">Item Name</th>
+                    <th className="p-3 text-center">Item</th>
                     <th className="p-3 text-center">Inventory</th>
                     {!selectedBranch && !isStaff && (
                       <th className="p-3 text-center">Branch</th>
