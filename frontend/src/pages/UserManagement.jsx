@@ -341,37 +341,49 @@ const UserManagement = () => {
                   { /* LAGUNA BRANCH */}
                   <option value="Manager-Laguna-ChknChop">Manager-Laguna-ChknChop</option>
                   <option value="Staff-Laguna-ChknChop">Staff-Laguna-ChknChop</option>
+                  <option value="Manager-Laguna-VardaBurger">Manager-Laguna-VardaBurger</option>
                   <option value="Staff-Laguna-VardaBurger">Staff-Laguna-VardaBurger</option>
+                  <option value="Manager-Laguna-TheGoodJuice">Manager-Laguna-TheGoodJuice</option>
                   <option value="Staff-Laguna-TheGoodJuice">Staff-Laguna-TheGoodJuice</option>
+                  <option value="Manager-Laguna-TheGoodNoodleBar">Manager-Laguna-TheGoodNoodleBar</option>
                   <option value="Staff-Laguna-TheGoodNoodleBar">Staff-Laguna-TheGoodNoodleBar</option>
 
                   {/* lIPA BATANGAS BRANCH */}
                   <option value="Manager-Lipa-ChknChop">Manager-Lipa-ChknChop</option>
                   <option value="Staff-Lipa-ChknChop">Staff-Lipa-ChknChop</option>
+                  <option value="Manager-Lipa-VardaBurger">Manager-Lipa-VardaBurger</option>
                   <option value="Staff-Lipa-VardaBurger">Staff-Lipa-VardaBurger</option>
+                  <option value="Manager-Lipa-Silog">Manager-Lipa-Silog</option>
                   <option value="Staff-Lipa-Silog">Staff-Lipa-Silog</option>
+                  <option value="Manager-Lipa-NRB">Manager-Lipa-NRB</option>
                   <option value="Staff-Lipa-NRB">Staff-Lipa-NRB</option>
+                  <option value="Manager-Lipa-Beverage">Manager-Lipa-Beverage</option>
                   <option value="Staff-Lipa-Beverage">Staff-Lipa-Beverage</option>
+                  <option value="Manager-Lipa-Bread">Manager-Lipa-Bread</option>
                   <option value="Staff-Lipa-Bread">Staff-Lipa-Bread</option>
 
                   {/* PUP MAIN BRANCH */}
                   <option value="Manager-PUPMain-ChknChop">Manager-PUPMain-ChknChop</option>
                   <option value="Staff-PUPMain-ChknChop">Staff-PUPMain-ChknChop</option>
+                  <option value="Manager-PUPMain-VardaBurger">Manager-PUPMain-VardaBurger</option>
                   <option value="Staff-PUPMain-VardaBurger">Staff-PUPMain-VardaBurger</option> 
 
                   {/* MAPUA INTRAMUROS BRANCH */}
                   <option value="Manager-MAPUAIntramuros-VardaBurger">Manager-MAPUAIntramuros-VardaBurger</option>
                   <option value="Staff-MAPUAIntramuros-VardaBurger">Staff-MAPUAIntramuros-VardaBurger</option>
+                  <option value="Manager-MAPUAIntramuros-TheGoodJuice">Manager-MAPUAIntramuros-TheGoodJuice</option>
                   <option value="Staff-MAPUAIntramuros-TheGoodJuice">Staff-MAPUAIntramuros-TheGoodJuice</option>
 
                   {/* MAPUA MAKATI BRANCH */}
                   <option value="Manager-MAPUAMakati-ChknChop">Manager-MAPUAMakati-ChknChop</option>
                   <option value="Staff-MAPUAMakati-ChknChop">Staff-MAPUAMakati-ChknChop</option>
+                  <option value="Manager-MAPUAMakati-VardaBurger">Manager-MAPUAMakati-VardaBurger</option>
                   <option value="Staff-MAPUAMakati-VardaBurger">Staff-MAPUAMakati-VardaBurger</option>
 
                   {/* ST JUDE MANILA BRANCH */} 
                   <option value="Manager-STJudeManila-ChknChop">Manager-STJudeManila-ChknChop</option>
                   <option value="Staff-STJudeManila-ChknChop">Staff-STJudeManila-ChknChop</option>
+                  <option value="Manager-STJudeManila-VardaBurger">Manager-STJudeManila-VardaBurger</option>
                   <option value="Staff-STJudeManila-VardaBurger">Staff-STJudeManila-VardaBurger</option>
                   
                 </select>

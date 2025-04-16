@@ -68,7 +68,7 @@ const regions = [
 const allBranches = regions.flatMap(region => region.branches);
 
 const getLocationFromRole = (role) => {
-  if (!role || !role.startsWith("Staff-")) return null;
+  if (!role || (!role.startsWith("Staff-") && !role.startsWith("Manager-"))) return null;
   
   const parts = role.split("-");
   if (parts.length < 3) return null;
@@ -127,13 +127,14 @@ const Dashboard = () => {
 
   const userRole = localStorage.getItem("role");
   const isAdmin = userRole === "Admin";
+  const isManager = userRole?.startsWith("Manager-");
   const isStaff = userRole?.startsWith("Staff-");
-  const staffLocation = isStaff ? getLocationFromRole(userRole) : null;
+  const staffOrManagerLocation = (isStaff || isManager) ? getLocationFromRole(userRole) : null;
 
   useEffect(() => {
-    if (isStaff && staffLocation) {
-      setSelectedRegion(staffLocation.region);
-      setSelectedBranch(staffLocation.branch);
+    if ((isStaff || isManager) && staffOrManagerLocation?.branch) {
+      setSelectedRegion(staffOrManagerLocation.region);
+      setSelectedBranch(staffOrManagerLocation.branch);
     }
   }, [userRole]);
 
@@ -142,13 +143,13 @@ const Dashboard = () => {
       const region = regions.find(r => r.name === selectedRegion);
       if (region) {
         setAvailableBranches(region.branches);
-        if (!isStaff || !staffLocation?.branch) {
+        if (!(isStaff || isManager) || !staffOrManagerLocation?.branch) {
           setSelectedBranch("");
         }
       }
     } else {
       setAvailableBranches(allBranches);
-      if (!isStaff || !staffLocation?.branch) {
+      if (!(isStaff || isManager) || !staffOrManagerLocation?.branch) {
         setSelectedBranch("");
       }
     }
@@ -189,8 +190,8 @@ const Dashboard = () => {
       try {
         const params = new URLSearchParams();
         
-        if (isStaff && staffLocation?.branch) {
-          params.append('branch', staffLocation.branch);
+        if ((isStaff || isManager) && staffOrManagerLocation?.branch) {
+          params.append('branch', staffOrManagerLocation.branch);
         } else {
           if (selectedBranch) {
             params.append('branch', selectedBranch);
@@ -240,15 +241,15 @@ const Dashboard = () => {
 
         // Process graph data
         if (graphData && Array.isArray(graphData)) {
-          const filteredGraphData = isStaff && staffLocation?.branch
-            ? graphData.filter(item => item.branch === staffLocation.branch)
+          const filteredGraphData = (isStaff || isManager) && staffOrManagerLocation?.branch
+            ? graphData.filter(item => item.branch === staffOrManagerLocation.branch)
             : selectedRegion && !selectedBranch
               ? graphData.filter(item => 
                   regions.find(r => r.name === selectedRegion)?.branches.includes(item.branch))
               : graphData;
           
           const productNames = [...new Set(filteredGraphData.map(item => item.name))].slice(0, 10);
-          const branches = [...new Set(filteredGraphData.map(item => item.branch))].slice(0, 5); // Limit to 5 branches for better visibility
+          const branches = [...new Set(filteredGraphData.map(item => item.branch))].slice(0, 5);
           
           const colorPalette = [
             '#4f46e5', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6',
@@ -327,7 +328,7 @@ const Dashboard = () => {
                 value={selectedRegion}
                 onChange={(e) => setSelectedRegion(e.target.value)}
                 className="bg-transparent border-none outline-none text-gray-800 pl-3 py-3 pr-10 w-full appearance-none cursor-pointer font-medium text-sm focus:ring-0 focus:border-none"
-                disabled={isStaff}
+                disabled={isStaff || isManager}
               >
                 <option value="">All Regions</option>
                 {regions.map((region, idx) => (
@@ -363,7 +364,7 @@ const Dashboard = () => {
                 value={selectedBranch}
                 onChange={(e) => setSelectedBranch(e.target.value)}
                 className="bg-transparent border-none outline-none text-gray-800 pl-3 py-3 pr-10 w-full appearance-none cursor-pointer font-medium text-sm focus:ring-0 focus:border-none"
-                disabled={isStaff}
+                disabled={isStaff || isManager}
               >
                 <option value="">All Branches</option>
                 {availableBranches.map((branch, idx) => (
@@ -385,8 +386,8 @@ const Dashboard = () => {
           <div className="bg-red-800 p-4 rounded-lg shadow-md flex items-center justify-center hover:shadow-lg transition-shadow border border-yellow-400">
             <div className="text-center">
               <h3 className="text-lg font-semibold text-yellow-300">
-                {isStaff && staffLocation?.branch
-                  ? staffLocation.branch
+                {(isStaff || isManager) && staffOrManagerLocation?.branch
+                  ? staffOrManagerLocation.branch
                   : selectedBranch 
                     ? selectedBranch 
                     : selectedRegion 
@@ -401,7 +402,7 @@ const Dashboard = () => {
                       ? "Regional View" 
                       : "Global View"
                 ) : (
-                  "Your Branch View"
+                  isManager ? "Your Managed Branch" : "Your Branch View"
                 )}
               </p>
             </div>
@@ -419,8 +420,8 @@ const Dashboard = () => {
           {/* Slow Moving Items */}
           <div className="bg-white p-6 rounded-2xl shadow-sm border border-red-100 hover:shadow-md transition duration-200">
             <h2 className="text-lg font-semibold text-red-800 mb-4 border-b border-red-100 pb-2">
-              {isStaff && staffLocation?.branch
-                ? `${staffLocation.branch} Slow Moving Items`
+              {(isStaff || isManager) && staffOrManagerLocation?.branch
+                ? `${staffOrManagerLocation.branch} Slow Moving Items`
                 : selectedBranch
                   ? `${selectedBranch} Slow Moving Items`
                   : "Slow Moving Items"}
@@ -431,7 +432,7 @@ const Dashboard = () => {
                   <tr className="bg-red-50 text-left text-red-800 uppercase text-xs tracking-wider">
                     <th className="p-3 text-center">Item</th>
                     <th className="p-3 text-center">Inventory</th>
-                    {!selectedBranch && !isStaff && (
+                    {!selectedBranch && !(isStaff || isManager) && (
                       <th className="p-3 text-center">Branch</th>
                     )}
                   </tr>
@@ -445,7 +446,7 @@ const Dashboard = () => {
                       >
                         <td className="p-3 text-center">{item.name}</td>
                         <td className="p-3 text-center">{item.stock}</td>
-                        {!selectedBranch && !isStaff && (
+                        {!selectedBranch && !(isStaff || isManager) && (
                           <td className="p-3 text-center truncate max-w-xs">{item.branch}</td>
                         )}
                       </tr>
@@ -453,7 +454,7 @@ const Dashboard = () => {
                   ) : (
                     <tr>
                       <td
-                        colSpan={selectedBranch || isStaff ? 2 : 3}
+                        colSpan={selectedBranch || (isStaff || isManager) ? 2 : 3}
                         className="p-4 text-center text-gray-500 font-normal"
                       >
                         {isLoading ? "Loading..." : "No slow moving items found"}
@@ -468,8 +469,8 @@ const Dashboard = () => {
           {/* Fast Moving Items */}
           <div className="bg-white p-6 rounded-2xl shadow-sm border border-red-100 hover:shadow-md transition duration-200">
             <h2 className="text-lg font-semibold text-red-800 mb-4 border-b border-red-100 pb-2">
-              {isStaff && staffLocation?.branch
-                ? `${staffLocation.branch} Fast Moving Items`
+              {(isStaff || isManager) && staffOrManagerLocation?.branch
+                ? `${staffOrManagerLocation.branch} Fast Moving Items`
                 : selectedBranch
                   ? `${selectedBranch} Fast Moving Items`
                   : "Fast Moving Items"}
@@ -480,7 +481,7 @@ const Dashboard = () => {
                   <tr className="bg-red-50 text-left text-red-800 uppercase text-xs tracking-wider">
                     <th className="p-3 text-center">Item</th>
                     <th className="p-3 text-center">Inventory</th>
-                    {!selectedBranch && !isStaff && (
+                    {!selectedBranch && !(isStaff || isManager) && (
                       <th className="p-3 text-center">Branch</th>
                     )}
                   </tr>
@@ -494,7 +495,7 @@ const Dashboard = () => {
                       >
                         <td className="p-3 text-center">{item.name}</td>
                         <td className="p-3 text-center">{item.stock}</td>
-                        {!selectedBranch && !isStaff && (
+                        {!selectedBranch && !(isStaff || isManager) && (
                           <td className="p-3 text-center truncate max-w-xs">{item.branch}</td>
                         )}
                       </tr>
@@ -502,7 +503,7 @@ const Dashboard = () => {
                   ) : (
                     <tr>
                       <td
-                        colSpan={selectedBranch || isStaff ? 2 : 3}
+                        colSpan={selectedBranch || (isStaff || isManager) ? 2 : 3}
                         className="p-4 text-center text-gray-500 font-normal"
                       >
                         {isLoading ? "Loading..." : "No fast moving items found"}
@@ -514,12 +515,10 @@ const Dashboard = () => {
             </div>
           </div>
         </div>
-
   
         {/* Top Section */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-
-         {/* Recent Activity Card */}
+          {/* Recent Activity Card */}
           <div className="bg-white p-6 rounded-xl shadow-md border border-red-100 lg:col-span-2 hover:shadow-lg transition-shadow duration-200">
             <h2 className="text-xl font-semibold mb-4 text-red-800 border-b border-red-100 pb-2">
               Recent Activity
@@ -576,11 +575,11 @@ const Dashboard = () => {
                     datasets: [{
                       data: categoryData.values,
                       backgroundColor: [
-                        "rgba(185, 28, 28, 0.9)",   // red-700
-                        "rgba(202, 138, 4, 0.9)",    // amber-600
-                        "rgba(234, 179, 8, 0.9)",     // yellow-500
-                        "rgba(220, 38, 38, 0.9)",     // red-600
-                        "rgba(153, 27, 27, 0.9)"      // red-800
+                        "rgba(185, 28, 28, 0.9)",
+                        "rgba(202, 138, 4, 0.9)",
+                        "rgba(234, 179, 8, 0.9)",
+                        "rgba(220, 38, 38, 0.9)",
+                        "rgba(153, 27, 27, 0.9)"
                       ],
                       hoverBackgroundColor: [
                         "rgba(185, 28, 28, 1)",
@@ -590,8 +589,8 @@ const Dashboard = () => {
                         "rgba(153, 27, 27, 1)"
                       ],
                       borderWidth: 5,
-                      borderColor: '#fef2f2', // lighter background border
-                      hoverOffset: 10, // pops out on hover
+                      borderColor: '#fef2f2',
+                      hoverOffset: 10,
                     }],
                   }}
                   options={{
@@ -605,7 +604,7 @@ const Dashboard = () => {
                         enabled: true,
                       },
                     },
-                    cutout: '0%', // full pie (not donut)
+                    cutout: '0%',
                   }}
                 />
               ) : (
@@ -620,8 +619,8 @@ const Dashboard = () => {
         {/* Bar Graph Card */}
         <div className="bg-white p-6 mt-6 rounded-xl shadow-md border border-red-100 hover:shadow-lg transition-shadow duration-200">
           <h2 className="text-xl font-semibold mb-4 text-red-800 border-b border-red-100 pb-2">
-            {isStaff && staffLocation?.branch 
-              ? `${staffLocation.branch} Inventory` 
+            {(isStaff || isManager) && staffOrManagerLocation?.branch 
+              ? `${staffOrManagerLocation.branch} Inventory` 
               : selectedBranch 
                 ? `${selectedBranch} Inventory` 
                 : "Inventory Overview"}
