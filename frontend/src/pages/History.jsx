@@ -61,7 +61,7 @@ const regions = [
 const allBranches = regions.flatMap(region => region.branches);
 
 const getLocationFromRole = (role) => {
-  if (!role || !role.startsWith("Staff-")) return null;
+  if (!role || (!role.startsWith("Staff-") && !role.startsWith("Manager-"))) return null;
   
   const parts = role.split("-");
   if (parts.length < 3) return null;
@@ -112,8 +112,9 @@ const History = () => {
   // Get user role from localStorage
   const userRole = localStorage.getItem("role");
   const isAdmin = userRole === "Admin";
+  const isManager = userRole?.startsWith("Manager-");
   const isStaff = userRole?.startsWith("Staff-");
-  const staffLocation = isStaff ? getLocationFromRole(userRole) : null;
+  const staffOrManagerLocation = (isStaff || isManager) ? getLocationFromRole(userRole) : null;
 
   const [selectedRegion, setSelectedRegion] = useState("");
   const [selectedBranch, setSelectedBranch] = useState("");
@@ -127,9 +128,9 @@ const History = () => {
 
   // Set initial region/branch based on user role
   useEffect(() => {
-    if (isStaff && staffLocation) {
-      setSelectedRegion(staffLocation.region);
-      setSelectedBranch(staffLocation.branch);
+    if ((isStaff || isManager) && staffOrManagerLocation) {
+      setSelectedRegion(staffOrManagerLocation.region);
+      setSelectedBranch(staffOrManagerLocation.branch);
     }
   }, [userRole]);
 
@@ -138,15 +139,15 @@ const History = () => {
       const region = regions.find(r => r.name === selectedRegion);
       if (region) {
         setAvailableBranches(region.branches);
-        // Don't reset branch if it's already set by staff role
-        if (!isStaff || !staffLocation?.branch) {
+        // Don't reset branch if it's already set by staff/manager role
+        if (!(isStaff || isManager) || !staffOrManagerLocation?.branch) {
           setSelectedBranch("");
         }
       }
     } else {
       setAvailableBranches([]);
-      // Don't reset branch if it's set by staff role
-      if (!isStaff || !staffLocation?.branch) {
+      // Don't reset branch if it's set by staff/manager role
+      if (!(isStaff || isManager) || !staffOrManagerLocation?.branch) {
         setSelectedBranch("");
       }
     }
@@ -362,7 +363,7 @@ const History = () => {
                   value={selectedRegion}
                   onChange={(e) => setSelectedRegion(e.target.value)}
                   className="bg-transparent border-none outline-none text-gray-800 pl-3 py-3 pr-10 w-full appearance-none cursor-pointer font-medium text-sm focus:ring-0 focus:border-none"
-                  disabled={isStaff}
+                  disabled={isStaff || isManager}
                 >
                   <option value="">All Regions</option>
                   {regions.map((region, idx) => (
@@ -398,7 +399,7 @@ const History = () => {
                   value={selectedBranch}
                   onChange={(e) => setSelectedBranch(e.target.value)}
                   className="bg-transparent border-none outline-none text-gray-800 pl-3 py-3 pr-10 w-full appearance-none cursor-pointer font-medium text-sm focus:ring-0 focus:border-none"
-                  disabled={isStaff || !selectedRegion}
+                  disabled={isStaff || isManager || !selectedRegion}
                 >
                   <option value="">All Branches</option>
                   {availableBranches.map((branch, idx) => (
@@ -425,8 +426,8 @@ const History = () => {
           {/* Summary Card */}
           <div className="mb-6 bg-red-100 p-3 md:p-4 rounded-lg border border-red-200 shadow-sm">
             <h3 className="text-base md:text-lg font-semibold text-red-800">
-              {isStaff && staffLocation?.branch
-                ? `Viewing history for: ${staffLocation.branch}`
+              {(isStaff || isManager) && staffOrManagerLocation?.branch
+                ? `Viewing history for: ${staffOrManagerLocation.branch}`
                 : selectedBranch
                   ? `Viewing history for: ${selectedBranch}`
                   : selectedRegion

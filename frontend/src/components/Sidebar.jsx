@@ -22,14 +22,14 @@
     }, []);
 
     const inventoryStructure = {
-      "Laguna Branch": [
+      "Laguna": [
         { label: "CHKN CHOP", path: "/inventory/laguna-chkn-chop", roleMatch: "Laguna-ChknChop" },
         { label: "VARDA BURGER", path: "/inventory/laguna-varda-burger", roleMatch: "Laguna-VardaBurger" },
         { label: "THE GOOD JUICE", path: "/inventory/laguna-the-good-juice", roleMatch: "Laguna-TheGoodJuice" },
         { label: "THE GOOD NOODLE BAR", path: "/inventory/laguna-the-good-noodle-bar", roleMatch: "Laguna-TheGoodNoodleBar" },
         // Add more Laguna stores here
       ],
-      "Lipa Batangas Branch": [
+      "Lipa Batangas": [
         { label: "CHKN CHOP", path: "/inventory/lipabatangas-chkn-chop", roleMatch: "Lipa-ChknChop" },
         { label: "VARDA BURGER", path: "/inventory/lipabatangas-varda-burger", roleMatch: "Lipa-VardaBurger" },
         { label: "SILOG", path: "/inventory/lipabatangas-silog", roleMatch: "Lipa-Silog" },
@@ -38,7 +38,7 @@
         { label: "MAIN C - BREAD", path: "/inventory/lipabatangas-bread-main-c", roleMatch: "Lipa-Bread"},
         // Add more Lipa stores here
       ],
-      "PUP Main Branch": [
+      "PUP Main": [
         { label: "CHKN CHOP", path: "/inventory/pup-main-chkn-chop", roleMatch: "PUPMain-ChknChop"},
         { label: "VARDA BURGER", path: "/inventory/pup-main-varda-burger", roleMatch: "PUPMain-VardaBurger"},
       ],
@@ -69,24 +69,26 @@
 
     const getAccessibleBranches = () => {
       if (!userRole) return {};
-      if (userRole === "Admin" || userRole === "Manager") return inventoryStructure;
-
-      if (userRole.startsWith("Staff-")) {
-        const staffBranch = userRole.replace("Staff-", "");
+      if (userRole === "Admin") return inventoryStructure;
+    
+      // Handle both Staff and Manager roles
+      if (userRole.startsWith("Staff-") || userRole.startsWith("Manager-")) {
+        const rolePrefix = userRole.startsWith("Staff-") ? "Staff-" : "Manager-";
+        const userBranch = userRole.replace(rolePrefix, "");
         const accessibleBranches = {};
         
         Object.keys(inventoryStructure).forEach(branch => {
           const accessibleStores = inventoryStructure[branch].filter(
-            store => store.roleMatch === staffBranch
+            store => store.roleMatch === userBranch
           );
           if (accessibleStores.length > 0) {
             accessibleBranches[branch] = accessibleStores;
           }
         });
-
+    
         return accessibleBranches;
       }
-
+    
       return {};
     };
 
