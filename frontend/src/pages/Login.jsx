@@ -91,14 +91,29 @@ const LoginForm = () => {
                 </svg>
               </div>
             </div>
-            <h3 className="text-xl font-bold text-gray-800 mb-2 text-center">IT Support</h3>
             <p className="text-gray-600 mb-4 text-center">
-              Please contact your IT Support team:
-              <br />
-              <span className="font-semibold text-red-600">(555) 123-4567</span>
-              <br />
-              <span className="text-sm">support@varda.com</span>
+              Please contact IT Support Here:
+              <a
+                href="https://www.facebook.com/profile.php?id=61575182142390" // replace with your actual FB link
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center gap-2 pt-3 text-blue-600 hover:underline"
+              >
+                <svg
+                  className="w-5 h-5 fill-current"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                >
+                  <path d="M22.675 0H1.325C.593 0 0 .593 0 1.326v21.348C0 23.407.593 24 1.325 
+                  24H12.82v-9.294H9.692v-3.622h3.128V8.413c0-3.1 1.893-4.788 4.659-4.788 
+                  1.325 0 2.463.099 2.794.143v3.24l-1.918.001c-1.504 
+                  0-1.795.715-1.795 1.763v2.312h3.587l-.467 3.622h-3.12V24h6.116C23.407 
+                  24 24 23.407 24 22.674V1.326C24 .593 23.407 0 22.675 0z" />
+                </svg>
+                <span className="bold">VARDA IT Support</span>
+              </a>
             </p>
+
             <button
               onClick={() => setShowContactModal(false)}
               className="w-full bg-gradient-to-r from-red-600 to-red-700 text-white py-2.5 rounded-lg hover:from-red-700 hover:to-red-800 transition-all duration-300 transform hover:-translate-y-0.5 shadow-md"
@@ -135,9 +150,6 @@ const LoginForm = () => {
                   style={{ maxWidth: '160px', maxHeight: '160px' }}
                 />
               </div>
-              <p className="text-yellow-300/80 text-center text-medium tracking-wide">
-                Inventory Management System
-              </p>
             </div>
           </div>
 
