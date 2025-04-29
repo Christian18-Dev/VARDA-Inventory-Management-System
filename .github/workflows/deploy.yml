@@ -24,16 +24,16 @@ jobs:
       # Install Dependencies inside 'frontend/'
       - name: Install Dependencies
         run: npm install
-        working-directory: frontend  # ✅ Fix: Run inside 'frontend' folder
+        working-directory: client  # ✅ Fix: Run inside 'frontend' folder
 
       # Build the Project inside 'frontend/'
       - name: Build Project
         run: npm run build
-        working-directory: frontend  # ✅ Fix: Run inside 'frontend' folder
+        working-directory: client  # ✅ Fix: Run inside 'frontend' folder
 
       # Deploy to Github Pages from 'frontend/dist/'
       - name: Deploy to Github Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: frontend/dist  # ✅ Fix: Use 'frontend/dist' instead of 'dist'
+          publish_dir: client/dist  # ✅ Fix: Use 'frontend/dist' instead of 'dist'
