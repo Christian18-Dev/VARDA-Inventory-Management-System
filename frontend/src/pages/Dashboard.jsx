@@ -518,80 +518,86 @@ const Dashboard = () => {
   
         {/* Top Section */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Recent Activity Card */}
-          <div className="bg-white p-6 rounded-xl shadow-md border border-red-100 lg:col-span-2 hover:shadow-lg transition-shadow duration-200">
-            <h2 className="text-xl font-semibold mb-4 text-red-800 border-b border-red-100 pb-2">
-              Recent Activity
-            </h2>
-            <ul className="space-y-3">
-              {recentActivity.length > 0 ? (
-                recentActivity.map((activity, index) => {
-                  let hoverTimer;
-                  
-                  const handleMouseEnter = (e) => {
-                    const element = e.currentTarget.querySelector('.activity-action');
-                    hoverTimer = setTimeout(() => {
-                      element.classList.remove('truncate');
-                    }, 500); 
-                  };
-                  
-                  const handleMouseLeave = (e) => {
-                    clearTimeout(hoverTimer);
-                    const element = e.currentTarget.querySelector('.activity-action');
-                    element.classList.add('truncate');
-                  };
+          {/* Conditionally render Recent Activity Card only for Admin */}
+          {isAdmin && (
+            <div className="bg-white p-6 rounded-xl shadow-md border border-red-100 lg:col-span-2 hover:shadow-lg transition-shadow duration-200">
+              <h2 className="text-xl font-semibold mb-4 text-red-800 border-b border-red-100 pb-2">
+                Recent Activity
+              </h2>
+              <ul className="space-y-3">
+                {recentActivity.length > 0 ? (
+                  recentActivity.map((activity, index) => {
+                    let hoverTimer;
 
-                  return (
-                    <li
-                      key={index}
-                      className="border-b border-red-100 pb-2 flex justify-start items-center text-sm text-gray-700 hover:bg-red-50/50 transition-colors p-2 rounded-md gap-4"
-                      onMouseEnter={handleMouseEnter}
-                      onMouseLeave={handleMouseLeave}
-                    >
-                      <span className="font-medium text-gray-800 w-1/4">{activity.username}</span>
-                      <span className="activity-action w-1/2 truncate">{activity.action}</span>
-                      <span className="text-gray-500 w-1/4 text-right">
-                        {new Date(activity.timestamp).toLocaleString()}
-                      </span>
-                    </li>
-                  );
-                })
-              ) : (
-                <li className="text-gray-500">No recent activity</li>
-              )}
-            </ul>
-          </div>
-          
+                    const handleMouseEnter = (e) => {
+                      const element = e.currentTarget.querySelector('.activity-action');
+                      hoverTimer = setTimeout(() => {
+                        element.classList.remove('truncate');
+                      }, 500);
+                    };
+
+                    const handleMouseLeave = (e) => {
+                      clearTimeout(hoverTimer);
+                      const element = e.currentTarget.querySelector('.activity-action');
+                      element.classList.add('truncate');
+                    };
+
+                    return (
+                      <li
+                        key={index}
+                        className="border-b border-red-100 pb-2 flex justify-start items-center text-sm text-gray-700 hover:bg-red-50/50 transition-colors p-2 rounded-md gap-4"
+                        onMouseEnter={handleMouseEnter}
+                        onMouseLeave={handleMouseLeave}
+                      >
+                        <span className="font-medium text-gray-800 w-1/4">{activity.username}</span>
+                        <span className="activity-action w-1/2 truncate">{activity.action}</span>
+                        <span className="text-gray-500 w-1/4 text-right">
+                          {new Date(activity.timestamp).toLocaleString()}
+                        </span>
+                      </li>
+                    );
+                  })
+                ) : (
+                  <li className="text-gray-500">No recent activity</li>
+                )}
+              </ul>
+            </div>
+          )}
+
           {/* Pie Chart Card */}
-          <div className="bg-white p-6 rounded-xl shadow-md border border-red-100 hover:shadow-lg transition-shadow duration-200">
-            <h2 className="text-lg font-semibold mb-3 text-red-800">
-              Categories
-            </h2>
+          <div
+            className={`bg-white p-6 rounded-xl shadow-md border border-red-100 hover:shadow-lg transition-shadow duration-200 ${
+              isAdmin ? '' : 'lg:col-span-3'
+            }`}
+          >
+            <h2 className="text-lg font-semibold mb-3 text-red-800">Categories</h2>
             <div className="h-[250px] md:h-[300px] relative">
               {categoryData.labels.length > 0 ? (
                 <Pie
                   data={{
                     labels: categoryData.labels,
-                    datasets: [{
-                      data: categoryData.values,
-                      backgroundColor: [
-                        "rgba(185, 28, 28, 0.9)",
-                        "rgba(202, 138, 4, 0.9)",
-                        "rgba(234, 179, 8, 0.9)",
-                        "rgba(220, 38, 38, 0.9)",
-                        "rgba(153, 27, 27, 0.9)"
-                      ],
-                      hoverBackgroundColor: [
-                        "rgba(185, 28, 28, 1)",
-                        "rgba(202, 138, 4, 1)",
-                        "rgba(234, 179, 8, 1)",
-                        "rgba(220, 38, 38, 1)",
-                        "rgba(153, 27, 27, 1)"
-                      ],
-                      borderWidth: 5,
-                      borderColor: '#fef2f2',
-                      hoverOffset: 10,
-                    }],
+                    datasets: [
+                      {
+                        data: categoryData.values,
+                        backgroundColor: [
+                          'rgba(185, 28, 28, 0.9)',
+                          'rgba(202, 138, 4, 0.9)',
+                          'rgba(234, 179, 8, 0.9)',
+                          'rgba(220, 38, 38, 0.9)',
+                          'rgba(153, 27, 27, 0.9)',
+                        ],
+                        hoverBackgroundColor: [
+                          'rgba(185, 28, 28, 1)',
+                          'rgba(202, 138, 4, 1)',
+                          'rgba(234, 179, 8, 1)',
+                          'rgba(220, 38, 38, 1)',
+                          'rgba(153, 27, 27, 1)',
+                        ],
+                        borderWidth: 5,
+                        borderColor: '#fef2f2',
+                        hoverOffset: 10,
+                      },
+                    ],
                   }}
                   options={{
                     ...chartOptions,
@@ -609,7 +615,9 @@ const Dashboard = () => {
                 />
               ) : (
                 <div className="h-full flex items-center justify-center">
-                  <p className="text-gray-500">{isLoading ? "Loading..." : "No category data available"}</p>
+                  <p className="text-gray-500">
+                    {isLoading ? 'Loading...' : 'No category data available'}
+                  </p>
                 </div>
               )}
             </div>
