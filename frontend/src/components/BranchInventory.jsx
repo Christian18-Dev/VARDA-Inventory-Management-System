@@ -4,7 +4,6 @@ import Navbar from "./Navbar";
 import { fetchProducts, addProduct, deleteProduct, updateProduct, resetInventory, API_URL } from "../api";
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
-
 const calculateInventory = ({ begInventory = 0, delivered = 0, waste = 0, use = 0, withdrawal = 0 }) => {
   const current = begInventory + delivered - waste - use - withdrawal; 
   return { current: Math.max(current, 0) };
@@ -31,6 +30,10 @@ const BranchInventory = ({ branchName }) => {
   const [showSubmitConfirm, setShowSubmitConfirm] = useState(false);
   const [productToDelete, setProductToDelete] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
+  
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [productsPerPage] = useState(20);
 
   useEffect(() => {
     const storedRole = localStorage.getItem("role");
@@ -46,13 +49,34 @@ const BranchInventory = ({ branchName }) => {
     const getProducts = async () => {
       try {
         const data = await fetchProducts(branchName);
-        setProducts(data.products);
+        // Ensure we're getting all products without any limit
+        setProducts(data.products || []);
       } catch (error) {
         console.error("Error fetching products:", error);
       }
     };
     getProducts();
   }, [branchName]);
+
+  // Filter products based on search query
+  const filteredProducts = products.filter(
+    (p) =>
+      p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      p.category.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  // Reset to first page when search query changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery]);
+
+  // Pagination Logic
+  const indexOfLastProduct = currentPage * productsPerPage;
+  const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
+  const currentProducts = filteredProducts.slice(indexOfFirstProduct, indexOfLastProduct);
+  const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
+
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   const logActivity = async (action, details = {}) => {
     try {
@@ -154,7 +178,7 @@ const BranchInventory = ({ branchName }) => {
     const parsedProduct = {
       name: newProduct.name,
       category: newProduct.category,
-      price: parseFloat(newProduct.price) || 0, // Include price field
+      price: parseFloat(newProduct.price) || 0,
       begInventory: role === "admin" ? parseFloat(newProduct.begInventory) || 0 : 0,
       delivered: parseFloat(newProduct.delivered) || 0,
       waste: role === "admin" ? parseFloat(newProduct.waste) || 0 : 0,
@@ -181,18 +205,17 @@ const BranchInventory = ({ branchName }) => {
         });
         setShowAddModal(false);
   
-          // ✅ Log to Activity Log
-          const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/activitylogs/log`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              username: localStorage.getItem("username") || "Unknown User",
-              role: role,
-              action: `Added ${productToAdd.name} from the Inventory at ${branchName}`,
-            }),
-          });
+        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/activitylogs/log`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            username: localStorage.getItem("username") || "Unknown User",
+            role: role,
+            action: `Added ${productToAdd.name} from the Inventory at ${branchName}`,
+          }),
+        });
   
         if (!response.ok) {
           console.error("Failed to log activity:", response.statusText);
@@ -208,21 +231,18 @@ const BranchInventory = ({ branchName }) => {
   };
   
   const handleUpdateProduct = async () => {
-    // First preserve the existing use value
     const currentUseValue = editProduct.use || 0;
   
     const parsedProduct = {
-      ...editProduct, // Spread all existing product data first
+      ...editProduct,
       price: parseFloat(editProduct.price) || 0,
       begInventory: role === "admin" ? parseFloat(editProduct.begInventory) || 0 : editProduct.begInventory,
       delivered: parseFloat(editProduct.delivered) || 0,
       waste: role === "admin" ? parseFloat(editProduct.waste) || 0 : editProduct.waste,
-      // Explicitly preserve the use value - only change if admin is modifying it
       use: role === "admin" ? parseFloat(editProduct.use) || currentUseValue : currentUseValue,
       withdrawal: role === "admin" ? parseFloat(editProduct.withdrawal) || 0 : editProduct.withdrawal,
     };
   
-    // Calculate current inventory
     const { current } = calculateInventory(parsedProduct);
     const updatedProduct = { ...parsedProduct, current };
   
@@ -233,7 +253,6 @@ const BranchInventory = ({ branchName }) => {
         setShowEditModal(false);
         setEditProduct(null);
   
-        // Log the update action
         await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/activitylogs/log`, {
           method: "POST",
           headers: {
@@ -258,10 +277,8 @@ const BranchInventory = ({ branchName }) => {
       return;
     }
   
-    // Log to check the final product details
     console.log("Final productToDelete object:", productToDelete);
   
-    // Get the product name and ID
     const productName = productToDelete?.name || "Unknown Product";
     const productId = productToDelete?._id;
   
@@ -271,10 +288,8 @@ const BranchInventory = ({ branchName }) => {
     }
   
     try {
-      // ✅ Delete the product using the corrected deleteProduct function
       await deleteProduct(branchName, productId);
   
-      // ✅ Update state to remove the deleted product
       setProducts((prev) =>
         prev.filter((product) => product._id !== productId)
       );
@@ -282,7 +297,6 @@ const BranchInventory = ({ branchName }) => {
       setShowDeleteConfirm(false);
       setProductToDelete(null);
   
-      // ✅ Log the delete action
       await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/activitylogs/log`, {
         method: "POST",
         headers: {
@@ -396,74 +410,67 @@ const BranchInventory = ({ branchName }) => {
                 </tr>
               </thead>
               <tbody>
-                {products.length > 0 ? (
-                  products
-                    .filter(
-                      (p) =>
-                        p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                        p.category.toLowerCase().includes(searchQuery.toLowerCase())
-                    )
-                    .map((product) => (
-                      <tr
-                        key={product._id}
-                        className="border-b hover:bg-gray-100 transition duration-150"
-                      >
-                        {[
-                          product.name,
-                          product.category,
-                          `₱ ${product.price}`,
-                          product.begInventory,
-                          product.delivered,
-                          product.waste,
-                          product.use,
-                          product.withdrawal,
-                          product.current,
-                        ].map((item, i) => (
-                          <td
-                            key={i}
-                            className={`px-5 py-4 whitespace-nowrap text-black ${
-                              i === 2
-                                ? "text-green-600 font-medium"
-                                : i === 5
-                                ? "text-red-500"
-                                : i === 6
-                                ? "text-yellow-500"
-                                : ""
-                            }`}
-                          >
-                            {item}
-                          </td>
-                        ))}
-                        <td className="px-5 py-4 whitespace-nowrap space-x-2">
-
-                            <button
-                              className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg shadow-md transition duration-150"
-                              onClick={() => {
-                                setEditProduct(product);
-                                setShowEditModal(true);
-                              }}
-                            >
-                              Edit
-                            </button>
-                          
-                          {role === "admin" && (
-                            <button
-                              className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg shadow-md transition duration-150"
-                              onClick={() => {
-                                setProductToDelete(product);
-                                setShowDeleteConfirm(true);
-                              }}
-                            >
-                              Delete
-                            </button>
-                          )}
+                {currentProducts.length > 0 ? (
+                  currentProducts.map((product) => (
+                    <tr
+                      key={product._id}
+                      className="border-b hover:bg-gray-100 transition duration-150"
+                    >
+                      {[
+                        product.name,
+                        product.category,
+                        `₱ ${product.price}`,
+                        product.begInventory,
+                        product.delivered,
+                        product.waste,
+                        product.use,
+                        product.withdrawal,
+                        product.current,
+                      ].map((item, i) => (
+                        <td
+                          key={i}
+                          className={`px-5 py-4 whitespace-nowrap text-black ${
+                            i === 2
+                              ? "text-green-600 font-medium"
+                              : i === 5
+                              ? "text-red-500"
+                              : i === 6
+                              ? "text-yellow-500"
+                              : ""
+                          }`}
+                        >
+                          {item}
                         </td>
-                      </tr>
-                    ))
+                      ))}
+                      <td className="px-5 py-4 whitespace-nowrap space-x-2">
+                        <button
+                          className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg shadow-md transition duration-150"
+                          onClick={() => {
+                            setEditProduct(product);
+                            setShowEditModal(true);
+                          }}
+                        >
+                          Edit
+                        </button>
+                      
+                        {role === "admin" && (
+                          <button
+                            className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg shadow-md transition duration-150"
+                            onClick={() => {
+                              setProductToDelete(product);
+                              setShowDeleteConfirm(true);
+                            }}
+                          >
+                            Delete
+                          </button>
+                        )}
+                      </td>
+                    </tr>
+                  ))
                 ) : (
                   <tr>
                     <td colSpan="10" className="text-center py-6 text-gray-500">
-                      No products found
+                      {searchQuery ? "No matching products found" : "No products found"}
                     </td>
                   </tr>
                 )}
@@ -471,6 +478,34 @@ const BranchInventory = ({ branchName }) => {
             </table>
           </div>
         </div>
+
+        {/* Pagination */}
+        {filteredProducts.length > productsPerPage && (
+          <div className="flex flex-col md:flex-row justify-between items-center mt-6 gap-4">
+            <div className="text-gray-700 text-sm md:text-base">
+              Showing {indexOfFirstProduct + 1} to {Math.min(indexOfLastProduct, filteredProducts.length)} of {filteredProducts.length} products
+            </div>
+            <div className="flex gap-2">
+              <button
+                onClick={() => paginate(currentPage - 1)}
+                disabled={currentPage === 1}
+                className="px-3 py-1 md:px-4 md:py-2 bg-gray-200 rounded-lg disabled:opacity-50 text-sm md:text-base"
+              >
+                Previous
+              </button>
+              <span className="px-3 py-1 md:px-4 md:py-2 bg-gray-200 rounded-lg text-sm md:text-base">
+                {currentPage} of {totalPages}
+              </span>
+              <button
+                onClick={() => paginate(currentPage + 1)}
+                disabled={currentPage === totalPages}
+                className="px-3 py-1 md:px-4 md:py-2 bg-gray-200 rounded-lg disabled:opacity-50 text-sm md:text-base"
+              >
+                Next
+              </button>
+            </div>
+          </div>
+        )}
   
         {/* Add Product Modal */}
         {showAddModal && (
@@ -623,7 +658,6 @@ const BranchInventory = ({ branchName }) => {
       </div>
     </div>
   );
-  
-  };
+};
 
 export default BranchInventory;

@@ -1,7 +1,7 @@
 export const API_URL = import.meta.env.VITE_API_URL;
 
 // Fetch products for a specific branch
-export const fetchProducts = async (branch, page = 1, limit = 25) => {
+export const fetchProducts = async (branch, page = 1, limit = 100) => {
   try {
     const response = await fetch(`${API_URL}?branch=${encodeURIComponent(branch)}&page=${page}&limit=${limit}`);
     const data = await response.json();
