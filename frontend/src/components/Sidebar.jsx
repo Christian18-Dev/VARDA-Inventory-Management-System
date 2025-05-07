@@ -2,7 +2,7 @@
   import { Link, useLocation, useNavigate } from "react-router-dom";
   import { Menu, X, ChevronDown, ChevronUp, LogOut } from "lucide-react";
   import '../index.css'
-  import logo from "../assets/vardalogo.png";
+  import logo from "../assets/vardanewlogo.png";
 
   const Sidebar = () => {
     const location = useLocation();

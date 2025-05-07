@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Logo from "../assets/vardalogo.png";
+import Logo from "../assets/vardanewlogo.png";
 import '../Login.css'
 
 const LoginForm = () => {
