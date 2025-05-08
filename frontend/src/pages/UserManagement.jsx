@@ -367,6 +367,7 @@ const UserManagement = () => {
                   <option value="Staff-PUPMain-ChknChop">Staff-PUPMain-ChknChop</option>
                   <option value="Manager-PUPMain-VardaBurger">Manager-PUPMain-VardaBurger</option>
                   <option value="Staff-PUPMain-VardaBurger">Staff-PUPMain-VardaBurger</option> 
+                  <option value="Staff-PUPMain">Staff-PUPMain</option>
 
                   {/* MAPUA INTRAMUROS BRANCH */}
                   <option value="Manager-MAPUAIntramuros-VardaBurger">Manager-MAPUAIntramuros-VardaBurger</option>

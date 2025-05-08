@@ -79,7 +79,13 @@
         
         Object.keys(inventoryStructure).forEach(branch => {
           const accessibleStores = inventoryStructure[branch].filter(
-            store => store.roleMatch === userBranch
+            store => {
+              // For PUP Main, check if role is specific to one store or the general PUPMain role
+              if (branch === "PUP Main") {
+                return store.roleMatch === userBranch || userBranch === "PUPMain";
+              }
+              return store.roleMatch === userBranch;
+            }
           );
           if (accessibleStores.length > 0) {
             accessibleBranches[branch] = accessibleStores;
