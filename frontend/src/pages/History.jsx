@@ -64,7 +64,7 @@ const getLocationFromRole = (role) => {
   if (!role || (!role.startsWith("Staff-") && !role.startsWith("Manager-"))) return null;
   
   const parts = role.split("-");
-  if (parts.length < 3) return null;
+  if (parts.length < 2) return null;
   
   // Map role region names to display region names
   const regionMap = {
@@ -78,6 +78,14 @@ const getLocationFromRole = (role) => {
   
   const roleRegion = parts[1];
   const displayRegion = regionMap[roleRegion] || roleRegion.toUpperCase();
+  
+  // For PUPMain role (no specific branch), return the region but no specific branch
+  if (roleRegion === "PUPMain" && parts.length === 2) {
+    return { 
+      region: displayRegion,
+      branch: "" // Empty branch means they can choose between both
+    };
+  }
   
   // Map role branch types to display branch types
   const branchTypeMap = {
@@ -127,12 +135,15 @@ const History = () => {
   const [endDate, setEndDate] = useState("");
 
   // Set initial region/branch based on user role
-  useEffect(() => {
-    if ((isStaff || isManager) && staffOrManagerLocation) {
-      setSelectedRegion(staffOrManagerLocation.region);
+useEffect(() => {
+  if ((isStaff || isManager) && staffOrManagerLocation) {
+    setSelectedRegion(staffOrManagerLocation.region);
+    // Only set branch if it's specific, not for general PUPMain role
+    if (staffOrManagerLocation.branch) {
       setSelectedBranch(staffOrManagerLocation.branch);
     }
-  }, [userRole]);
+  }
+}, [userRole]);
 
   useEffect(() => {
     if (selectedRegion) {
@@ -399,7 +410,7 @@ const History = () => {
                   value={selectedBranch}
                   onChange={(e) => setSelectedBranch(e.target.value)}
                   className="bg-transparent border-none outline-none text-gray-800 pl-3 py-3 pr-10 w-full appearance-none cursor-pointer font-medium text-sm focus:ring-0 focus:border-none"
-                  disabled={isStaff || isManager || !selectedRegion}
+                  disabled={(isStaff || isManager) && staffOrManagerLocation?.branch}
                 >
                   <option value="">All Branches</option>
                   {availableBranches.map((branch, idx) => (
