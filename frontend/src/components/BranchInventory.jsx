@@ -13,6 +13,7 @@ const BranchInventory = ({ branchName }) => {
   const [role, setRole] = useState(null);
   const [products, setProducts] = useState([]);
   const [showAddModal, setShowAddModal] = useState(false);
+  const categories = ["Others", "Condiments", "Cups", "Juices", "Cold Items", "Veggies", "Bread", "Meat", "Frozen Meat"];
   const [newProduct, setNewProduct] = useState({
     name: "",
     category: "",
@@ -28,6 +29,7 @@ const BranchInventory = ({ branchName }) => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showSubmitConfirm, setShowSubmitConfirm] = useState(false);
+  const [showStockWarning, setShowStockWarning] = useState(false);
   const [productToDelete, setProductToDelete] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   
@@ -242,6 +244,15 @@ const BranchInventory = ({ branchName }) => {
       use: role === "admin" ? parseFloat(editProduct.use) || currentUseValue : currentUseValue,
       withdrawal: role === "admin" ? parseFloat(editProduct.withdrawal) || 0 : editProduct.withdrawal,
     };
+  
+    // Calculate available stock
+    const availableStock = parsedProduct.begInventory + parsedProduct.delivered - parsedProduct.waste - parsedProduct.withdrawal;
+    
+    // Check if trying to use more than available stock
+    if (parsedProduct.use > availableStock) {
+      setShowStockWarning(true);
+      return;
+    }
   
     const { current } = calculateInventory(parsedProduct);
     const updatedProduct = { ...parsedProduct, current };
@@ -524,12 +535,18 @@ const BranchInventory = ({ branchName }) => {
                 </div>
                 <div>
                   <label className="block text-sm font-medium">Category</label>
-                  <input
-                    type="text"
+                  <select
                     value={newProduct.category}
                     onChange={(e) => setNewProduct({ ...newProduct, category: e.target.value })}
                     className="w-full border border-gray-300 px-3 py-2 rounded-md"
-                  />
+                  >
+                    <option value="">Select a category</option>
+                    {categories.map((category) => (
+                      <option key={category} value={category}>
+                        {category}
+                      </option>
+                    ))}
+                  </select>
                 </div>
                 <div>
                   <label className="block text-sm font-medium">Price</label>
@@ -591,25 +608,40 @@ const BranchInventory = ({ branchName }) => {
             <label className="block text-xs sm:text-sm font-medium text-gray-600 capitalize">
               {field}
             </label>
-            <input
-              type={["price", "begInventory", "delivered", "waste", "use", "withdrawal"].includes(field)
-                ? "number"
-                : "text"}
-              value={editProduct[field] === 0 ? "" : editProduct[field]}
-              onChange={(e) => {
-                const value = e.target.value;
-                if (["name", "category"].includes(field)) {
-                  setEditProduct({ ...editProduct, [field]: value });
-                } else if (/^\d*\.?\d*$/.test(value)) {
-                  setEditProduct({ ...editProduct, [field]: value });
+            {field === "category" ? (
+              <select
+                value={editProduct[field] === 0 ? "" : editProduct[field]}
+                onChange={(e) => setEditProduct({ ...editProduct, [field]: e.target.value })}
+                className="w-full border border-gray-200 sm:border-gray-300 px-2 py-1.5 sm:px-3 sm:py-2 rounded text-xs sm:text-base"
+              >
+                <option value="">Select a category</option>
+                {categories.map((category) => (
+                  <option key={category} value={category}>
+                    {category}
+                  </option>
+                ))}
+              </select>
+            ) : (
+              <input
+                type={["price", "begInventory", "delivered", "waste", "use", "withdrawal"].includes(field)
+                  ? "number"
+                  : "text"}
+                value={editProduct[field] === 0 ? "" : editProduct[field]}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (["name", "category"].includes(field)) {
+                    setEditProduct({ ...editProduct, [field]: value });
+                  } else if (/^\d*\.?\d*$/.test(value)) {
+                    setEditProduct({ ...editProduct, [field]: value });
+                  }
+                }}
+                className="w-full border border-gray-200 sm:border-gray-300 px-2 py-1.5 sm:px-3 sm:py-2 rounded text-xs sm:text-base"
+                disabled={
+                  role === "staff" &&
+                  !["name", "category", "delivered", "waste", "use", "withdrawal"].includes(field)
                 }
-              }}
-              className="w-full border border-gray-200 sm:border-gray-300 px-2 py-1.5 sm:px-3 sm:py-2 rounded text-xs sm:text-base"
-              disabled={
-                role === "staff" &&
-                !["name", "category", "delivered", "waste", "use", "withdrawal"].includes(field)
-              }
-            />
+              />
+            )}
           </div>
         ))}
       </div>
@@ -650,6 +682,26 @@ const BranchInventory = ({ branchName }) => {
                   className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
                 >
                   Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Stock Warning Modal */}
+        {showStockWarning && (
+          <div className="fixed inset-0 flex items-center justify-center bg-black/30 backdrop-blur-sm z-50 p-4">
+            <div className="bg-white rounded-lg p-6 w-full max-w-sm text-center">
+              <h2 className="text-lg font-semibold mb-4 text-red-600">Insufficient Stock</h2>
+              <p className="mb-4 text-gray-600">
+                You do not have enough stock to use. Please check your Inventory.
+              </p>
+              <div className="flex justify-center">
+                <button
+                  onClick={() => setShowStockWarning(false)}
+                  className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600"
+                >
+                  OK
                 </button>
               </div>
             </div>
