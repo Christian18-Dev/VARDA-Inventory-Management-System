@@ -4,6 +4,25 @@ const jwt = require('jsonwebtoken');
 
 const router = express.Router();
 
+// Helper function to get date and time in Philippines timezone (GMT+8)
+const getPhilippinesDateTime = () => {
+  const options = { 
+    timeZone: 'Asia/Manila'
+  };
+  
+  const now = new Date();
+  
+  // Format date as MM/DD/YYYY
+  const dateOptions = { ...options, month: 'numeric', day: 'numeric', year: 'numeric' };
+  const today = now.toLocaleDateString('en-US', dateOptions);
+  
+  // Format time as HH:MM:SS AM/PM
+  const timeOptions = { ...options, hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: true };
+  const time = now.toLocaleTimeString('en-US', timeOptions);
+  
+  return { today, time };
+};
+
 // Middleware to verify JWT token
 const verifyToken = (req, res, next) => {
   const token = req.header('Authorization');
@@ -30,7 +49,7 @@ const verifyToken = (req, res, next) => {
 router.get('/today/:username', verifyToken, async (req, res) => {
   try {
     const { username } = req.params;
-    const today = new Date().toLocaleDateString();
+    const { today } = getPhilippinesDateTime();
     
     const dtr = await DTR.findOne({ username, date: today });
     if (!dtr) {
@@ -48,8 +67,7 @@ router.get('/today/:username', verifyToken, async (req, res) => {
 router.post('/time-in', verifyToken, async (req, res) => {
   try {
     const { username, role, selfieIn } = req.body;
-    const today = new Date().toLocaleDateString();
-    const timeIn = new Date().toLocaleTimeString();
+    const { today, time: timeIn } = getPhilippinesDateTime();
 
     // Check if user already has a time-in for today
     const existingDTR = await DTR.findOne({ 
@@ -83,8 +101,7 @@ router.post('/time-in', verifyToken, async (req, res) => {
 router.post('/time-out', verifyToken, async (req, res) => {
   try {
     const { username, selfieOut } = req.body;
-    const today = new Date().toLocaleDateString();
-    const timeOut = new Date().toLocaleTimeString();
+    const { today, time: timeOut } = getPhilippinesDateTime();
 
     const dtr = await DTR.findOneAndUpdate(
       { 
