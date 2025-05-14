@@ -26,6 +26,7 @@ const BranchInventory = ({ branchName }) => {
     current: 0,
   });
   const [editProduct, setEditProduct] = useState(null);
+  const [endInventory, setEndInventory] = useState("");
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showSubmitConfirm, setShowSubmitConfirm] = useState(false);
@@ -59,6 +60,45 @@ const BranchInventory = ({ branchName }) => {
     };
     getProducts();
   }, [branchName]);
+
+  // Calculate use based on beginning inventory and end inventory
+  const calculateUse = (begInv, deliveredItems, wasteItems, withdrawalItems, endInv) => {
+    // Parse values to ensure they're numbers
+    const beginning = parseFloat(begInv) || 0;
+    const delivered = parseFloat(deliveredItems) || 0;
+    const waste = parseFloat(wasteItems) || 0;
+    const withdrawal = parseFloat(withdrawalItems) || 0;
+    const ending = parseFloat(endInv) || 0;
+
+    // Calculate total available stock
+    const availableStock = beginning + delivered - waste - withdrawal;
+    
+    // Calculate use (what was consumed)
+    const useAmount = availableStock - ending;
+    
+    // Ensure use is not negative
+    return Math.max(useAmount, 0);
+  };
+
+  // Update use value when end inventory changes
+  const handleEndInventoryChange = (value) => {
+    setEndInventory(value);
+    
+    if (editProduct) {
+      const use = calculateUse(
+        editProduct.begInventory,
+        editProduct.delivered,
+        editProduct.waste,
+        editProduct.withdrawal,
+        value
+      );
+      
+      setEditProduct({
+        ...editProduct,
+        use: use
+      });
+    }
+  };
 
   // Filter products based on search query
   const filteredProducts = products.filter(
@@ -233,15 +273,13 @@ const BranchInventory = ({ branchName }) => {
   };
   
   const handleUpdateProduct = async () => {
-    const currentUseValue = editProduct.use || 0;
-  
     const parsedProduct = {
       ...editProduct,
       price: parseFloat(editProduct.price) || 0,
       begInventory: role === "admin" ? parseFloat(editProduct.begInventory) || 0 : editProduct.begInventory,
       delivered: parseFloat(editProduct.delivered) || 0,
       waste: role === "admin" ? parseFloat(editProduct.waste) || 0 : editProduct.waste,
-      use: role === "admin" ? parseFloat(editProduct.use) || currentUseValue : currentUseValue,
+      use: parseFloat(editProduct.use) || 0, // Use is now calculated from end inventory
       withdrawal: role === "admin" ? parseFloat(editProduct.withdrawal) || 0 : editProduct.withdrawal,
     };
   
@@ -263,19 +301,9 @@ const BranchInventory = ({ branchName }) => {
         setProducts((prev) => prev.map((p) => (p._id === updated._id ? updated : p)));
         setShowEditModal(false);
         setEditProduct(null);
+        setEndInventory("");
   
-        await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/activitylogs/log`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            username: localStorage.getItem("username") || "Unknown User",
-            role: role,
-            action: `Updated the product ${updatedProduct.name} from the inventory at ${branchName}`,
-            branch: branchName,
-          }),
-        });
+        await logActivity(`Updated the product ${updatedProduct.name} from the inventory at ${branchName}`);
       }
     } catch (err) {
       console.error("Update error:", err);
@@ -327,6 +355,14 @@ const BranchInventory = ({ branchName }) => {
     }
   };
   
+  // When opening edit modal, initialize the end inventory based on current values
+  const openEditModal = (product) => {
+    setEditProduct(product);
+    // Calculate what the end inventory should be based on current values
+    const endInv = product.begInventory + product.delivered - product.waste - product.use - product.withdrawal;
+    setEndInventory(Math.max(endInv, 0));
+    setShowEditModal(true);
+  };
 
   if (!role) return null;
 
@@ -457,8 +493,7 @@ const BranchInventory = ({ branchName }) => {
                         <button
                           className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg shadow-md transition duration-150"
                           onClick={() => {
-                            setEditProduct(product);
-                            setShowEditModal(true);
+                            openEditModal(product);
                           }}
                         >
                           Edit
@@ -601,8 +636,9 @@ const BranchInventory = ({ branchName }) => {
           "name",
           "category",
           ...(role === "admin"
-            ? ["price", "begInventory", "delivered", "waste", "use", "withdrawal"]
-            : ["price", "delivered", "waste", "use", "withdrawal"]),
+            ? ["price", "begInventory", "delivered", "waste", "endInventory", "withdrawal"]
+            : ["price", "delivered", "waste", "endInventory", "withdrawal"]),
+          "use"
         ].map((field) => (
           <div key={field}>
             <label className="block text-xs sm:text-sm font-medium text-gray-600 capitalize">
@@ -621,6 +657,19 @@ const BranchInventory = ({ branchName }) => {
                   </option>
                 ))}
               </select>
+            ) : field === "endInventory" ? (
+              <input
+                type="number"
+                value={endInventory === 0 ? "" : endInventory}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (/^\d*\.?\d*$/.test(value)) {
+                    handleEndInventoryChange(value);
+                  }
+                }}
+                className="w-full border border-gray-200 sm:border-gray-300 px-2 py-1.5 sm:px-3 sm:py-2 rounded text-xs sm:text-base"
+                disabled={role === "staff" && !["name", "category", "delivered", "waste", "endInventory", "withdrawal"].includes(field)}
+              />
             ) : (
               <input
                 type={["price", "begInventory", "delivered", "waste", "use", "withdrawal"].includes(field)
@@ -637,8 +686,8 @@ const BranchInventory = ({ branchName }) => {
                 }}
                 className="w-full border border-gray-200 sm:border-gray-300 px-2 py-1.5 sm:px-3 sm:py-2 rounded text-xs sm:text-base"
                 disabled={
-                  role === "staff" &&
-                  !["name", "category", "delivered", "waste", "use", "withdrawal"].includes(field)
+                  field === "use" || (role === "staff" &&
+                  !["name", "category", "delivered", "waste", "withdrawal"].includes(field))
                 }
               />
             )}
