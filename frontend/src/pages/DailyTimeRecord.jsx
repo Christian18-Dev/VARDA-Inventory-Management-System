@@ -37,7 +37,7 @@ export default function DailyTimeRecord() {
     }
     const selfieIn = captureImage();
     try {
-      const res = await axios.post('${import.meta.env.VITE_API_BASE_URL}/api/DTR/time-in', {
+      const res = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/DTR/time-in`, {
         username: userData.username,
         role: userData.role,
         selfieIn,
@@ -65,7 +65,7 @@ export default function DailyTimeRecord() {
     }
     const selfieOut = captureImage();
     try {
-      const res = await axios.post('${import.meta.env.VITE_API_BASE_URL}/api/DTR/time-out', {
+      const res = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/DTR/time-out`, {
         username: userData.username,
         selfieOut,
       }, {
