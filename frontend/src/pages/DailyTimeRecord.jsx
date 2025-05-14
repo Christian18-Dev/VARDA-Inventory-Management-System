@@ -3,6 +3,7 @@ import Webcam from 'react-webcam';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export default function DailyTimeRecord() {
   const webcamRef = useRef(null);
@@ -36,7 +37,7 @@ export default function DailyTimeRecord() {
     }
     const selfieIn = captureImage();
     try {
-      const res = await axios.post('http://localhost:10000/api/DTR/time-in', {
+      const res = await axios.post('${import.meta.env.VITE_API_BASE_URL}/api/DTR/time-in', {
         username: userData.username,
         role: userData.role,
         selfieIn,
@@ -64,7 +65,7 @@ export default function DailyTimeRecord() {
     }
     const selfieOut = captureImage();
     try {
-      const res = await axios.post('http://localhost:10000/api/DTR/time-out', {
+      const res = await axios.post('${import.meta.env.VITE_API_BASE_URL}/api/DTR/time-out', {
         username: userData.username,
         selfieOut,
       }, {
