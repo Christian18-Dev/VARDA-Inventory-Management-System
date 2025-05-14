@@ -22,7 +22,6 @@ import STJudeManilaVardaBurgerInventory from "./pages/inventory/STJude/STJudeMan
 import UserManagement from "./pages/UserManagement";
 import History from "./pages/History";
 import ActivityLog from "./pages/ActivityLog";
-import DailyTimeRecord from "./pages/DailyTimeRecord";
 
 // ✅ PrivateRoute to Protect Routes
 const PrivateRoute = ({ element }) => {
@@ -57,7 +56,6 @@ function App() {
         <Route path="/inventory/st-jude-manila-varda-burger" element={<PrivateRoute element={<STJudeManilaVardaBurgerInventory />}  />} />
         <Route path="/history" element={<History />} />
         <Route path="/activitylogs" element={<ActivityLog />} />
-        <Route path="/DailyTimeRecord" element={<DailyTimeRecord />} />
 
       </Routes>
     </Router>
