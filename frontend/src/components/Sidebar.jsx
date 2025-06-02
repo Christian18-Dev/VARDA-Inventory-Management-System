@@ -50,6 +50,9 @@ const Sidebar = () => {
       { label: "CHKN CHOP", path: "/inventory/mapua-makati-chkn-chop", roleMatch: "MAPUAMakati-ChknChop"},
       { label: "VARDA BURGER", path: "/inventory/mapua-makati-varda-burger", roleMatch: "MAPUAMakati-VardaBurger"},
     ],
+    "ADMU": [
+      { label: "VARDA BURGER", path: "/inventory/admu-varda-burger", roleMatch: "ADMU-VardaBurger"},
+    ],
     "ST Jude Manila": [
       { label: "CHKN CHOP", path: "/inventory/st-jude-manila-chkn-chop", roleMatch: "STJudeManila-ChknChop"},
       { label: "VARDA BURGER", path: "/inventory/st-jude-manila-varda-burger", roleMatch: "STJudeManila-VardaBurger"},

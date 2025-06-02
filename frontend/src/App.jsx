@@ -1,6 +1,7 @@
 import { HashRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
+import DailyTimeRecord from "./pages/DailyTimeRecord";
 import LagunaCHKNChopInventory from "./pages/inventory/Laguna/LagunaCHKNChop";
 import LagunaVardaBurgerInventory from "./pages/inventory/Laguna/LagunaVardaBurger";
 import LagunaTheGoodJuiceInventory from "./pages/inventory/Laguna/LagunaTheGoodJuice";
@@ -19,6 +20,7 @@ import MAPUAMakatiVardaBurgerInventory from "./pages/inventory/MAPUA/MAPUAMakati
 import MAPUAMakatiCHKNChopInventory from "./pages/inventory/MAPUA/MAPUAMakatiCHKNChop";
 import STJudeManilaCHKNChopInventory from "./pages/inventory/STJude/STJudeManilaCHKNChop";
 import STJudeManilaVardaBurgerInventory from "./pages/inventory/STJude/STJudeManilaVardaBurger";
+import ADMUVardaBurgerInventory from "./pages/inventory/ADMU/ADMUVardaBurger";
 import UserManagement from "./pages/UserManagement";
 import History from "./pages/History";
 import ActivityLog from "./pages/ActivityLog";
@@ -36,6 +38,7 @@ function App() {
         <Route path="/" element={<Login />} />
         <Route path="/dashboard" element={<PrivateRoute element={<Dashboard />} />} />
         <Route path="/users" element={<PrivateRoute element={<UserManagement />} />} />
+        <Route path="/DailyTimeRecord" element={<PrivateRoute element={<DailyTimeRecord />} />} />
         <Route path="/inventory/laguna-chkn-chop" element={<PrivateRoute element={<LagunaCHKNChopInventory />}  />} />
         <Route path="/inventory/laguna-varda-burger" element={<PrivateRoute element={<LagunaVardaBurgerInventory />}  />} />
         <Route path="/inventory/laguna-the-good-juice" element={<PrivateRoute element={<LagunaTheGoodJuiceInventory />}  />} />
@@ -54,9 +57,9 @@ function App() {
         <Route path="/inventory/mapua-makati-chkn-chop" element={<PrivateRoute element={<MAPUAMakatiCHKNChopInventory />}  />} />
         <Route path="/inventory/st-jude-manila-chkn-chop" element={<PrivateRoute element={<STJudeManilaCHKNChopInventory />}  />} />
         <Route path="/inventory/st-jude-manila-varda-burger" element={<PrivateRoute element={<STJudeManilaVardaBurgerInventory />}  />} />
+        <Route path="/inventory/admu-varda-burger" element={<PrivateRoute element={<ADMUVardaBurgerInventory />}  />} />
         <Route path="/history" element={<History />} />
         <Route path="/activitylogs" element={<ActivityLog />} />
-
       </Routes>
     </Router>
   );
