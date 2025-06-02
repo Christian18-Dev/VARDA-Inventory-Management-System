@@ -386,6 +386,10 @@ const UserManagement = () => {
                   <option value="Staff-STJudeManila-ChknChop">Staff-STJudeManila-ChknChop</option>
                   <option value="Manager-STJudeManila-VardaBurger">Manager-STJudeManila-VardaBurger</option>
                   <option value="Staff-STJudeManila-VardaBurger">Staff-STJudeManila-VardaBurger</option>
+
+                  {/* ADMU BRANCH */}
+                  <option value="Manager-ADMU-VardaBurger">Manager-ADMU-VardaBurger</option>
+                  <option value="Staff-ADMU-VardaBurger">Staff-ADMU-VardaBurger</option>
                   
                 </select>
                 <div className="flex justify-end">

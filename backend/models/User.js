@@ -12,12 +12,14 @@ const UserSchema = new mongoose.Schema({
                 "Manager-Lipa-Bread", "Manager-PUPMain-ChknChop", "Manager-PUPMain-VardaBurger", "Manager-PUPMain", 
                 "Manager-MAPUAIntramuros-VardaBurger", "Manager-MAPUAIntramuros-TheGoodJuice", "Manager-MAPUAMakati-ChknChop", 
                 "Manager-MAPUAMakati-VardaBurger", "Manager-STJudeManila-ChknChop", "Manager-STJudeManila-VardaBurger",
+                "Manager-ADMU-VardaBurger",
                 "Staff-Laguna-ChknChop", "Staff-Laguna-VardaBurger", "Staff-Laguna-TheGoodJuice", "Staff-Laguna-TheGoodNoodleBar",
                 "Staff-Lipa-ChknChop", "Staff-Lipa-VardaBurger", "Staff-Lipa-Silog", "Staff-Lipa-NRB", "Staff-Lipa-Beverage", "Staff-Lipa-Bread",
                 "Staff-PUPMain-ChknChop", "Staff-PUPMain-VardaBurger", "Staff-PUPMain",
                 "Staff-MAPUAIntramuros-VardaBurger", "Staff-MAPUAIntramuros-TheGoodJuice",
                 "Staff-MAPUAMakati-ChknChop", "Staff-MAPUAMakati-VardaBurger",
                 "Staff-STJudeManila-ChknChop", "Staff-STJudeManila-VardaBurger",
+                "Staff-ADMU-VardaBurger"
               ], 
         default: "User" 
     }

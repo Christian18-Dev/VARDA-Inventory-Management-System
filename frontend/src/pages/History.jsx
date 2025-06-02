@@ -56,6 +56,12 @@ const regions = [
       "ST JUDE MANILA VARDA BURGER",
     ]
   },
+  {
+    name: "ADMU",
+    branches: [
+      "ADMU VARDA BURGER"
+    ]
+  }
 ];
 
 const allBranches = regions.flatMap(region => region.branches);
@@ -73,17 +79,18 @@ const getLocationFromRole = (role) => {
     "PUPMain": "PUP MAIN BRANCH",
     "MAPUAIntramuros": "MAPUA INTRAMUROS",
     "MAPUAMakati": "MAPUA MAKATI",
-    "STJudeManila": "ST JUDE MANILA"
+    "STJudeManila": "ST JUDE MANILA",
+    "ADMU": "ADMU"
   };
   
   const roleRegion = parts[1];
   const displayRegion = regionMap[roleRegion] || roleRegion.toUpperCase();
   
-  // For PUPMain role (no specific branch), return the region but no specific branch
+  // Special case for PUPMain role (no specific branch)
   if (roleRegion === "PUPMain" && parts.length === 2) {
     return { 
       region: displayRegion,
-      branch: "" // Empty branch means they can choose between both
+      branch: "" // Empty branch means they can see both
     };
   }
   
@@ -102,6 +109,14 @@ const getLocationFromRole = (role) => {
   const roleBranchType = parts.slice(2).join(""); // Join remaining parts
   const displayBranchType = branchTypeMap[roleBranchType] || 
                           roleBranchType.replace(/([A-Z])/g, " $1").trim().toUpperCase();
+  
+  // For ADMU, we only have VARDA BURGER
+  if (roleRegion === "ADMU") {
+    return {
+      region: "ADMU",
+      branch: "ADMU VARDA BURGER"
+    };
+  }
   
   const branch = `${displayRegion} ${displayBranchType}`;
   
