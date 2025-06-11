@@ -131,7 +131,7 @@ const UserManagement = () => {
 
       const url = isEditing
         ? `${baseUrl}/api/auth/users/${selectedUserId}`
-        : `${baseUrl}/api/auth/register`;
+        : `${baseUrl}/api/auth/users`;
 
       const method = isEditing ? "PUT" : "POST";
 

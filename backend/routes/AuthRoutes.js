@@ -36,42 +36,6 @@ const verifyToken = (req, res, next) => {
   };
   
 
-// Register Route
-router.post("/register", async (req, res) => {
-  console.log("🔹 Register endpoint hit");
-
-  const { username, password } = req.body;
-
-  if (!username || !password) {
-      return res.status(400).json({ error: "Username and password are required" });
-  }
-
-  try {
-      const existingUser = await User.findOne({ username });
-      if (existingUser) {
-          console.log("❌ User already exists:", username);
-          return res.status(400).json({ error: "User already exists" });
-      }
-
-      const hashedPassword = await bcrypt.hash(password, 10);
-      // Force role to be "User" for all new registrations
-      const newUser = new User({ 
-          username, 
-          password: hashedPassword, 
-          role: "User" // Override any role provided in request
-      });
-
-      await newUser.save();
-      console.log("✅ User registered:", username, "Role:", newUser.role);
-
-      // ✅ Send the created user in the response
-      res.status(201).json({ message: "User registered successfully", newUser });
-  } catch (error) {
-      console.error("❌ Error registering user:", error);
-      res.status(500).json({ error: "Error registering user" });
-  }
-});
-
 // Login Route
 router.post("/login", async (req, res) => {
   console.log("🔹 Login endpoint hit"); // Check if this is logged
@@ -167,6 +131,37 @@ router.delete("/users/:id", verifyToken, async (req, res) => {
   } catch (error) {
       console.error("❌ Error deleting user:", error);
       res.status(500).json({ error: "Server error" });
+  }
+});
+
+// ✅ Create new user (Admin only)
+router.post("/users", verifyToken, async (req, res) => {
+  try {
+    if (req.user.role !== "Admin") {
+      return res.status(403).json({ error: "Access denied" });
+    }
+
+    const { username, password, role } = req.body;
+
+    if (!username || !password || !role) {
+      return res.status(400).json({ error: "Username, password and role are required" });
+    }
+
+    const existingUser = await User.findOne({ username });
+    if (existingUser) {
+      return res.status(400).json({ error: "User already exists" });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const newUser = new User({ username, password: hashedPassword, role });
+
+    await newUser.save();
+    console.log("✅ Admin created new user:", username, "Role:", role);
+
+    res.status(201).json({ message: "User created successfully", user: newUser });
+  } catch (error) {
+    console.error("❌ Error creating user:", error);
+    res.status(500).json({ error: "Error creating user" });
   }
 });
 
