@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Logo from "../assets/vardanewlogo.png";
 import '../Login.css'
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const LoginForm = () => {
   const navigate = useNavigate();
@@ -18,7 +19,7 @@ const LoginForm = () => {
     setLoading(true);
   
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/auth/login`, {
+      const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, password }),
@@ -32,7 +33,7 @@ const LoginForm = () => {
       localStorage.setItem("role", data.role);
       localStorage.setItem("username", username);
   
-      await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/activitylogs/log`, {
+      await fetch(`${API_BASE_URL}/api/activitylogs/log`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

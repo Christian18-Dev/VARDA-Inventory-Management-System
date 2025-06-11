@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import Sidebar from "../components/Sidebar";
 import Navbar from "../components/Navbar";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const UserManagement = () => {
   const [users, setUsers] = useState([]);
@@ -29,7 +30,7 @@ const UserManagement = () => {
   const fetchUsers = async () => {
     try {
       const token = localStorage.getItem("token");
-      const baseUrl = import.meta.env.VITE_API_BASE_URL.replace(/\/$/, "");
+      const baseUrl = API_BASE_URL.replace(/\/$/, "");
 
       const response = await fetch(`${baseUrl}/api/auth/users`, {
         headers: { Authorization: `Bearer ${token}` },
@@ -126,7 +127,7 @@ const UserManagement = () => {
 
     try {
       const token = localStorage.getItem("token");
-      const baseUrl = import.meta.env.VITE_API_BASE_URL.replace(/\/$/, "");
+      const baseUrl = API_BASE_URL.replace(/\/$/, "");
 
       const url = isEditing
         ? `${baseUrl}/api/auth/users/${selectedUserId}`
@@ -267,7 +268,7 @@ const UserManagement = () => {
                     onClick={async () => {
                       try {
                         const token = localStorage.getItem("token");
-                        const baseUrl = import.meta.env.VITE_API_BASE_URL.replace(/\/$/, "");
+                        const baseUrl = API_BASE_URL.replace(/\/$/, "");
 
                         const response = await fetch(`${baseUrl}/api/auth/users/${userToDelete._id}`, {
                           method: "DELETE",

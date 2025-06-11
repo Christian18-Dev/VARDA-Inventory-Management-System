@@ -25,7 +25,9 @@ const allowedOrigins = [
   "https://christian18-dev.github.io",
   "https://vardafoodgroup.com",
   "https://www.vardafoodgroup.com", 
-  "http://localhost:3001"
+  "http://localhost:3001",
+  "http://localhost:5173",  // Vite's default development port
+  "http://127.0.0.1:5173"  // Alternative localhost
 ];
 
 
@@ -34,7 +36,12 @@ app.use(express.json());
 app.use(
   cors({
     origin: (origin, callback) => {
-      if (!origin || allowedOrigins.includes(origin)) {
+      // Allow requests with no origin (like mobile apps or curl requests)
+      if (!origin) {
+        return callback(null, true);
+      }
+      
+      if (allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
         console.warn(`❌ Blocked CORS request from: ${origin}`);

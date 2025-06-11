@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import Sidebar from "../components/Sidebar";
 import Navbar from "../components/Navbar";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const ActivityLog = () => {
   const [logs, setLogs] = useState([]);
@@ -30,7 +31,7 @@ const ActivityLog = () => {
 
   const fetchLogs = async () => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/activitylogs`);
+      const response = await fetch(`${API_BASE_URL}/api/activitylogs`);
       if (!response.ok) throw new Error("Failed to fetch logs");
       const data = await response.json();
       setLogs(data);
@@ -45,7 +46,7 @@ const ActivityLog = () => {
 
   const confirmClearLogs = async () => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/activitylogs/clear`, {
+      const response = await fetch(`${API_BASE_URL}/api/activitylogs/clear`, {
         method: "DELETE",
       });
 

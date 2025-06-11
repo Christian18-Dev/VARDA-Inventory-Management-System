@@ -11,6 +11,7 @@ import {
   LinearScale,
 } from "chart.js";
 import { motion } from "framer-motion";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 ChartJS.register(ArcElement, Tooltip, Legend, BarElement, CategoryScale, LinearScale);
 
@@ -198,7 +199,7 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchRecentActivity = async () => {
       const data = await fetchWithErrorHandling(
-        `${import.meta.env.VITE_API_BASE_URL}/api/activitylogs`
+        `${API_BASE_URL}/api/activitylogs`
       );
       if (data) setRecentActivity(data.slice(0, 7));
     };
@@ -229,16 +230,16 @@ const Dashboard = () => {
         // Fetch all data in parallel
         const [highData, lowData, categoryData, graphData] = await Promise.all([
           fetchWithErrorHandling(
-            `${import.meta.env.VITE_API_BASE_URL}/api/dashboard/highest-inventory-items?${params}`
+            `${API_BASE_URL}/api/dashboard/highest-inventory-items?${params}`
           ),
           fetchWithErrorHandling(
-            `${import.meta.env.VITE_API_BASE_URL}/api/dashboard/lowest-inventory-items?${params}`
+            `${API_BASE_URL}/api/dashboard/lowest-inventory-items?${params}`
           ),
           fetchWithErrorHandling(
-            `${import.meta.env.VITE_API_BASE_URL}/api/dashboard/category-distribution?${params}`
+            `${API_BASE_URL}/api/dashboard/category-distribution?${params}`
           ),
           fetchWithErrorHandling(
-            `${import.meta.env.VITE_API_BASE_URL}/api/dashboard/inventory-data?${params}&limit=50`
+            `${API_BASE_URL}/api/dashboard/inventory-data?${params}&limit=50`
           )
         ]);
 

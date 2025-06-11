@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Menu, X, ChevronDown, ChevronUp, LogOut } from "lucide-react";
 import '../index.css'
 import logo from "../assets/vardanewlogo.png";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const Sidebar = () => {
   const location = useLocation();
@@ -108,7 +109,7 @@ const Sidebar = () => {
     const role = localStorage.getItem("role");
 
     try {
-      await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/activitylogs/log`, {
+      await fetch(`${API_BASE_URL}/api/activitylogs/log`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

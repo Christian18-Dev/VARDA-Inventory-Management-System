@@ -86,7 +86,7 @@ const BranchInventory = ({ branchName }) => {
 
   const logActivity = async (action, details = {}) => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/activitylogs/log`, {
+      const response = await fetch(`${API_BASE_URL}/api/activitylogs/log`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -128,7 +128,7 @@ const BranchInventory = ({ branchName }) => {
 
     try {
       // 1. Save current inventory to history
-      const baseUrl = import.meta.env.VITE_API_BASE_URL.replace(/\/$/, "");
+      const baseUrl = API_BASE_URL.replace(/\/$/, "");
       const saveHistoryResponse = await fetch(`${baseUrl}/api/history/save`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -230,7 +230,7 @@ const BranchInventory = ({ branchName }) => {
         });
         setShowAddModal(false);
   
-        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/activitylogs/log`, {
+        const response = await fetch(`${API_BASE_URL}/api/activitylogs/log`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -287,7 +287,7 @@ const BranchInventory = ({ branchName }) => {
         setShowEditModal(false);
         setEditProduct(null);
   
-        await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/activitylogs/log`, {
+        await fetch(`${API_BASE_URL}/api/activitylogs/log`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -331,7 +331,7 @@ const BranchInventory = ({ branchName }) => {
       setShowDeleteConfirm(false);
       setProductToDelete(null);
   
-      await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/activitylogs/log`, {
+      await fetch(`${API_BASE_URL}/api/activitylogs/log`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

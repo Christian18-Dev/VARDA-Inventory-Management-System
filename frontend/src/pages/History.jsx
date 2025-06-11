@@ -6,6 +6,7 @@ import { saveAs } from "file-saver";
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import PDFDocument from "../components/PDFDocument";
 import { motion } from "framer-motion";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const regions = [
   {
@@ -195,7 +196,7 @@ useEffect(() => {
     console.log("🔍 Fetching history for:", branchKey);
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/history/${branchKey}`);
+      const response = await fetch(`${API_BASE_URL}/api/history/${branchKey}`);
       if (!response.ok) throw new Error("Failed to fetch history");
       const data = await response.json();
       setHistoryData(data);
