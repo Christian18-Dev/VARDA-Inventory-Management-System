@@ -40,7 +40,7 @@ const verifyToken = (req, res, next) => {
 router.post("/register", async (req, res) => {
   console.log("🔹 Register endpoint hit");
 
-  const { username, password, role } = req.body;
+  const { username, password } = req.body;
 
   if (!username || !password) {
       return res.status(400).json({ error: "Username and password are required" });
@@ -54,7 +54,12 @@ router.post("/register", async (req, res) => {
       }
 
       const hashedPassword = await bcrypt.hash(password, 10);
-      const newUser = new User({ username, password: hashedPassword, role });
+      // Force role to be "User" for all new registrations
+      const newUser = new User({ 
+          username, 
+          password: hashedPassword, 
+          role: "User" // Override any role provided in request
+      });
 
       await newUser.save();
       console.log("✅ User registered:", username, "Role:", newUser.role);
